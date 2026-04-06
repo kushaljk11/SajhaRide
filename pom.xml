@@ -10,6 +10,7 @@
     <name>MyRideRental</name>
     <packaging>war</packaging>
 
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>25</maven.compiler.target>
@@ -36,7 +37,13 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
