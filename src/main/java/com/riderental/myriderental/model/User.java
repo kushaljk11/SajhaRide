@@ -9,40 +9,32 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-    private String role;
     private String address;
-    private String profileImage;
-
-    // Trust Score fields (optional but useful)
-    private int totalBookings;
-    private int completedBookings;
-    private int cancelledBookings;
+    private String profileImagePath;
+    private String role;
     private double trustScore;
-
-    // Account status
     private String accountStatus;
 
-    // timestamps
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    // Default constructor
     public User() {
     }
 
-    // Parameterized constructor
-    public User(int userId, String fullName, String email, String password,
-                String phoneNumber, String role, String address) {
+    public User(int userId, String fullName, String email, String password, String phoneNumber,
+                String address, String profileImagePath, String role, double trustScore,
+                String accountStatus, LocalDateTime createdAt) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.role = role;
         this.address = address;
+        this.profileImagePath = profileImagePath;
+        this.role = role;
+        this.trustScore = trustScore;
+        this.accountStatus = accountStatus;
+        this.createdAt = createdAt;
     }
-
-    // Getters and Setters
 
     public int getUserId() {
         return userId;
@@ -84,14 +76,6 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getAddress() {
         return address;
     }
@@ -100,36 +84,20 @@ public class User {
         this.address = address;
     }
 
-    public String getProfileImage() {
-        return profileImage;
+    public String getProfileImagePath() {
+        return profileImagePath;
     }
 
-    public void setProfileImage(String profileImage) {
-        this.profileImage = profileImage;
+    public void setProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
     }
 
-    public int getTotalBookings() {
-        return totalBookings;
+    public String getRole() {
+        return role;
     }
 
-    public void setTotalBookings(int totalBookings) {
-        this.totalBookings = totalBookings;
-    }
-
-    public int getCompletedBookings() {
-        return completedBookings;
-    }
-
-    public void setCompletedBookings(int completedBookings) {
-        this.completedBookings = completedBookings;
-    }
-
-    public int getCancelledBookings() {
-        return cancelledBookings;
-    }
-
-    public void setCancelledBookings(int cancelledBookings) {
-        this.cancelledBookings = cancelledBookings;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public double getTrustScore() {
@@ -154,13 +122,5 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

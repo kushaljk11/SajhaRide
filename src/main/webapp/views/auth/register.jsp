@@ -1,4 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%
+    String fullNameValue = request.getParameter("fullName") == null ? "" : request.getParameter("fullName");
+    String emailValue = request.getParameter("email") == null ? "" : request.getParameter("email");
+    String phoneNumberValue = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber");
+    String addressValue = request.getParameter("address") == null ? "" : request.getParameter("address");
+%>
 <html>
 <head>
     <title>SajhaRide - Register</title>
@@ -9,7 +15,7 @@
 <div class="w-full flex flex-col md:flex-row min-h-screen">
 
     <div class="hidden md:flex md:w-1/2 relative bg-cover bg-center"
-         style="background-image: url('../../images/login.png');">
+         style="background-image: url('../../images/register.png');">
         <div class="absolute inset-0 bg-gradient-to-br from-red-900/70 via-black/50 to-black/30 flex items-end p-10">
             <div>
                 <span class="inline-block bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
@@ -38,6 +44,7 @@
                             id="fullName"
                             type="text"
                             name="fullName"
+                            value="<%= fullNameValue %>"
                             required
                             placeholder="Enter your full name"
                             class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
@@ -51,6 +58,7 @@
                                 id="email"
                                 type="email"
                                 name="email"
+                                value="<%= emailValue %>"
                                 required
                                 placeholder="name@example.com"
                                 class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
@@ -63,6 +71,7 @@
                                 id="phoneNumber"
                                 type="tel"
                                 name="phoneNumber"
+                                value="<%= phoneNumberValue %>"
                                 required
                                 placeholder="98XXXXXXXX"
                                 class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
@@ -82,33 +91,20 @@
                     />
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                        <select
-                                id="role"
-                                name="role"
-                                required
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
-                        >
-                            <option value="">Select role</option>
-                            <option value="USER">User</option>
-                            <option value="DRIVER">Driver</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                        <input
-                                id="address"
-                                type="text"
-                                name="address"
-                                required
-                                placeholder="Enter your address"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
-                        />
-                    </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                    <input
+                            id="address"
+                            type="text"
+                            name="address"
+                            value="<%= addressValue %>"
+                            required
+                            placeholder="Enter your address"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
+                    />
                 </div>
+
+                <input type="hidden" name="role" value="USER" />
 
                 <div>
                     <label for="profileImage" class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
