@@ -6,7 +6,7 @@ public class RegisterDto {
     private String password;
     private String phoneNumber;
     private String address;
-    private String role; // optional; default handled in DB
+    private String role;
 
     public RegisterDto() {
     }

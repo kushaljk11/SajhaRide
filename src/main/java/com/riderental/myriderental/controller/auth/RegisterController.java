@@ -31,8 +31,7 @@ public class RegisterController extends HttpServlet {
         String password = request.getParameter("password");
         String phoneNumber = request.getParameter("phoneNumber");
         String address = request.getParameter("address");
-        String role = "USER";
-
+        String role = request.getParameter("role") != null ? request.getParameter("role") : "USER";
         if (ValidationUtil.isBlank(fullName) || ValidationUtil.isBlank(email)
                 || ValidationUtil.isBlank(password) || ValidationUtil.isBlank(phoneNumber)
                 || ValidationUtil.isBlank(address)) {

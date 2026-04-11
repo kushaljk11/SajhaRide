@@ -42,7 +42,19 @@ public class LoginController extends HttpServlet {
             }
 
             request.getSession().setAttribute("loggedInUser", user);
-            response.sendRedirect(request.getContextPath() + "/profile");
+
+            String role = user.getRole();
+             switch (role) {
+                 case "ADMIN":
+                     response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                     break;
+                 case "OWNER" :
+                     response.sendRedirect(request.getContextPath() + "/owner/dashboard");
+                     break;
+                 case "RENTER" :
+                     response.sendRedirect(request.getContextPath() + "/render/dashboard");
+                     break;
+             }
         } catch (SQLException e) {
             throw new ServletException("Unable to login user", e);
         }

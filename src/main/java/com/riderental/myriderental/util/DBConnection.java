@@ -9,9 +9,9 @@ public class DBConnection {
 
     private static final String HOST = "localhost";
     private static final String PORT = "3306";
-    private static final String DB_NAME = "vehicle_rental";
+    private static final String DB_NAME = "sajharide";
     private static final String USER = "root";
-    private static final String PASSWORD = "";//Your Db Password
+    private static final String PASSWORD = "kushal6612";
 
     static {
         try {

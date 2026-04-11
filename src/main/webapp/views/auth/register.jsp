@@ -36,7 +36,8 @@
                 <p class="text-gray-500 text-center text-sm mt-1">Fill all details to create your account</p>
             </div>
 
-            <form action="${pageContext.request.contextPath}/register" method="post" enctype="multipart/form-data" class="space-y-5">
+            <form action="${pageContext.request.contextPath}/register" method="post" enctype="multipart/form-data"
+                  class="space-y-5">
 
                 <div>
                     <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -66,7 +67,8 @@
                     </div>
 
                     <div>
-                        <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-2">Phone
+                            Number</label>
                         <input
                                 id="phoneNumber"
                                 type="tel"
@@ -91,20 +93,42 @@
                     />
                 </div>
 
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                    <input
-                            id="address"
-                            type="text"
-                            name="address"
-                            value="<%= addressValue %>"
-                            required
-                            placeholder="Enter your address"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
-                    />
-                </div>
+                <div class="flex flex-col md:flex-row md:gap-4">
 
-                <input type="hidden" name="role" value="USER" />
+                    <!-- Address Field -->
+                    <div class="w-full">
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+                            Address
+                        </label>
+                        <input
+                                id="address"
+                                type="text"
+                                name="address"
+                                value="<%= addressValue %>"
+                                required
+                                placeholder="Enter your address"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
+                        />
+                    </div>
+
+                    <!-- Role Dropdown -->
+                    <div class="w-full">
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                            Select Role
+                        </label>
+                        <select
+                                name="role"
+                                id="role"
+                                required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-700"
+                        >
+                            <option value="">-- Select Role --</option>
+                            <option value="OWNER">Owner</option>
+                            <option value="RENTER">Renter</option>
+                        </select>
+                    </div>
+
+                </div>
 
                 <div>
                     <label for="profileImage" class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>

@@ -8,20 +8,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data access object for CRUD operations on the users table.
- */
 public class UserDAO {
 
+    // CREATE USER
     public User create(User user) throws SQLException {
         String sql = """
                 INSERT INTO users
-                (full_name, email, password, phone_number, address, profile_image_path, role, trust_score, account_status)
+                (fullName, email, password, phoneNumber, address, profileImagePath, role, trustScore, accountStatus)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getEmail());
@@ -41,17 +39,19 @@ public class UserDAO {
                 }
             }
 
-            // created_at is set by DB; fetch it back for completeness
             return findById(user.getUserId());
         }
     }
 
+    // FIND BY EMAIL
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM users WHERE email = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return map(rs);
@@ -61,12 +61,15 @@ public class UserDAO {
         return null;
     }
 
-    public User findById(int id) throws SQLException {
-        String sql = "SELECT * FROM users WHERE user_id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+    // FIND BY ID
+    public User findById(int userId) throws SQLException {
+        String sql = "SELECT * FROM users WHERE userId = ?";
 
-            stmt.setInt(1, id);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return map(rs);
@@ -76,31 +79,34 @@ public class UserDAO {
         return null;
     }
 
+    // FIND ALL USERS
     public List<User> findAll() throws SQLException {
-        String sql = "SELECT * FROM users ORDER BY created_at DESC";
+        String sql = "SELECT * FROM users ORDER BY createdAt DESC";
         List<User> users = new ArrayList<>();
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 users.add(map(rs));
             }
         }
+
         return users;
     }
 
+    // UPDATE FULL USER
     public boolean update(User user) throws SQLException {
         String sql = """
                 UPDATE users
-                SET full_name = ?, email = ?, password = ?, phone_number = ?, address = ?,
-                    profile_image_path = ?, role = ?, trust_score = ?, account_status = ?
-                WHERE user_id = ?
+                SET fullName = ?, email = ?, password = ?, phoneNumber = ?, address = ?,
+                    profileImagePath = ?, role = ?, trustScore = ?, accountStatus = ?
+                WHERE userId = ?
                 """;
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getEmail());
@@ -117,15 +123,16 @@ public class UserDAO {
         }
     }
 
+    // UPDATE PROFILE ONLY
     public boolean updateProfile(User user) throws SQLException {
         String sql = """
                 UPDATE users
-                SET full_name = ?, phone_number = ?, address = ?, profile_image_path = ?
-                WHERE user_id = ?
+                SET fullName = ?, phoneNumber = ?, address = ?, profileImagePath = ?
+                WHERE userId = ?
                 """;
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getPhoneNumber());
@@ -137,35 +144,40 @@ public class UserDAO {
         }
     }
 
+    // DELETE USER
     public boolean delete(int userId) throws SQLException {
-        String sql = "DELETE FROM users WHERE user_id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM users WHERE userId = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userId);
             return stmt.executeUpdate() > 0;
         }
     }
 
+    // MAP RESULT SET → USER OBJECT
     private User map(ResultSet rs) throws SQLException {
         User user = new User();
-        user.setUserId(rs.getInt("user_id"));
-        user.setFullName(rs.getString("full_name"));
+
+        user.setUserId(rs.getInt("userId"));
+        user.setFullName(rs.getString("fullName"));
         user.setEmail(rs.getString("email"));
         user.setPassword(rs.getString("password"));
-        user.setPhoneNumber(rs.getString("phone_number"));
+        user.setPhoneNumber(rs.getString("phoneNumber"));
         user.setAddress(rs.getString("address"));
-        user.setProfileImagePath(rs.getString("profile_image_path"));
+        user.setProfileImagePath(rs.getString("profileImagePath"));
         user.setRole(rs.getString("role"));
-        user.setTrustScore(rs.getDouble("trust_score"));
-        user.setAccountStatus(rs.getString("account_status"));
+        user.setTrustScore(rs.getDouble("trustScore"));
+        user.setAccountStatus(rs.getString("accountStatus"));
 
-        Timestamp createdAt = rs.getTimestamp("created_at");
-        if (createdAt != null) {
-            user.setCreatedAt(createdAt.toLocalDateTime());
+        Timestamp ts = rs.getTimestamp("createdAt");
+        if (ts != null) {
+            user.setCreatedAt(ts.toLocalDateTime());
         } else {
             user.setCreatedAt(LocalDateTime.now());
         }
+
         return user;
     }
 }
