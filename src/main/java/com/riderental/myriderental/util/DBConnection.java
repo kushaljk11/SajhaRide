@@ -1,12 +1,17 @@
 package com.riderental.myriderental.util;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBConnection {
+
+    private static final String HOST = "localhost";
+    private static final String PORT = "3306";
+    private static final String DB_NAME = "vehicle_rental";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";//Your Db Password
 
     static {
         try {
@@ -16,66 +21,38 @@ public class DBConnection {
         }
     }
 
-    private static final String HOST = "localhost";
-    private static final String PORT = "3306";
-    private static final String DB_NAME = "vehicle_rental";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";//Your DB Password
+    private DBConnection() {
+    }
 
-    private static final String BASE_URL =
-            "jdbc:mysql://" + HOST + ":" + PORT + "/";
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(getJdbcUrl(), USER, PASSWORD);
+    }
 
-    private static boolean schemaInitialized = false;
-
-
-        public static Connection getConnection() throws SQLException {
-            if (!schemaInitialized) {
-                synchronized (DBConnection.class) {
-                    if (!schemaInitialized) {
-                        try (Connection connection =
-                                     DriverManager.getConnection(BASE_URL, USER, PASSWORD)) {
-                            runSqlFile(connection, "Schema.sql");
-                        }
-
-                        try (Connection connection =
-                                     DriverManager.getConnection(BASE_URL + DB_NAME, USER, PASSWORD)) {
-                            runSqlFile(connection, "updates.sql");
-                        }
-                        schemaInitialized = true;
-                    }
-                }
-            }
-
-            return DriverManager.getConnection(BASE_URL + DB_NAME, USER, PASSWORD);
-        }
-
-
-        private static void runSqlFile(Connection connection, String fileName) throws SQLException {
-
-            try (InputStream input =
-                         DBConnection.class.getClassLoader().getResourceAsStream(fileName)) {
-
-                if (input == null) return;
-
-                String sql = new String(input.readAllBytes());
-
-                try (Statement statement = connection.createStatement()) {
-
-                    for (String query : sql.split(";")) {
-
-                        String trimmed = query.trim();
-
-                        if (!trimmed.isEmpty()) {
-                            try {
-                                statement.execute(trimmed);
-                            } catch (SQLException ignored) {
-                            }
-                        }
-                    }
-                }
-
-            } catch (Exception e) {
-                throw new SQLException(e);
-            }
+    public static void ensureDatabaseExists() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(getServerJdbcUrl(), USER, PASSWORD);
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + DB_NAME + "`");
         }
     }
+
+    public static String getJdbcUrl() {
+        return getServerJdbcUrl() + DB_NAME
+                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    }
+
+    public static String getUser() {
+        return USER;
+    }
+
+    public static String getPassword() {
+        return PASSWORD;
+    }
+
+    public static String getDatabaseName() {
+        return DB_NAME;
+    }
+
+    private static String getServerJdbcUrl() {
+        return "jdbc:mysql://" + HOST + ":" + PORT + "/";
+    }
+}
