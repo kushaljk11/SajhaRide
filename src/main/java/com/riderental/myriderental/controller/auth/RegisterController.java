@@ -9,6 +9,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
 @WebServlet("/register")
 @MultipartConfig
@@ -31,7 +32,7 @@ public class RegisterController extends HttpServlet {
         String password = request.getParameter("password");
         String phoneNumber = request.getParameter("phoneNumber");
         String address = request.getParameter("address");
-        String role = request.getParameter("role") != null ? request.getParameter("role") : "USER";
+        String role = normalizeRole(request.getParameter("role"));
         if (ValidationUtil.isBlank(fullName) || ValidationUtil.isBlank(email)
                 || ValidationUtil.isBlank(password) || ValidationUtil.isBlank(phoneNumber)
                 || ValidationUtil.isBlank(address)) {
@@ -68,6 +69,22 @@ public class RegisterController extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("errorMessage", message);
         doGet(request, response);
+    }
+
+    private String normalizeRole(String rawRole) {
+        if (rawRole == null || rawRole.isBlank()) {
+                return "RENTER";
+        }
+
+        String normalized = rawRole.trim().toUpperCase(Locale.ROOT);
+        if ("USER".equals(normalized)) {
+            return "RENTER";
+        }
+
+        return switch (normalized) {
+            case "RENTER", "OWNER", "ADMIN" -> normalized;
+            default -> "RENTER";
+        };
     }
 
     private String saveProfileImage(Part profileImage, HttpServletRequest request) throws IOException, ServletException {
