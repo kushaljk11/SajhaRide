@@ -1,4 +1,126 @@
 package com.riderental.myriderental.controller.booking;
 
-public class RequestBookingController {
+import com.riderental.myriderental.model.Booking;
+import com.riderental.myriderental.model.User;
+import com.riderental.myriderental.model.Vehicle;
+import com.riderental.myriderental.dao.VehicleDAO;
+import com.riderental.myriderental.service.AvailabilityService;
+import com.riderental.myriderental.service.BookingService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+@WebServlet("/booking/request")
+public class RequestBookingController extends HttpServlet {
+
+    private final BookingService bookingService = new BookingService();
+    private final AvailabilityService availabilityService = new AvailabilityService();
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
+
+    // SHOW BOOKING FORM
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        User sessionUser = getSessionUser(request);
+        if (sessionUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String vehicleIdParam = request.getParameter("vehicleId");
+        if (vehicleIdParam == null || vehicleIdParam.isBlank()) {
+            response.sendRedirect(request.getContextPath() + "/vehicles");
+            return;
+        }
+
+        try {
+            int vehicleId = Integer.parseInt(vehicleIdParam);
+            Vehicle vehicle = vehicleDAO.findById(vehicleId);
+
+            if (vehicle == null) {
+                request.setAttribute("errorMessage", "Vehicle not found.");
+                request.getRequestDispatcher("/views/vehicle/vehicle-list.jsp")
+                        .forward(request, response);
+                return;
+            }
+
+            request.setAttribute("vehicle", vehicle);
+            request.getRequestDispatcher("/views/vehicle/vehicle-details.jsp")
+                    .forward(request, response);
+
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/vehicles");
+        } catch (SQLException e) {
+            throw new ServletException("Unable to load vehicle", e);
+        }
+    }
+
+    // SUBMIT BOOKING REQUEST
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        User sessionUser = getSessionUser(request);
+        if (sessionUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String vehicleIdParam = request.getParameter("vehicleId");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+
+        // Validate date inputs
+        String dateError = availabilityService.validate(startDateStr, endDateStr);
+        if (dateError != null) {
+            request.setAttribute("errorMessage", dateError);
+            doGet(request, response);
+            return;
+        }
+
+        try {
+            int vehicleId = Integer.parseInt(vehicleIdParam);
+            LocalDate startDate = LocalDate.parse(startDateStr.trim());
+            LocalDate endDate = LocalDate.parse(endDateStr.trim());
+
+            // Check availability
+            if (!availabilityService.isAvailable(vehicleId, startDate, endDate)) {
+                request.setAttribute("errorMessage",
+                        "This vehicle is already booked for the selected dates. Please choose different dates.");
+                request.setAttribute("vehicleId", vehicleId);
+                doGet(request, response);
+                return;
+            }
+
+            // Create booking
+            Booking booking = bookingService.requestBooking(
+                    vehicleId, sessionUser.getUserId(), startDate, endDate);
+
+            // Redirect to booking history with success message
+            response.sendRedirect(request.getContextPath()
+                    + "/booking/history?success=Booking+request+submitted+successfully");
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Invalid vehicle ID.");
+            doGet(request, response);
+        } catch (IllegalStateException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            doGet(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Unable to create booking", e);
+        }
+    }
+
+    private User getSessionUser(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session == null ? null : (User) session.getAttribute("loggedInUser");
+    }
 }
