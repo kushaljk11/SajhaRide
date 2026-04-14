@@ -15,7 +15,7 @@
 <div class="w-full flex flex-col md:flex-row min-h-screen">
 
     <div class="hidden md:flex md:w-1/2 relative bg-cover bg-center"
-         style="background-image: url('../../images/register.png');">
+         style="background-image: url('../../../images/register.png');">
         <div class="absolute inset-0 bg-gradient-to-br from-red-900/70 via-black/50 to-black/30 flex items-end p-10">
             <div>
                 <span class="inline-block bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full mb-4">

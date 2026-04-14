@@ -13,7 +13,7 @@
 <div class="w-full overflow-hidden flex flex-col md:flex-row min-h-screen">
 
     <div class="hidden md:flex md:w-1/2 relative bg-cover bg-center h-1/2 md:h-auto"
-         style="background-image: url('../../images/register.png');">
+         style="background-image: url('../../../images/register.png');">
 
         <div class="absolute inset-0 bg-gradient-to-br from-red-800/70 via-black/50 to-black/30 flex flex-col justify-end p-10">
             <div>

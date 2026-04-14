@@ -12,7 +12,7 @@ public class RenterDashboardController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/views/renter/dashboard.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/renter/dashboard.jsp")
                 .forward(request, response);
     }
 }
