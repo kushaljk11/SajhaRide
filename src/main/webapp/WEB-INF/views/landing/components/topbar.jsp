@@ -1,12 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <% String ctx
 = request.getContextPath(); %>
 
-<html>
-  <head>
-    <title>SajhaRide</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-
   <header class="w-full bg-white border-b border-neutral-300">
     <div
       class="relative mx-auto flex h-14 max-w-[1280px] items-center px-4 sm:px-6 lg:px-8"
@@ -50,13 +44,13 @@
           List a Vehicle
         </a>
         <a
-                href="<%= ctx %>/vehicles/list"
+                href="<%= ctx %>/aboutus"
                 class="text-[13px] font-medium text-slate-700 hover:text-slate-900 transition"
         >
           About Us
         </a>
         <a
-                href="<%= ctx %>/vehicles/list"
+          href="<%= ctx %>/contact"
                 class="text-[13px] font-medium text-slate-700 hover:text-slate-900 transition"
         >
           Contact
@@ -66,14 +60,14 @@
       <!-- Right: Auth -->
       <div class="ml-auto flex items-center gap-4">
         <a
-          href="<%= ctx %>/auth/login"
+          href="<%= ctx %>/login"
           class="rounded-xl border border-red-800 px-5 py-2 text-[12px] font-medium text-red-800 shadow-sm transition hover:bg-red-800 hover:text-white hover:shadow-md"
         >
           Login
         </a>
 
         <a
-          href="<%= ctx %>/auth/register"
+          href="<%= ctx %>/register"
           class="rounded-xl bg-red-800 px-5 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-white hover:text-red-800 hover:border hover:border-red-800 hover:shadow-md"
         >
           Signup
@@ -81,4 +75,3 @@
       </div>
     </div>
   </header>
-</html>
