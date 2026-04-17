@@ -54,7 +54,7 @@
         <div>
             <h1 class="text-3xl font-bold">My Profile</h1>
             <p class="text-red-100 text-sm mt-1">
-                Update your account information and personal details
+                NOTE: Everything you change will be update....
             </p>
         </div>
 
@@ -96,23 +96,23 @@
 
         <!-- Account Info -->
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-            <h3 class="text-xs uppercase tracking-widest font-semibold text-red-800 mb-4">
+            <h3 class="text-lg font-semibold text-red-800 mb-4">
                 Account Information
             </h3>
 
             <div class="space-y-4 text-sm">
                 <div>
-                    <p class="text-gray-400 uppercase text-xs">Email</p>
+                    <p class="text-gray-400 uppercas text-sm">Email</p>
                     <p class="font-medium text-gray-700 break-all"><%= email %></p>
                 </div>
 
                 <div>
-                    <p class="text-gray-400 uppercase text-xs">Status</p>
+                    <p class="text-gray-400 text-sm">Status</p>
                     <p class="font-medium text-green-600"><%= status %></p>
                 </div>
 
                 <div>
-                    <p class="text-gray-400 uppercase text-xs">Role</p>
+                    <p class="text-gray-400 text-sm">Role</p>
                     <p class="font-medium text-gray-700"><%= role %></p>
                 </div>
             </div>
@@ -192,7 +192,7 @@
                          class="w-10 h-10 rounded-full object-cover border"
                          alt="Current image">
                     <span class="text-sm text-gray-500">
-                        Current photo — upload new one to replace
+                        Current Photo || Upload new one to replace
                     </span>
                 </div>
                 <% } %>

@@ -3,21 +3,20 @@ package com.riderental.myriderental.controller.owner;
 import com.riderental.myriderental.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet("/owner/dashboard")
-public class OwnerDashboardController extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@WebServlet("/owner/add-vehicle")
+public class AddNewPost extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!ensureOwnerAccess(request, response)) {
             return;
         }
-
-        request.getRequestDispatcher("/WEB-INF/views/owner/dashboard.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/owner/add-vehicle.jsp").forward(request, response);
     }
 
     private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {

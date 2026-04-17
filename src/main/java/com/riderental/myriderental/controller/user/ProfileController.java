@@ -34,7 +34,7 @@ public class ProfileController extends HttpServlet {
             User freshUser = userDAO.findById(sessionUser.getUserId());
             request.getSession().setAttribute("loggedInUser", freshUser);
             request.setAttribute("user", freshUser);
-            request.getRequestDispatcher("/views/user/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Unable to load profile", e);
         }
