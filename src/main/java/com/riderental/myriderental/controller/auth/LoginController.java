@@ -50,6 +50,7 @@ public class LoginController extends HttpServlet {
             }
 
             // Temporary compatibility for legacy rows created with USER role.
+            role = role.trim();
             role = "USER".equalsIgnoreCase(role) ? "RENTER" : role.toUpperCase();
 
             switch (role) {

@@ -20,7 +20,7 @@ public class RenterDashboardController extends HttpServlet {
             return;
         }
 
-        String role = loggedInUser.getRole();
+        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
         if ("owner".equalsIgnoreCase(role)) {
             response.sendRedirect(request.getContextPath() + "/owner/dashboard");
             return;
@@ -30,6 +30,7 @@ public class RenterDashboardController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-//        response.sendRedirect(request.getContextPath() + "/explore");
+
+        request.getRequestDispatcher("/WEB-INF/views/renter/dashboard.jsp").forward(request, response);
     }
 }
