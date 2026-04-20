@@ -12,14 +12,14 @@
   }
 
   boolean dashboardActive = currentPath.startsWith("/renter/dashboard");
-  boolean myBookingsActive = currentPath.startsWith("/renter/bookings");
+  boolean myBookingsActive = currentPath.startsWith("/renter/booking");
   boolean savedActive = currentPath.startsWith("/renter/saved");
   boolean paymentsActive = currentPath.startsWith("/renter/payments");
   boolean exploreActive = currentPath.startsWith("/explore");
   boolean profileActive = currentPath.startsWith("/profile");
 %>
 <aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
-  <div class="mb-5 flex items-center gap-2 px-1">
+  <div class="mb-5 gap-2 flex items-center px-1">
     <img src="${pageContext.request.contextPath}/images/logo.svg" alt="SajhaRide" class="h-9 w-auto" />
     <p class="text-lg mt-4 font-semibold text-red-800">
       Sajha<span class="text-blue-800">Ride</span>
@@ -28,7 +28,7 @@
 
   <hr />
 
-  <nav class="mt-4 space-y-2">
+  <nav class="mt-4 flex-1 space-y-2 pb-4">
     <a href="${pageContext.request.contextPath}/renter/dashboard" data-renter-route="/renter/dashboard" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= dashboardActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>" <%= dashboardActive ? "aria-current=\"page\"" : "" %>>
       <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <rect x="4" y="4" width="7" height="7" rx="1"></rect>
@@ -39,7 +39,7 @@
       Dashboard
     </a>
 
-    <a href="${pageContext.request.contextPath}/renter/bookings" data-renter-route="/renter/bookings" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= myBookingsActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>" <%= myBookingsActive ? "aria-current=\"page\"" : "" %>>
+    <a href="${pageContext.request.contextPath}/renter/booking" data-renter-route="/renter/booking" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= myBookingsActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>" <%= myBookingsActive ? "aria-current=\"page\"" : "" %>>
       <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <rect x="3" y="4" width="18" height="16" rx="2"></rect>
         <path d="M3 10h18"></path>

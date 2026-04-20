@@ -1,4 +1,4 @@
-package com.riderental.myriderental.controller.admin;
+package com.riderental.myriderental.controller.renter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,12 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/admin/dashboard")
-public class AdminDashboardController extends HttpServlet {
+@WebServlet("/renter/booking")
+public class RenterBookingController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/renter/booking.jsp").forward(request, response);
     }
 }
