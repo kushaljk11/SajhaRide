@@ -2,11 +2,10 @@
 ALTER TABLE users
     ADD COLUMN IF NOT EXISTS fullName VARCHAR(100) NULL;
 
--- Backfill from legacy name column if it exists, otherwise use email
+-- Backfill from available fullName/email values.
 UPDATE users
 SET fullName = COALESCE(
     NULLIF(TRIM(fullName), ''),
-    NULLIF(TRIM(COALESCE(name, '')), ''),
     SUBSTR(email, 1, 100)
 )
 WHERE fullName IS NULL OR TRIM(fullName) = '';
