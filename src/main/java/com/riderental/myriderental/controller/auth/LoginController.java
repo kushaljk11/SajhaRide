@@ -17,7 +17,7 @@ public class LoginController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/views/auth/login.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp")
                 .forward(request, response);
     }
 
@@ -50,6 +50,7 @@ public class LoginController extends HttpServlet {
             }
 
             // Temporary compatibility for legacy rows created with USER role.
+            role = role.trim();
             role = "USER".equalsIgnoreCase(role) ? "RENTER" : role.toUpperCase();
 
             switch (role) {

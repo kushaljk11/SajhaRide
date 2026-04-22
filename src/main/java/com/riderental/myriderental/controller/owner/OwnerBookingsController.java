@@ -1,4 +1,4 @@
-package com.riderental.myriderental.controller.admin;
+package com.riderental.myriderental.controller.owner;
 
 import com.riderental.myriderental.model.User;
 import jakarta.servlet.ServletException;
@@ -10,19 +10,18 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet("/admin/users")
-public class ManageUsersController extends HttpServlet {
+@WebServlet("/owner/bookings")
+public class OwnerBookingsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!ensureAdminAccess(request, response)) {
+        if (!ensureOwnerAccess(request, response)) {
             return;
         }
-
-        request.getRequestDispatcher("/WEB-INF/views/admin/manage-users.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/owner/bookings.jsp").forward(request, response);
     }
 
-    private boolean ensureAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
         User loggedInUser = session == null ? null : (User) session.getAttribute("loggedInUser");
 
@@ -31,14 +30,9 @@ public class ManageUsersController extends HttpServlet {
             return false;
         }
 
-        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
-        if ("admin".equalsIgnoreCase(role)) {
-            return true;
-        }
-
+        String role = loggedInUser.getRole();
         if ("owner".equalsIgnoreCase(role)) {
-            response.sendRedirect(request.getContextPath() + "/owner/dashboard");
-            return false;
+            return true;
         }
 
         if ("renter".equalsIgnoreCase(role)) {
