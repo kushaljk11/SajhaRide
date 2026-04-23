@@ -3,6 +3,14 @@
 <%
     User paymentUser = (User) session.getAttribute("loggedInUser");
     String firstName = "Rider";
+    String esewaStatus = request.getParameter("esewa_status");
+    String esewaMessage = request.getParameter("message");
+    String safeEsewaMessage = esewaMessage == null ? "" : esewaMessage
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#x27;");
     if (paymentUser != null && paymentUser.getFullName() != null && !paymentUser.getFullName().isBlank()) {
         String[] nameParts = paymentUser.getFullName().trim().split("\\s+");
         firstName = nameParts[0];
@@ -22,6 +30,13 @@
         <%@ include file="/WEB-INF/views/renter/components/topbar.jsp" %>
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <% if (esewaStatus != null && !esewaStatus.isBlank()) { %>
+            <div class="mb-4 rounded-xl border px-4 py-3 text-sm <%= "complete".equalsIgnoreCase(esewaStatus) ? "border-green-200 bg-green-50 text-green-800" : "border-yellow-200 bg-yellow-50 text-yellow-800" %>">
+                <strong class="mr-2">eSewa:</strong>
+                <%= !safeEsewaMessage.isBlank() ? safeEsewaMessage : ("complete".equalsIgnoreCase(esewaStatus) ? "Payment completed." : "Payment not completed.") %>
+            </div>
+            <% } %>
+
             <section class="rounded-3xl border border-red-100 bg-white p-5 shadow-sm sm:p-7">
                 <h1 class="text-2xl font-semibold text-gray-900 sm:text-4xl">Payment Center</h1>
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-600 sm:text-base">Welcome back, <span class="font-semibold text-red-800"><%= firstName %></span>. Track your recent transactions, monitor pending charges, and manage payment details from one clean dashboard.</p>
@@ -131,15 +146,33 @@
                             <p class="text-xs text-red-700/80">For booking BK-10231</p>
                         </div>
                         <div class="mt-4 space-y-3">
-                            <label class="block">
-                                <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Payment Method</span>
-                                <select class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-800 focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                    <option>eSewa Wallet</option>
-                                    <option>Khalti Wallet</option>
-                                    <option>Card (Visa)</option>
-                                </select>
-                            </label>
-                            <button type="button" class="w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Pay Rs. 1,200</button>
+                            <p class="text-sm font-semibold text-gray-700">Choose how you want to pay for booking BK-10231.</p>
+
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <form action="<%= request.getContextPath() %>/renter/payment" method="post">
+                                    <input type="hidden" name="action" value="initiate" />
+                                    <input type="hidden" name="gateway" value="ESEWA" />
+                                    <input type="hidden" name="bookingId" value="10231" />
+                                    <input type="hidden" name="amount" value="1200" />
+                                    <button type="submit" class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-800 transition hover:bg-red-100">eSewa Payment</button>
+                                </form>
+
+                                <form action="<%= request.getContextPath() %>/renter/payment" method="post">
+                                    <input type="hidden" name="action" value="initiate" />
+                                    <input type="hidden" name="gateway" value="KHALTI" />
+                                    <input type="hidden" name="bookingId" value="10231" />
+                                    <input type="hidden" name="amount" value="1200" />
+                                    <button type="submit" class="w-full rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-center text-sm font-semibold text-purple-800 transition hover:bg-purple-100">Khalti Payment</button>
+                                </form>
+
+                                <form action="<%= request.getContextPath() %>/renter/payment" method="post" class="sm:col-span-2">
+                                    <input type="hidden" name="action" value="initiate" />
+                                    <input type="hidden" name="gateway" value="CASH" />
+                                    <input type="hidden" name="bookingId" value="10231" />
+                                    <input type="hidden" name="amount" value="1200" />
+                                    <button type="submit" class="w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-800 transition hover:bg-amber-100">Cash on Pickup</button>
+                                </form>
+                            </div>
                         </div>
                     </article>
 
