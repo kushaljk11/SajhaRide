@@ -1,11 +1,10 @@
 package com.riderental.myriderental.controller.owner;
 
+import com.riderental.myriderental.dao.VehicleDAO;
 import com.riderental.myriderental.model.Booking;
 import com.riderental.myriderental.model.User;
 import com.riderental.myriderental.model.Vehicle;
-import com.riderental.myriderental.dao.VehicleDAO;
 import com.riderental.myriderental.service.BookingService;
-import com.riderental.myriderental.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,44 +25,26 @@ public class OwnerDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         if (!ensureOwnerAccess(request, response)) {
             return;
         }
 
         User sessionUser = getSessionUser(request);
-        if (sessionUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // Only owners can access this dashboard
-        if (!"OWNER".equals(sessionUser.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // Pass success message if redirected from approve/reject
-        String success = request.getParameter("success");
-        if (success != null && !success.isBlank()) {
-            request.setAttribute("successMessage", success);
-        }
 
         try {
             int ownerId = sessionUser.getUserId();
 
-            // Get owner vehicles
             List<Vehicle> vehicles = vehicleDAO.findByOwner(ownerId);
-
-            // Get all bookings for owner vehicles
             List<Booking> allBookings = bookingService.getOwnerBookings(ownerId);
-
-            // Get pending bookings for the requests table
             List<Booking> pendingBookings = bookingService.getOwnerPendingBookings(ownerId);
-
-            // Get total earnings
             double totalEarnings = bookingService.getOwnerEarnings(ownerId);
 
-            // Pass everything to JSP
+            String success = request.getParameter("success");
+            if (success != null && !success.isBlank()) {
+                request.setAttribute("successMessage", success);
+            }
+
             request.setAttribute("vehicles", vehicles);
             request.setAttribute("allBookings", allBookings);
             request.setAttribute("pendingBookings", pendingBookings);
@@ -72,7 +53,7 @@ public class OwnerDashboardController extends HttpServlet {
             request.setAttribute("totalBookings", allBookings.size());
             request.setAttribute("pendingCount", pendingBookings.size());
 
-            request.getRequestDispatcher("/views/owner/dashboard.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/owner/dashboard.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
@@ -84,10 +65,6 @@ public class OwnerDashboardController extends HttpServlet {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
     }
-}
-        request.getRequestDispatcher("/WEB-INF/views/owner/dashboard.jsp")
-                .forward(request, response);
-    }
 
     private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
@@ -98,7 +75,8 @@ public class OwnerDashboardController extends HttpServlet {
             return false;
         }
 
-        String role = loggedInUser.getRole();
+        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
+
         if ("owner".equalsIgnoreCase(role)) {
             return true;
         }

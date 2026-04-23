@@ -11,7 +11,7 @@ public class DBConnection {
     private static final String PORT = "3306";
     private static final String DB_NAME = "sajharide";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "kushal6612";
 
     static {
         try {
@@ -26,6 +26,12 @@ public class DBConnection {
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(getJdbcUrl(), USER, PASSWORD);
+    }
+
+    public static void validateConnectivity() throws SQLException {
+        try (Connection connection = getConnection()) {
+            // Opening and closing a connection is sufficient validation at startup.
+        }
     }
 
     public static void ensureDatabaseExists() throws SQLException {

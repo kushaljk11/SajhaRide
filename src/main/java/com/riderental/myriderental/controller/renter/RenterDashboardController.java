@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet({"/renter/dashboard"})
+@WebServlet("/renter/dashboard")
 public class RenterDashboardController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
@@ -24,18 +24,16 @@ public class RenterDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User loggedInUser = session == null ? null : (User) session.getAttribute("loggedInUser");
 
         User sessionUser = getSessionUser(request);
+
         if (sessionUser == null) {
-        if (loggedInUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        // Only renters can access this dashboard
-        if (!"RENTER".equals(sessionUser.getRole())) {
+        // Only renters allowed
+        if (!"RENTER".equalsIgnoreCase(sessionUser.getRole())) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -44,7 +42,6 @@ public class RenterDashboardController extends HttpServlet {
             List<Booking> allBookings = bookingService.getRenterBookings(
                     sessionUser.getUserId());
 
-            // Separate bookings by status for dashboard stats
             List<Booking> pendingBookings = new ArrayList<>();
             List<Booking> approvedBookings = new ArrayList<>();
             List<Booking> completedBookings = new ArrayList<>();
@@ -59,20 +56,18 @@ public class RenterDashboardController extends HttpServlet {
                 }
             }
 
-            // Pass data to JSP
             request.setAttribute("allBookings", allBookings);
             request.setAttribute("pendingBookings", pendingBookings);
             request.setAttribute("approvedBookings", approvedBookings);
             request.setAttribute("completedBookings", completedBookings);
             request.setAttribute("rejectedBookings", rejectedBookings);
 
-            // Stats for the summary cards
             request.setAttribute("totalBookings", allBookings.size());
             request.setAttribute("pendingCount", pendingBookings.size());
             request.setAttribute("approvedCount", approvedBookings.size());
             request.setAttribute("completedCount", completedBookings.size());
 
-            request.getRequestDispatcher("/views/renter/dashboard.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/renter/dashboard.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
@@ -83,17 +78,5 @@ public class RenterDashboardController extends HttpServlet {
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
-        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
-        if ("owner".equalsIgnoreCase(role)) {
-            response.sendRedirect(request.getContextPath() + "/owner/dashboard");
-            return;
-        }
-
-        if (!"renter".equalsIgnoreCase(role)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        request.getRequestDispatcher("/WEB-INF/views/renter/dashboard.jsp").forward(request, response);
     }
 }

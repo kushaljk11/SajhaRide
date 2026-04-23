@@ -36,7 +36,7 @@ CREATE TABLE vehicles
 
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (owner_id) REFERENCES users (user_id)
+    FOREIGN KEY (owner_id) REFERENCES users (userId)
         ON DELETE CASCADE
 );
 
@@ -60,7 +60,7 @@ CREATE TABLE bookings
     FOREIGN KEY (vehicle_id) REFERENCES vehicles (vehicle_id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES users (userId)
         ON DELETE CASCADE
 );
 
@@ -84,10 +84,10 @@ CREATE TABLE reviews
     FOREIGN KEY (booking_id) REFERENCES bookings (booking_id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (reviewer_id) REFERENCES users (user_id)
+    FOREIGN KEY (reviewer_id) REFERENCES users (userId)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (reviewee_id) REFERENCES users (user_id)
+    FOREIGN KEY (reviewee_id) REFERENCES users (userId)
         ON DELETE CASCADE,
 
     FOREIGN KEY (vehicle_id) REFERENCES vehicles (vehicle_id)

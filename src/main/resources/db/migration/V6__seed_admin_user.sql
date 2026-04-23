@@ -16,3 +16,4 @@ WHERE NOT EXISTS (
     WHERE email = 'admin@gmail.com'
 );
 
+
