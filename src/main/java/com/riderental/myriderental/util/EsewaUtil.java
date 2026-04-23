@@ -1,0 +1,191 @@
+package com.riderental.myriderental.util;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+public final class EsewaUtil {
+
+    private static final DateTimeFormatter TRANSACTION_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    private EsewaUtil() {
+    }
+
+    public static String formatAmount(double amount) {
+        return formatAmount(BigDecimal.valueOf(amount));
+    }
+
+    public static String formatAmount(BigDecimal amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+
+        if (amount.signum() < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative");
+        }
+
+        BigDecimal normalized = amount.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros();
+        String text = normalized.toPlainString();
+        return text.contains(".") ? text : text + ".0";
+    }
+
+    public static String generateTransactionUuid(String bookingId) {
+        String safeBookingId = sanitizeIdentifier(bookingId);
+        String timestamp = LocalDateTime.now().format(TRANSACTION_TIME_FORMAT);
+        String randomSuffix = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        return safeBookingId + "-" + timestamp + "-" + randomSuffix;
+    }
+
+    public static String createSignature(String secretKey, Map<String, String> fields, String signedFieldNames) {
+        Objects.requireNonNull(secretKey, "secretKey");
+        String signingString = buildSigningString(fields, signedFieldNames);
+
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            mac.init(secretKeySpec);
+            byte[] rawSignature = mac.doFinal(signingString.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(rawSignature);
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Unable to generate eSewa signature", e);
+        }
+    }
+
+    public static String buildSigningString(Map<String, String> fields, String signedFieldNames) {
+        Objects.requireNonNull(fields, "fields");
+        if (signedFieldNames == null || signedFieldNames.isBlank()) {
+            throw new IllegalArgumentException("signedFieldNames cannot be blank");
+        }
+
+        String[] fieldNames = signedFieldNames.split(",");
+        StringBuilder builder = new StringBuilder();
+        boolean firstSignedField = true;
+
+        for (String rawFieldName : fieldNames) {
+            String fieldName = rawFieldName.trim();
+            if (fieldName.isEmpty()) {
+                continue;
+            }
+
+            if (!fields.containsKey(fieldName)) {
+                throw new IllegalArgumentException("Missing required signed field: " + fieldName);
+            }
+
+            if (!firstSignedField) {
+                builder.append(',');
+            }
+            firstSignedField = false;
+            builder.append(fieldName).append('=').append(Objects.toString(fields.get(fieldName), ""));
+        }
+
+        if (builder.isEmpty()) {
+            throw new IllegalArgumentException("No signed fields were provided");
+        }
+
+        return builder.toString();
+    }
+
+    public static String buildQueryString(Map<String, String> parameters) {
+        Objects.requireNonNull(parameters, "parameters");
+
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            if (!first) {
+                builder.append('&');
+            }
+            first = false;
+
+            builder.append(urlEncode(entry.getKey()))
+                    .append('=')
+                    .append(urlEncode(Objects.toString(entry.getValue(), "")));
+        }
+
+        return builder.toString();
+    }
+
+    public static String readFully(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return "";
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            return builder.toString();
+        }
+    }
+
+    public static String extractJsonStringValue(String json, String key) {
+        if (json == null || json.isBlank() || key == null || key.isBlank()) {
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*(\"((?:\\\\.|[^\"\\\\])*)\"|([^,}\\s]+))");
+        Matcher matcher = pattern.matcher(json);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        String quotedValue = matcher.group(2);
+        String rawValue = matcher.group(3);
+        String value = quotedValue != null ? quotedValue : rawValue;
+        return value == null ? null : unescapeJson(value);
+    }
+
+    public static boolean isCompleteStatus(String status) {
+        if (status == null) {
+            return false;
+        }
+
+        String normalized = status.trim().toUpperCase();
+        return "COMPLETE".equals(normalized)
+                || "SUCCESS".equals(normalized)
+                || "SUCCESSFUL".equals(normalized)
+                || "PAID".equals(normalized);
+    }
+
+    public static String sanitizeIdentifier(String value) {
+        if (value == null || value.isBlank()) {
+            return "txn";
+        }
+
+        String sanitized = value.trim().replaceAll("[^A-Za-z0-9_-]", "");
+        return sanitized.isBlank() ? "txn" : sanitized;
+    }
+
+    private static String urlEncode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static String unescapeJson(String value) {
+        return value
+                .replace("\\\\", "\\")
+                .replace("\\\"", "\"")
+                .replace("\\n", "\n")
+                .replace("\\r", "\r")
+                .replace("\\t", "\t");
+    }
+}
+
