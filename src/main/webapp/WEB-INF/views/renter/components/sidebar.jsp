@@ -15,6 +15,7 @@
   boolean myBookingsActive = currentPath.startsWith("/renter/booking");
   boolean savedActive = currentPath.startsWith("/renter/saved");
   boolean paymentsActive = currentPath.startsWith("/renter/payments");
+  boolean chatActive = currentPath.startsWith("/renter/chat");
   boolean exploreActive = currentPath.startsWith("/explore");
   boolean profileActive = currentPath.startsWith("/profile");
 %>
@@ -60,6 +61,15 @@
         <path d="M3 10h18"></path>
       </svg>
       Payment
+    </a>
+
+    <a href="${pageContext.request.contextPath}/renter/chat" data-renter-route="/renter/chat" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= chatActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>" <%= chatActive ? "aria-current=\"page\"" : "" %>>
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M7 10h10"></path>
+        <path d="M7 14h6"></path>
+        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      </svg>
+      Chat
     </a>
 
     <a href="${pageContext.request.contextPath}/explore" data-renter-route="/explore" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= exploreActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>" <%= exploreActive ? "aria-current=\"page\"" : "" %>>

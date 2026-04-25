@@ -164,7 +164,8 @@
     </a>
 
     <a
-      href=""
+      href="${pageContext.request.contextPath}/owner/chat"
+      data-owner-route="/owner/chat"
       class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= chatActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>"
       <%= chatActive ? "aria-current=\"page\"" : "" %>
     >
@@ -186,8 +187,8 @@
     <a
       href="${pageContext.request.contextPath}/explore"
       data-owner-route="/explore"
-      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= exploreActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>""
-            <%= exploreActive ? "aria-current=\"page\"" : "" %>
+      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= exploreActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>"
+      <%= exploreActive ? "aria-current=\"page\"" : "" %>
     >
       <svg
         class="h-5 w-5"
@@ -221,6 +222,9 @@
         isActive = true;
       }
       if (route === "/owner/settings" && path.indexOf("/owner/settings") === 0) {
+        isActive = true;
+      }
+      if (route === "/owner/chat" && path.indexOf("/owner/chat") === 0) {
         isActive = true;
       }
 
