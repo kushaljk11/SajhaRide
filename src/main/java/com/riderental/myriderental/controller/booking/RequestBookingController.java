@@ -47,13 +47,13 @@ public class RequestBookingController extends HttpServlet {
 
             if (vehicle == null) {
                 request.setAttribute("errorMessage", "Vehicle not found.");
-                request.getRequestDispatcher("/views/vehicle/vehicle-list.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/vehicle/vehicle-list.jsp")
                         .forward(request, response);
                 return;
             }
 
             request.setAttribute("vehicle", vehicle);
-            request.getRequestDispatcher("/views/vehicle/vehicle-details.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/vehicle/vehicle-details.jsp")
                     .forward(request, response);
 
         } catch (NumberFormatException e) {
@@ -101,8 +101,7 @@ public class RequestBookingController extends HttpServlet {
             }
 
             // Create booking
-            Booking booking = bookingService.requestBooking(
-                    vehicleId, sessionUser.getUserId(), startDate, endDate);
+            bookingService.requestBooking(vehicleId, sessionUser.getUserId(), startDate, endDate);
 
             // Redirect to booking history with success message
             response.sendRedirect(request.getContextPath()

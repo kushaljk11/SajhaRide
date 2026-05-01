@@ -1,5 +1,6 @@
 package com.riderental.myriderental.controller.user;
 
+import com.riderental.myriderental.dao.VehicleDAO;
 import com.riderental.myriderental.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,6 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import com.riderental.myriderental.model.Vehicle;
 
 @WebServlet("/explore")
 public class Explore extends HttpServlet {
@@ -28,6 +32,17 @@ public class Explore extends HttpServlet {
         }
 
         request.setAttribute("viewRole", role.toLowerCase());
+
+        // Fetch available vehicles
+        try {
+            VehicleDAO vehicleDAO = new VehicleDAO();
+            List<Vehicle> vehicles = vehicleDAO.findAvailable();
+            request.setAttribute("vehicles", vehicles);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading vehicles");
+        }
+
         request.getRequestDispatcher("/WEB-INF/views/user/explore.jsp").forward(request, response);
     }
 }

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/vehicles")
+@WebServlet(urlPatterns = {"/vehicles", "/vehicles/list"})
 public class ViewVehicleController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
@@ -35,7 +35,9 @@ public class ViewVehicleController extends HttpServlet {
             }
 
             request.setAttribute("vehicles", vehicles);
-            request.getRequestDispatcher("/views/vehicle/vehicle-list.jsp")
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("type", type);
+            request.getRequestDispatcher("/WEB-INF/views/vehicle/vehicle-list.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
