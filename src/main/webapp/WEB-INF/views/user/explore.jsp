@@ -2,6 +2,8 @@
   File Templates. --%>
   <%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ page import="com.riderental.myriderental.model.User" %>
+    <%@ page import="java.util.List" %>
+    <%@ page import="com.riderental.myriderental.model.Vehicle" %>
       <% User loggedInUser=(User) session.getAttribute("loggedInUser"); String role=(String)
         request.getAttribute("viewRole"); if ((role==null || role.isBlank()) && loggedInUser !=null &&
         loggedInUser.getRole() !=null) { role=loggedInUser.getRole().toLowerCase(); } boolean ownerView="owner"
@@ -114,6 +116,7 @@
                                           class="text-lg font-semibold text-red-800">Rs. 6,500</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Kathmandu • Manual • 7 Seats</p>
+                                    <p class="mt-2 text-sm text-gray-700">Comfortable and reliable SUV suitable for family trips and mountain roads.</p>
                                     <button
                                       class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
                                       Now</button>
@@ -138,9 +141,10 @@
                                           class="text-lg font-semibold text-red-800">Rs. 2,500</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Lalitpur • 350cc • Petrol</p>
-                                    <button
-                                      class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
-                                      Now</button>
+                                      <p class="mt-2 text-sm text-gray-700">Classic cruiser with a comfortable ride and strong mid-range torque — great for weekend rides.</p>
+                                      <button
+                                        class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
+                                        Now</button>
                                   </div>
                                 </article>
 
@@ -162,9 +166,10 @@
                                           class="text-lg font-semibold text-red-800">Rs. 4,000</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Kathmandu • Automatic • 5 Seats</p>
-                                    <button
-                                      class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
-                                      Now</button>
+                                      <p class="mt-2 text-sm text-gray-700">Compact and fuel-efficient hatchback perfect for city commuting and short trips.</p>
+                                      <button
+                                        class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
+                                        Now</button>
                                   </div>
                                 </article>
 
@@ -186,9 +191,10 @@
                                           class="text-lg font-semibold text-red-800">Rs. 12,000</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Kathmandu • Auto • 4x4</p>
-                                    <button
-                                      class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
-                                      Now</button>
+                                      <p class="mt-2 text-sm text-gray-700">Powerful premium SUV with off-road capability and spacious interiors for long journeys.</p>
+                                      <button
+                                        class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
+                                        Now</button>
                                   </div>
                                 </article>
 
@@ -210,9 +216,10 @@
                                           class="text-lg font-semibold text-red-800">Rs. 1,500</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Bhaktapur • 125cc • Storage</p>
-                                    <button
-                                      class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
-                                      Now</button>
+                                      <p class="mt-2 text-sm text-gray-700">Lightweight scooter ideal for quick errands and easy parking in crowded streets.</p>
+                                      <button
+                                        class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
+                                        Now</button>
                                   </div>
                                 </article>
 
@@ -234,9 +241,10 @@
                                           class="text-lg font-semibold text-red-800">Rs. 4,500</span></p>
                                     </div>
                                     <p class="mt-3 text-xs text-gray-600">Pokhara • Off-road • ABS</p>
-                                    <button
-                                      class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
-                                      Now</button>
+                                      <p class="mt-2 text-sm text-gray-700">Adventure motorcycle built for rough terrain with good suspension and handling off-road.</p>
+                                      <button
+                                        class="mt-4 w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-900">Book
+                                        Now</button>
                                   </div>
                                 </article>
                               </div>

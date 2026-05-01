@@ -160,6 +160,31 @@ public class BookingDAO {
         }
     }
 
+    // CHECK IF BOOKING BELONGS TO AN OWNER'S VEHICLE
+    public boolean isOwnedBy(int bookingId, int ownerId) throws SQLException {
+        String sql = """
+                SELECT COUNT(*)
+                FROM bookings b
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                WHERE b.booking_id = ? AND v.owner_id = ?
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, bookingId);
+            stmt.setInt(2, ownerId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        return false;
+    }
+
     // COUNT ALL BOOKINGS
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings";

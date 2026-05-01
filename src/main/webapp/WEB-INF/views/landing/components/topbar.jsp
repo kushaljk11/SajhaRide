@@ -1,5 +1,20 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %> <% String ctx
-= request.getContextPath(); %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.riderental.myriderental.model.User" %>
+<%
+  String ctx = request.getContextPath();
+  User signedInUser = (User) session.getAttribute("loggedInUser");
+  String dashboardUrl = null;
+  if (signedInUser != null) {
+    String role = signedInUser.getRole() == null ? "RENTER" : signedInUser.getRole().trim().toUpperCase();
+    if ("ADMIN".equals(role)) {
+      dashboardUrl = ctx + "/admin/dashboard";
+    } else if ("OWNER".equals(role)) {
+      dashboardUrl = ctx + "/owner/dashboard";
+    } else {
+      dashboardUrl = ctx + "/renter/dashboard";
+    }
+  }
+%>
 
   <header class="w-full bg-white border-b border-neutral-300">
     <div
@@ -32,13 +47,13 @@
           Home
         </a>
         <a
-          href="<%= ctx %>/rides"
+          href="<%= ctx %>/login"
           class="text-[13px] font-medium text-slate-700 hover:text-slate-900 transition"
         >
           Rent a Ride
         </a>
         <a
-          href="<%= ctx %>/vehicles/list"
+          href="<%= ctx %>/login"
           class="text-[13px] font-medium text-slate-700 hover:text-slate-900 transition"
         >
           List a Vehicle
@@ -59,6 +74,16 @@
 
       <!-- Right: Auth -->
       <div class="ml-auto flex items-center gap-4">
+        <% if (dashboardUrl != null) { %>
+        <a
+          href="<%= dashboardUrl %>"
+          class="rounded-xl bg-red-800 px-5 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-white hover:text-red-800 hover:border hover:border-red-800 hover:shadow-md"
+          aria-label="Open dashboard"
+          title="Dashboard"
+        >
+          Dashboard
+        </a>
+        <% } else { %>
         <a
           href="<%= ctx %>/login"
           class="rounded-xl border border-red-800 px-5 py-2 text-[12px] font-medium text-red-800 shadow-sm transition hover:bg-red-800 hover:text-white hover:shadow-md"
@@ -72,6 +97,7 @@
         >
           Signup
         </a>
+        <% } %>
       </div>
     </div>
   </header>

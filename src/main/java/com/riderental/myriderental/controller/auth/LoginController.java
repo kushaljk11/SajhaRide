@@ -9,6 +9,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
@@ -41,17 +42,9 @@ public class LoginController extends HttpServlet {
                 return;
             }
 
+            String role = normalizeRole(user.getRole());
+            user.setRole(role);
             request.getSession().setAttribute("loggedInUser", user);
-
-            String role = user.getRole();
-            if (role == null) {
-                response.sendRedirect(request.getContextPath() + "/renter/dashboard");
-                return;
-            }
-
-            // Temporary compatibility for legacy rows created with USER role.
-            role = role.trim();
-            role = "USER".equalsIgnoreCase(role) ? "RENTER" : role.toUpperCase();
 
             switch (role) {
                 case "ADMIN":
@@ -70,5 +63,21 @@ public class LoginController extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Unable to login user", e);
         }
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "RENTER";
+        }
+
+        String normalized = role.trim().toUpperCase(Locale.ROOT);
+        if ("USER".equals(normalized)) {
+            return "RENTER";
+        }
+
+        return switch (normalized) {
+            case "ADMIN", "OWNER", "RENTER" -> normalized;
+            default -> "RENTER";
+        };
     }
 }

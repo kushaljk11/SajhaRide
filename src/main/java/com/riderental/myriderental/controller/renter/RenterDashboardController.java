@@ -2,8 +2,9 @@ package com.riderental.myriderental.controller.renter;
 
 import com.riderental.myriderental.model.Booking;
 import com.riderental.myriderental.model.User;
+import com.riderental.myriderental.model.Vehicle;
+import com.riderental.myriderental.dao.VehicleDAO;
 import com.riderental.myriderental.service.BookingService;
-import com.riderental.myriderental.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +21,7 @@ import java.util.List;
 public class RenterDashboardController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,33 +41,36 @@ public class RenterDashboardController extends HttpServlet {
         }
 
         try {
-            List<Booking> allBookings = bookingService.getRenterBookings(
-                    sessionUser.getUserId());
+            int renterId = sessionUser.getUserId();
+            List<Vehicle> vehicles = vehicleDAO.findByOwner(renterId);
+            List<Booking> allBookings = bookingService.getOwnerBookings(renterId);
 
             List<Booking> pendingBookings = new ArrayList<>();
-            List<Booking> approvedBookings = new ArrayList<>();
+            List<Booking> activeBookings = new ArrayList<>();
             List<Booking> completedBookings = new ArrayList<>();
-            List<Booking> rejectedBookings = new ArrayList<>();
 
             for (Booking b : allBookings) {
                 switch (b.getStatus()) {
                     case "PENDING" -> pendingBookings.add(b);
-                    case "APPROVED" -> approvedBookings.add(b);
+                    case "APPROVED" -> activeBookings.add(b);
                     case "COMPLETED" -> completedBookings.add(b);
-                    case "REJECTED" -> rejectedBookings.add(b);
                 }
             }
 
+            double totalEarnings = bookingService.getOwnerEarnings(renterId);
+
+            request.setAttribute("vehicles", vehicles);
             request.setAttribute("allBookings", allBookings);
             request.setAttribute("pendingBookings", pendingBookings);
-            request.setAttribute("approvedBookings", approvedBookings);
+            request.setAttribute("activeBookings", activeBookings);
             request.setAttribute("completedBookings", completedBookings);
-            request.setAttribute("rejectedBookings", rejectedBookings);
 
+            request.setAttribute("totalVehicles", vehicles.size());
             request.setAttribute("totalBookings", allBookings.size());
             request.setAttribute("pendingCount", pendingBookings.size());
-            request.setAttribute("approvedCount", approvedBookings.size());
+            request.setAttribute("activeCount", activeBookings.size());
             request.setAttribute("completedCount", completedBookings.size());
+            request.setAttribute("totalEarnings", totalEarnings);
 
             request.getRequestDispatcher("/WEB-INF/views/renter/dashboard.jsp")
                     .forward(request, response);

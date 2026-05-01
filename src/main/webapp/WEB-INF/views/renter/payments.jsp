@@ -1,7 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.riderental.myriderental.model.User" %>
+<%@ page import="com.riderental.myriderental.dao.PaymentDAO" %>
+<%@ page import="java.util.List" %>
 <%
     User paymentUser = (User) session.getAttribute("loggedInUser");
+    List<PaymentDAO.Payment> payments = (List<PaymentDAO.Payment>) request.getAttribute("payments");
+    Double totalSpent = (Double) request.getAttribute("totalSpent");
+    Double pendingAmount = (Double) request.getAttribute("pendingAmount");
+    Long paidCount = (Long) request.getAttribute("paidCount");
+    Long pendingCount = (Long) request.getAttribute("pendingCount");
+    PaymentDAO.Payment firstPendingPayment = (PaymentDAO.Payment) request.getAttribute("firstPendingPayment");
+
+    if (payments == null) payments = java.util.Collections.emptyList();
+    double ts = totalSpent == null ? 0.0 : totalSpent;
+    double pa = pendingAmount == null ? 0.0 : pendingAmount;
+    long paid = paidCount == null ? 0 : paidCount;
+    long pending = pendingCount == null ? 0 : pendingCount;
+
     String firstName = "Rider";
     String esewaStatus = request.getParameter("esewa_status");
     String esewaMessage = request.getParameter("message");
@@ -43,23 +58,23 @@
                 <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <article class="rounded-2xl border border-red-100 bg-red-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Total Spent</p>
-                        <p class="mt-2 text-2xl font-bold text-red-900">Rs. 18,450</p>
-                        <p class="mt-1 text-xs text-red-700/80">Across 7 bookings</p>
+                        <p class="mt-2 text-2xl font-bold text-red-900">Rs. <%= String.format(java.util.Locale.US, "%,.2f", ts) %></p>
+                        <p class="mt-1 text-xs text-red-700/80">Across successful payments</p>
                     </article>
                     <article class="rounded-2xl border border-gray-200 bg-white p-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">This Month</p>
-                        <p class="mt-2 text-2xl font-bold text-gray-900">Rs. 6,700</p>
-                        <p class="mt-1 text-xs text-gray-500">Apr 01 - Apr 20</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Successful Payments</p>
+                        <p class="mt-2 text-2xl font-bold text-gray-900"><%= paid %></p>
+                        <p class="mt-1 text-xs text-gray-500">Completed transactions</p>
                     </article>
                     <article class="rounded-2xl border border-gray-200 bg-white p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Pending</p>
-                        <p class="mt-2 text-2xl font-bold text-gray-900">Rs. 1,200</p>
-                        <p class="mt-1 text-xs text-gray-500">1 unsettled transaction</p>
+                        <p class="mt-2 text-2xl font-bold text-gray-900">Rs. <%= String.format(java.util.Locale.US, "%,.2f", pa) %></p>
+                        <p class="mt-1 text-xs text-gray-500"><%= pending %> unsettled transaction(s)</p>
                     </article>
                     <article class="rounded-2xl border border-gray-200 bg-white p-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Refunds</p>
-                        <p class="mt-2 text-2xl font-bold text-gray-900">Rs. 900</p>
-                        <p class="mt-1 text-xs text-gray-500">Last 30 days</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Total Transactions</p>
+                        <p class="mt-2 text-2xl font-bold text-gray-900"><%= payments.size() %></p>
+                        <p class="mt-1 text-xs text-gray-500">Payment records</p>
                     </article>
                 </div>
             </section>
@@ -87,50 +102,38 @@
                             </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
-                            <tr class="hover:bg-red-50/30">
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">TXN-40921</td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <p class="font-semibold text-gray-900">BK-10231</p>
-                                    <p class="text-xs text-gray-500">Honda Activa 6G</p>
-                                </td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">eSewa</td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Apr 20, 2026</td>
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">Rs. 1,200</td>
-                                <td class="px-5 py-4 sm:px-6"><span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">Pending</span></td>
+                            <% if (payments.isEmpty()) { %>
+                            <tr>
+                                <td colspan="6" class="px-5 py-6 text-center text-sm text-gray-500 sm:px-6">No payment history found.</td>
                             </tr>
+                            <% } %>
+                            <% for (PaymentDAO.Payment payment : payments) {
+                                String status = payment.getStatus() == null ? "PENDING" : payment.getStatus().toUpperCase();
+                                String statusClass = "bg-red-100 text-red-800";
+                                if ("SUCCESS".equals(status)) statusClass = "bg-red-800 text-white";
+                                if ("FAILED".equals(status)) statusClass = "bg-gray-200 text-gray-700";
+                                String transactionId = payment.getReferenceId();
+                                if (transactionId == null || transactionId.isBlank()) {
+                                    transactionId = payment.getTransactionUuid();
+                                }
+                                if (transactionId == null || transactionId.isBlank()) {
+                                    transactionId = payment.getPidx();
+                                }
+                                if (transactionId == null || transactionId.isBlank()) {
+                                    transactionId = "PMT-" + payment.getPaymentId();
+                                }
+                            %>
                             <tr class="hover:bg-red-50/30">
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">TXN-40784</td>
+                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6"><%= transactionId %></td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="font-semibold text-gray-900">BK-10082</p>
-                                    <p class="text-xs text-gray-500">Suzuki Swift</p>
+                                    <p class="font-semibold text-gray-900">BK-<%= payment.getBookingId() %></p>
                                 </td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Khalti</td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Apr 10, 2026</td>
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">Rs. 4,500</td>
-                                <td class="px-5 py-4 sm:px-6"><span class="inline-flex rounded-full bg-red-800 px-3 py-1 text-xs font-semibold text-white">Paid</span></td>
+                                <td class="px-5 py-4 text-gray-700 sm:px-6"><%= payment.getGateway() %></td>
+                                <td class="px-5 py-4 text-gray-700 sm:px-6"><%= payment.getCreatedAt() == null ? "-" : payment.getCreatedAt() %></td>
+                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">Rs. <%= String.format(java.util.Locale.US, "%,.2f", payment.getAmount()) %></td>
+                                <td class="px-5 py-4 sm:px-6"><span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold <%= statusClass %>"><%= status %></span></td>
                             </tr>
-                            <tr class="hover:bg-red-50/30">
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">TXN-40652</td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <p class="font-semibold text-gray-900">BK-10030</p>
-                                    <p class="text-xs text-gray-500">Mahindra Scorpio N</p>
-                                </td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Card</td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Apr 04, 2026</td>
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">Rs. 5,000</td>
-                                <td class="px-5 py-4 sm:px-6"><span class="inline-flex rounded-full bg-red-800 px-3 py-1 text-xs font-semibold text-white">Paid</span></td>
-                            </tr>
-                            <tr class="hover:bg-red-50/30">
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">TXN-40511</td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <p class="font-semibold text-gray-900">BK-09980</p>
-                                    <p class="text-xs text-gray-500">Royal Enfield Classic</p>
-                                </td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Cash</td>
-                                <td class="px-5 py-4 text-gray-700 sm:px-6">Mar 28, 2026</td>
-                                <td class="px-5 py-4 font-semibold text-gray-900 sm:px-6">Rs. 2,500</td>
-                                <td class="px-5 py-4 sm:px-6"><span class="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-100">Refunded</span></td>
-                            </tr>
+                            <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -142,37 +145,42 @@
                         <p class="mt-1 text-sm text-gray-600">Settle your unsettled transaction securely in a few taps.</p>
                         <div class="mt-4 rounded-xl border border-red-100 bg-red-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Due Now</p>
-                            <p class="mt-1 text-3xl font-bold text-red-900">Rs. 1,200</p>
-                            <p class="text-xs text-red-700/80">For booking BK-10231</p>
+                            <p class="mt-1 text-3xl font-bold text-red-900">Rs. <%= String.format(java.util.Locale.US, "%,.2f", pa) %></p>
+                            <p class="text-xs text-red-700/80"><%= firstPendingPayment == null ? "No pending payment found" : "For booking BK-" + firstPendingPayment.getBookingId() %></p>
                         </div>
                         <div class="mt-4 space-y-3">
-                            <p class="text-sm font-semibold text-gray-700">Choose how you want to pay for booking BK-10231.</p>
+                            <p class="text-sm font-semibold text-gray-700">Choose how you want to pay this pending booking.</p>
+
+                            <% if (firstPendingPayment == null) { %>
+                            <p class="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-600">All pending payments are already settled.</p>
+                            <% } else { %>
 
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <form action="<%= request.getContextPath() %>/renter/payment" method="post">
                                     <input type="hidden" name="action" value="initiate" />
                                     <input type="hidden" name="gateway" value="ESEWA" />
-                                    <input type="hidden" name="bookingId" value="10231" />
-                                    <input type="hidden" name="amount" value="1200" />
+                                    <input type="hidden" name="bookingId" value="<%= firstPendingPayment.getBookingId() %>" />
+                                    <input type="hidden" name="amount" value="<%= firstPendingPayment.getAmount() %>" />
                                     <button type="submit" class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-800 transition hover:bg-red-100">eSewa Payment</button>
                                 </form>
 
                                 <form action="<%= request.getContextPath() %>/renter/payment" method="post">
                                     <input type="hidden" name="action" value="initiate" />
                                     <input type="hidden" name="gateway" value="KHALTI" />
-                                    <input type="hidden" name="bookingId" value="10231" />
-                                    <input type="hidden" name="amount" value="1200" />
+                                    <input type="hidden" name="bookingId" value="<%= firstPendingPayment.getBookingId() %>" />
+                                    <input type="hidden" name="amount" value="<%= firstPendingPayment.getAmount() %>" />
                                     <button type="submit" class="w-full rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-center text-sm font-semibold text-purple-800 transition hover:bg-purple-100">Khalti Payment</button>
                                 </form>
 
                                 <form action="<%= request.getContextPath() %>/renter/payment" method="post" class="sm:col-span-2">
                                     <input type="hidden" name="action" value="initiate" />
                                     <input type="hidden" name="gateway" value="CASH" />
-                                    <input type="hidden" name="bookingId" value="10231" />
-                                    <input type="hidden" name="amount" value="1200" />
+                                    <input type="hidden" name="bookingId" value="<%= firstPendingPayment.getBookingId() %>" />
+                                    <input type="hidden" name="amount" value="<%= firstPendingPayment.getAmount() %>" />
                                     <button type="submit" class="w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-800 transition hover:bg-amber-100">Cash on Pickup</button>
                                 </form>
                             </div>
+                            <% } %>
                         </div>
                     </article>
 
