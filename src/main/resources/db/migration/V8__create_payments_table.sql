@@ -25,3 +25,4 @@ CREATE TABLE payments (
     INDEX idx_payment_status (status)
 );
 
+

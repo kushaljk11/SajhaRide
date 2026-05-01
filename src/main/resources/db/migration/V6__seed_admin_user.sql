@@ -11,9 +11,11 @@ SELECT
     0,
     'ACTIVE'
 WHERE NOT EXISTS (
-    SELECT 1
+    SELECT 1:wqa
+
     FROM users
     WHERE email = 'admin@gmail.com'
 );
+
 
 
