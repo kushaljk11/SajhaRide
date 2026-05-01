@@ -3,6 +3,8 @@ package com.riderental.myriderental.dao;
 import com.riderental.myriderental.util.DBConnection;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PaymentDAO {
 
@@ -120,6 +122,57 @@ public class PaymentDAO {
         }
 
         return null;
+    }
+
+    // LIST PAYMENTS FOR ONE RENTER (based on booking user_id)
+    public List<Payment> findByRenterId(int renterId) throws SQLException {
+        String sql = """
+                SELECT p.payment_id, p.booking_id, p.gateway, p.amount, p.transaction_uuid, p.pidx,
+                       p.status, p.reference_id, p.created_at
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                WHERE b.user_id = ?
+                ORDER BY p.created_at DESC
+                """;
+
+        List<Payment> payments = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, renterId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    payments.add(mapResultSetToPayment(rs));
+                }
+            }
+        }
+
+        return payments;
+    }
+
+    // SUM PAYMENT AMOUNT FOR A RENTER BY STATUS
+    public double sumAmountByRenterAndStatus(int renterId, String status) throws SQLException {
+        String sql = """
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                WHERE b.user_id = ? AND p.status = ?
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, renterId);
+            stmt.setString(2, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        }
+
+        return 0;
     }
 
     private Payment mapResultSetToPayment(ResultSet rs) throws SQLException {

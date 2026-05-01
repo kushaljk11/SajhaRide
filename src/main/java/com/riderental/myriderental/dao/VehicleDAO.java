@@ -45,7 +45,19 @@ public class VehicleDAO {
 
     // FIND BY ID
     public Vehicle findById(int vehicleId) throws SQLException {
-        String sql = "SELECT * FROM vehicles WHERE vehicle_id = ?";
+        return getVehicleById(vehicleId);
+    }
+
+    // GET VEHICLE BY ID WITH OWNER DETAILS
+    public Vehicle getVehicleById(int vehicleId) throws SQLException {
+        String sql = """
+                SELECT v.*, u.fullName AS owner_name, u.email AS owner_email,
+                       u.phoneNumber AS owner_phone_number, u.address AS owner_address,
+                       u.profileImagePath AS owner_profile_image_path
+                FROM vehicles v
+                JOIN users u ON v.owner_id = u.userId
+                WHERE v.vehicle_id = ?
+                """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

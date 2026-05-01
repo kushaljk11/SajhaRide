@@ -13,6 +13,11 @@ public class Vehicle {
     private String location;
     private String availabilityStatus;
     private String imagePath;
+    private String ownerName;
+    private String ownerEmail;
+    private String ownerPhoneNumber;
+    private String ownerAddress;
+    private String ownerProfileImagePath;
     private LocalDateTime createdAt;
 
     public Vehicle() {
@@ -59,6 +64,21 @@ public class Vehicle {
 
     public String getImagePath() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+
+    public String getOwnerName() { return ownerName; }
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+
+    public String getOwnerEmail() { return ownerEmail; }
+    public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
+
+    public String getOwnerPhoneNumber() { return ownerPhoneNumber; }
+    public void setOwnerPhoneNumber(String ownerPhoneNumber) { this.ownerPhoneNumber = ownerPhoneNumber; }
+
+    public String getOwnerAddress() { return ownerAddress; }
+    public void setOwnerAddress(String ownerAddress) { this.ownerAddress = ownerAddress; }
+
+    public String getOwnerProfileImagePath() { return ownerProfileImagePath; }
+    public void setOwnerProfileImagePath(String ownerProfileImagePath) { this.ownerProfileImagePath = ownerProfileImagePath; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
