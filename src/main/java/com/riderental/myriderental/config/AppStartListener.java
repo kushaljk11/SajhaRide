@@ -21,17 +21,15 @@ public class AppStartListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext context = sce.getServletContext();
-        String jdbcUrl = com.riderental.myriderental.util.DBConnection.getJdbcUrl();
-        try {
-            context.log("Starting application initialization. Validating DB and running Flyway migrations. JDBC URL=" + jdbcUrl);
-            FlywayRunner.migrate();
-            context.log("Flyway migration completed.");
-        } catch (Throwable ex) {
-            Throwable rootCause = getRootCause(ex);
-            context.log("Application startup failed in AppStartListener.contextInitialized. Root cause: "
-                    + rootCause.getClass().getName() + ": " + rootCause.getMessage(), ex);
-            LOGGER.log(Level.SEVERE, "Startup failed for JDBC URL " + jdbcUrl, ex);
-            throw ex;
+
+        context.log("Starting application initialization.");
+
+        boolean migrated = FlywayRunner.migrate();
+
+        if (migrated) {
+            context.log("Flyway migration completed successfully.");
+        } else {
+            context.log("Flyway migration failed. Application will continue in DEV mode.");
         }
     }
 
@@ -47,11 +45,12 @@ public class AppStartListener implements ServletContextListener {
 
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
+
             if (driver.getClass().getClassLoader() == webAppClassLoader) {
                 try {
                     DriverManager.deregisterDriver(driver);
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.FINE, "Could not deregister JDBC driver during shutdown: " + driver, ex);
+                    LOGGER.log(Level.FINE, "Could not deregister JDBC driver: " + driver, ex);
                 }
             }
         }
@@ -59,21 +58,16 @@ public class AppStartListener implements ServletContextListener {
 
     private void shutdownMysqlCleanupThread() {
         try {
-            Class<?> cleanupThreadClass = Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+            Class<?> cleanupThreadClass =
+                    Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+
             Method checkedShutdown = cleanupThreadClass.getMethod("checkedShutdown");
             checkedShutdown.invoke(null);
+
         } catch (ClassNotFoundException ignored) {
-            // MySQL driver not present in this classloader; nothing to shut down.
+            // MySQL driver not loaded here
         } catch (Exception ex) {
             LOGGER.log(Level.FINE, "MySQL cleanup thread shutdown was not completed.", ex);
         }
-    }
-
-    private Throwable getRootCause(Throwable throwable) {
-        Throwable cursor = throwable;
-        while (cursor.getCause() != null && cursor.getCause() != cursor) {
-            cursor = cursor.getCause();
-        }
-        return cursor;
     }
 }
