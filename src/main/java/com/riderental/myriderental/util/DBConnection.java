@@ -11,7 +11,7 @@ public class DBConnection {
     private static final String PORT = "3306";
     private static final String DB_NAME = "sajharide";
     private static final String USER = "root";
-    private static final String PASSWORD = "kushal6612";
+    private static final String PASSWORD = "1234";
 
     static {
         try {
