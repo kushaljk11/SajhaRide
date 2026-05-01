@@ -7,7 +7,7 @@
   if (servletPath != null && !servletPath.isEmpty()) {
     currentPath = servletPath;
   }
-  if (currentPath != null && currentPath.length() > 1 && currentPath.endsWith("/")) {
+  if (currentPath.length() > 1 && currentPath.endsWith("/")) {
     currentPath = currentPath.substring(0, currentPath.length() - 1);
   }
 
@@ -20,12 +20,12 @@
   boolean profileActive = currentPath.startsWith("/profile");
 %>
 <aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
-  <div class="mb-5 gap-2 flex items-center px-1">
+  <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img src="${pageContext.request.contextPath}/images/logo.svg" alt="SajhaRide" class="h-9 w-auto" />
     <p class="text-lg mt-4 font-semibold text-red-800">
       Sajha<span class="text-blue-800">Ride</span>
     </p>
-  </div>
+  </a>
 
   <hr />
 
@@ -92,11 +92,17 @@
 
 <script>
   (function () {
-    var path = window.location.pathname.replace(/\/$/, "");
+    var path = window.location.pathname.replace(/\/$/, "") || "/";
     var links = document.querySelectorAll("a[data-renter-route]");
 
     links.forEach(function (link) {
-      var route = (link.getAttribute("data-renter-route") || "").replace(/\/$/, "");
+      var hrefPath;
+      try {
+        hrefPath = new URL(link.href, window.location.origin).pathname;
+      } catch (e) {
+        hrefPath = (link.getAttribute("href") || "");
+      }
+      var route = (hrefPath || "").replace(/\/$/, "") || "/";
       var isActive = path === route || path.indexOf(route + "/") === 0;
 
       link.classList.remove("bg-red-800", "font-semibold", "text-white");

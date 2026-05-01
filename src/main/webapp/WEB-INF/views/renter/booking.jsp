@@ -1,7 +1,30 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.riderental.myriderental.model.User" %>
+<%@ page import="com.riderental.myriderental.model.Booking" %>
+<%@ page import="java.util.List" %>
 <%
   User bookingUser = (User) session.getAttribute("loggedInUser");
+  List<Booking> allBookings = (List<Booking>) request.getAttribute("allBookings");
+  List<Booking> pendingBookings = (List<Booking>) request.getAttribute("pendingBookings");
+  List<Booking> activeBookings = (List<Booking>) request.getAttribute("activeBookings");
+  List<Booking> completedBookings = (List<Booking>) request.getAttribute("completedBookings");
+  Integer totalBookings = (Integer) request.getAttribute("totalBookings");
+  Integer pendingCount = (Integer) request.getAttribute("pendingCount");
+  Integer activeCount = (Integer) request.getAttribute("activeCount");
+  Integer completedCount = (Integer) request.getAttribute("completedCount");
+  String successMessage = (String) request.getAttribute("successMessage");
+  String errorMessage = (String) request.getAttribute("errorMessage");
+
+  if (allBookings == null) allBookings = java.util.Collections.emptyList();
+  if (pendingBookings == null) pendingBookings = java.util.Collections.emptyList();
+  if (activeBookings == null) activeBookings = java.util.Collections.emptyList();
+  if (completedBookings == null) completedBookings = java.util.Collections.emptyList();
+
+  int tb = totalBookings == null ? allBookings.size() : totalBookings;
+  int pc = pendingCount == null ? pendingBookings.size() : pendingCount;
+  int ac = activeCount == null ? activeBookings.size() : activeCount;
+  int cc = completedCount == null ? completedBookings.size() : completedCount;
+
   String firstName = "Rider";
   if (bookingUser != null && bookingUser.getFullName() != null && !bookingUser.getFullName().isBlank()) {
     String[] nameParts = bookingUser.getFullName().trim().split("\\s+");
@@ -22,84 +45,79 @@
     <%@ include file="/WEB-INF/views/renter/components/topbar.jsp" %>
 
     <main class="flex-1 overflow-y-auto p-6 lg:p-8">
-      <h1 class="text-3xl font-semibold text-gray-900">My Bookings</h1>
-      <p class="text-sm mt-2 text-gray-500">Hey <span class="font-semibold text-red-800"><%= firstName %></span>, track your ride status and booking details here.</p>
+      <h1 class="text-3xl font-semibold text-gray-900">Booking Requests</h1>
+      <p class="text-sm mt-2 text-gray-500">Hey <span class="font-semibold text-red-800"><%= firstName %></span>, review incoming requests for your listed vehicles.</p>
+
+      <% if (successMessage != null && !successMessage.isBlank()) { %>
+      <div class="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"><%= successMessage %></div>
+      <% } %>
+      <% if (errorMessage != null && !errorMessage.isBlank()) { %>
+      <div class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= errorMessage %></div>
+      <% } %>
 
       <section class=" mt-6">
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-4">
           <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
             <p class="text-sm font-semibold text-gray-500">Total Bookings</p>
-            <p class="mt-2 text-3xl font-semibold text-gray-900">12</p>
+            <p class="mt-2 text-3xl font-semibold text-gray-900"><%= tb %></p>
           </article>
           <article class="rounded-2xl bg-red-800 p-4 text-white shadow-sm">
-            <p class="text-sm font-semibold text-red-100">Active</p>
-            <p class="mt-2 text-3xl font-semibold">2</p>
+            <p class="text-sm font-semibold text-red-100">Pending</p>
+            <p class="mt-2 text-3xl font-semibold"><%= pc %></p>
+          </article>
+          <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
+            <p class="text-sm font-semibold text-gray-500">Approved</p>
+            <p class="mt-2 text-3xl font-semibold text-gray-900"><%= ac %></p>
           </article>
           <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
             <p class="text-sm font-semibold text-gray-500">Completed</p>
-            <p class="mt-2 text-3xl font-semibold text-gray-900">10</p>
+            <p class="mt-2 text-3xl font-semibold text-gray-900"><%= cc %></p>
           </article>
         </div>
       </section>
 
       <section class="mt-6">
         <div class="grid gap-4">
+          <% if (allBookings.isEmpty()) { %>
           <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 class="text-lg font-semibold text-gray-900">Honda Activa 6G</h2>
-                <p class="text-sm text-gray-500">Pickup: Kalanki, Kathmandu</p>
-              </div>
-              <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">Active</span>
-            </div>
-            <div class="mt-4 grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
-              <p><span class="font-semibold text-gray-900">Booking ID:</span> BK-10231</p>
-              <p><span class="font-semibold text-gray-900">Date:</span> Apr 17, 2026</p>
-              <p><span class="font-semibold text-gray-900">Total:</span> Rs. 1,200</p>
-            </div>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <button type="button" class="rounded-lg bg-red-800 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-900">View Details</button>
-              <button type="button" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 transition hover:bg-red-100">Cancel Booking</button>
-            </div>
+            <p class="text-sm text-gray-600">No booking requests are available yet.</p>
           </article>
+          <% } %>
 
+          <% for (Booking booking : allBookings) {
+            String status = booking.getStatus() == null ? "PENDING" : booking.getStatus().toUpperCase();
+            String badgeClass = "bg-blue-100 text-blue-800";
+            if ("APPROVED".equals(status)) badgeClass = "bg-red-100 text-red-800";
+            if ("COMPLETED".equals(status)) badgeClass = "bg-emerald-100 text-emerald-800";
+            if ("REJECTED".equals(status)) badgeClass = "bg-gray-200 text-gray-700";
+          %>
           <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">Suzuki Swift</h2>
-                <p class="text-sm text-gray-500">Pickup: Gwarko, Lalitpur</p>
+                <h2 class="text-lg font-semibold text-gray-900"><%= booking.getVehicleName() %></h2>
+                <p class="text-sm text-gray-500">Renter: <%= booking.getRenterName() == null ? "-" : booking.getRenterName() %></p>
               </div>
-              <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Completed</span>
+              <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold <%= badgeClass %>"><%= status %></span>
             </div>
             <div class="mt-4 grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
-              <p><span class="font-semibold text-gray-900">Booking ID:</span> BK-10082</p>
-              <p><span class="font-semibold text-gray-900">Date:</span> Apr 10, 2026</p>
-              <p><span class="font-semibold text-gray-900">Total:</span> Rs. 4,500</p>
+              <p><span class="font-semibold text-gray-900">Booking ID:</span> BK-<%= booking.getBookingId() %></p>
+              <p><span class="font-semibold text-gray-900">Date:</span> <%= booking.getStartDate() %> to <%= booking.getEndDate() %></p>
+              <p><span class="font-semibold text-gray-900">Total:</span> Rs. <%= String.format(java.util.Locale.US, "%,.2f", booking.getTotalPrice()) %></p>
             </div>
+            <% if ("PENDING".equals(status)) { %>
             <div class="mt-4 flex flex-wrap gap-2">
-              <button type="button" class="rounded-lg bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-200">View Receipt</button>
-              <button type="button" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 transition hover:bg-red-100">Book Again</button>
+              <form action="${pageContext.request.contextPath}/renter/booking/approve" method="post">
+                <input type="hidden" name="bookingId" value="<%= booking.getBookingId() %>" />
+                <button type="submit" class="rounded-lg bg-red-800 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-900">Approve</button>
+              </form>
+              <form action="${pageContext.request.contextPath}/renter/booking/reject" method="post">
+                <input type="hidden" name="bookingId" value="<%= booking.getBookingId() %>" />
+                <button type="submit" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 transition hover:bg-red-100">Reject</button>
+              </form>
             </div>
+            <% } %>
           </article>
-
-          <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 class="text-lg font-semibold text-gray-900">Yamaha FZS</h2>
-                <p class="text-sm text-gray-500">Pickup: Bhaktapur Durbar Area</p>
-              </div>
-              <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">Pending</span>
-            </div>
-            <div class="mt-4 grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
-              <p><span class="font-semibold text-gray-900">Booking ID:</span> BK-10304</p>
-              <p><span class="font-semibold text-gray-900">Date:</span> Apr 19, 2026</p>
-              <p><span class="font-semibold text-gray-900">Total:</span> Rs. 2,250</p>
-            </div>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <button type="button" class="rounded-lg bg-red-800 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-900">Track Status</button>
-              <button type="button" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50">Contact Owner</button>
-            </div>
-          </article>
+          <% } %>
         </div>
       </section>
 

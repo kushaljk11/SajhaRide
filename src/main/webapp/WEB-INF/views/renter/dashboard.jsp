@@ -1,12 +1,39 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.riderental.myriderental.model.User" %>
+<%@ page import="com.riderental.myriderental.model.Vehicle" %>
+<%@ page import="com.riderental.myriderental.model.Booking" %>
+<%@ page import="java.util.List" %>
 <%
     User dashboardUser = (User) session.getAttribute("loggedInUser");
+    List<Vehicle> vehicles = (List<Vehicle>) request.getAttribute("vehicles");
+    List<Booking> allBookings = (List<Booking>) request.getAttribute("allBookings");
+    List<Booking> pendingBookings = (List<Booking>) request.getAttribute("pendingBookings");
+    List<Booking> activeBookings = (List<Booking>) request.getAttribute("activeBookings");
+    List<Booking> completedBookings = (List<Booking>) request.getAttribute("completedBookings");
+    Integer totalVehicles = (Integer) request.getAttribute("totalVehicles");
+    Integer totalBookings = (Integer) request.getAttribute("totalBookings");
+    Integer pendingCount = (Integer) request.getAttribute("pendingCount");
+    Integer activeCount = (Integer) request.getAttribute("activeCount");
+    Double totalEarnings = (Double) request.getAttribute("totalEarnings");
+
     String firstName = "Rider";
     if (dashboardUser != null && dashboardUser.getFullName() != null && !dashboardUser.getFullName().isBlank()) {
         String[] nameParts = dashboardUser.getFullName().trim().split("\\s+");
         firstName = nameParts[0];
     }
+
+    if (vehicles == null) vehicles = java.util.Collections.emptyList();
+    if (allBookings == null) allBookings = java.util.Collections.emptyList();
+    if (pendingBookings == null) pendingBookings = java.util.Collections.emptyList();
+    if (activeBookings == null) activeBookings = java.util.Collections.emptyList();
+    if (completedBookings == null) completedBookings = java.util.Collections.emptyList();
+
+    int tv = totalVehicles == null ? vehicles.size() : totalVehicles;
+    int tb = totalBookings == null ? allBookings.size() : totalBookings;
+    int pc = pendingCount == null ? pendingBookings.size() : pendingCount;
+    int ac = activeCount == null ? activeBookings.size() : activeCount;
+    int cc = completedBookings.size();
+    double earnings = totalEarnings == null ? 0.0 : totalEarnings;
 %>
 <html>
 <head>
@@ -23,99 +50,81 @@
 
         <main class="flex-1 overflow-y-auto p-6 lg:p-8">
             <h1 class="text-3xl font-semibold text-gray-900">Renter Dashboard</h1>
-            <p class="text-sm mt-1 text-gray-500">Welcome back, <span class="text-red-800 uppercase font-bold"><%= firstName %>.</span> Your latest trip updates are ready.</p>
+            <p class="text-sm mt-1 text-gray-500">Welcome back, <span class="text-red-800 uppercase font-bold"><%= firstName %>.</span> Here is your latest listing and booking performance.</p>
 
             <section class="mt-4">
                 <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
-                        <p class="text-sm font-semibold text-black">Total</p>
-                        <p class="mt-3 text-3xl font-semibold text-gray-900">12</p>
-                        <p class="text-sm text-gray-500">Completed Rides</p>
+                        <p class="text-sm font-semibold text-black">Listed Vehicles</p>
+                        <p class="mt-3 text-3xl font-semibold text-gray-900"><%= tv %></p>
+                        <p class="text-sm text-gray-500">Your active listings</p>
                     </article>
 
                     <article class="relative overflow-hidden rounded-2xl bg-red-800 p-4 text-white shadow-md">
                         <div class="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full border border-white/25"></div>
-                        <p class="text-sm font-semibold text-red-100">Saved</p>
-                        <p class="mt-3 text-3xl font-semibold">1</p>
-                        <p class="text-sm text-red-100">View Saved Post</p>
+                        <p class="text-sm font-semibold text-red-100">Active Bookings</p>
+                        <p class="mt-3 text-3xl font-semibold"><%= ac %></p>
+                        <p class="text-sm text-red-100">Approved and ongoing</p>
                     </article>
 
                     <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
                         <p class="text-sm font-semibold text-black">Total Bookings</p>
-                        <p class="mt-3 text-3xl font-semibold text-gray-900">10</p>
-                        <p class="text-sm text-gray-500">View Bookings</p>
+                        <p class="mt-3 text-3xl font-semibold text-gray-900"><%= tb %></p>
+                        <p class="text-sm text-gray-500">Across all listed vehicles</p>
                     </article>
 
                     <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
-                        <p class="text-sm font-semibold text-black">Waiting</p>
-                        <p class="mt-3 text-3xl font-semibold text-gray-900">1</p>
-                        <p class="text-sm text-gray-500">Pending Request</p>
+                        <p class="text-sm font-semibold text-black">Pending Requests</p>
+                        <p class="mt-3 text-3xl font-semibold text-gray-900"><%= pc %></p>
+                        <p class="text-sm text-gray-500">Awaiting your response</p>
                     </article>
                 </div>
+            </section>
+
+            <section class="mt-4">
+                <article class="rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200">
+                    <p class="text-sm font-semibold text-black">Completed Bookings</p>
+                    <p class="mt-3 text-3xl font-semibold text-gray-900"><%= cc %></p>
+                    <p class="text-sm text-gray-500">Total Earnings: Rs. <%= String.format(java.util.Locale.US, "%,.2f", earnings) %></p>
+                </article>
             </section>
 
             <section class="mt-6">
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900">Explore Vehicles</h2>
-                        <p class="text-sm text-gray-500">Find the perfect ride for your next plan.</p>
+                        <h2 class="text-xl font-semibold text-gray-900">My Listed Vehicles</h2>
+                        <p class="text-sm text-gray-500">Vehicles currently attached to your renter account.</p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/explore" class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
-                        View More
+                    <a href="${pageContext.request.contextPath}/renter/booking" class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
+                        Manage Requests
                     </a>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <% if (vehicles.isEmpty()) { %>
+                    <article class="rounded-2xl bg-white p-5 ring-1 ring-gray-200 sm:col-span-2 xl:col-span-4">
+                        <p class="text-sm text-gray-600">No vehicles listed yet. Add a vehicle first to receive booking requests and earnings.</p>
+                    </article>
+                    <% } %>
+                    <% for (Vehicle vehicle : vehicles) { %>
                     <article class="group overflow-hidden rounded-2xl bg-gray-50 ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-sm">
                         <div class="h-32 overflow-hidden">
-                            <img src="${pageContext.request.contextPath}/images/about.png" alt="Honda Dio 125" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+                            <img src="${pageContext.request.contextPath}/<%= (vehicle.getImagePath() == null || vehicle.getImagePath().isBlank()) ? "images/about.png" : vehicle.getImagePath() %>" alt="<%= vehicle.getVehicleName() %>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                         </div>
                         <div class="p-4">
-                            <h3 class="font-semibold text-gray-900">Honda Dio 125</h3>
-                            <p class="mt-1 text-sm text-gray-500">Petrol • Kathmandu</p>
-                            <p class="mt-3 text-sm font-semibold text-red-800">Rs. 1,450/day</p>
+                            <h3 class="font-semibold text-gray-900"><%= vehicle.getVehicleName() %></h3>
+                            <p class="mt-1 text-sm text-gray-500"><%= vehicle.getVehicleType() %> • <%= vehicle.getLocation() %></p>
+                            <p class="mt-3 text-sm font-semibold text-red-800">Rs. <%= String.format(java.util.Locale.US, "%,.2f", vehicle.getPricePerDay()) %>/day</p>
                         </div>
                     </article>
-
-                    <article class="group overflow-hidden rounded-2xl bg-gray-50 ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-sm">
-                        <div class="h-32 overflow-hidden">
-                            <img src="${pageContext.request.contextPath}/images/register.png" alt="Suzuki Access" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900">Suzuki Access</h3>
-                            <p class="mt-1 text-sm text-gray-500">Petrol • Lalitpur</p>
-                            <p class="mt-3 text-sm font-semibold text-red-800">Rs. 1,550/day</p>
-                        </div>
-                    </article>
-
-                    <article class="group overflow-hidden rounded-2xl bg-gray-50 ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-sm">
-                        <div class="h-32 overflow-hidden bg-gray-900">
-                            <img src="${pageContext.request.contextPath}/images/logoho.png" alt="Yamaha FZS" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900">Yamaha FZS</h3>
-                            <p class="mt-1 text-sm text-gray-500">Bike • Bhaktapur</p>
-                            <p class="mt-3 text-sm font-semibold text-red-800">Rs. 2,250/day</p>
-                        </div>
-                    </article>
-
-                    <article class="group overflow-hidden rounded-2xl bg-gray-50 ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-sm">
-                        <div class="h-32 overflow-hidden">
-                            <img src="${pageContext.request.contextPath}/images/about.png" alt="Royal Enfield 350" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900">Royal Enfield 350</h3>
-                            <p class="mt-1 text-sm text-gray-500">Bike • Pokhara</p>
-                            <p class="mt-3 text-sm font-semibold text-red-800">Rs. 3,800/day</p>
-                        </div>
-                    </article>
+                    <% } %>
                 </div>
             </section>
 
             <section class="mt-6 rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-6 py-5">
                     <h2 class="text-xl font-semibold text-gray-900">Recent Booking History</h2>
-                    <a href="${pageContext.request.contextPath}/renter/bookings" class="text-sm font-semibold text-red-800 hover:text-red-900">View All History</a>
+                    <a href="${pageContext.request.contextPath}/renter/booking" class="text-sm font-semibold text-red-800 hover:text-red-900">View All Requests</a>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -129,33 +138,29 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <tr class="hover:bg-gray-50/80">
-                                <td class="px-6 py-4">
-                                    <p class="font-semibold text-gray-900">Honda Activa 6G</p>
-                                    <p class="text-xs text-gray-500">Lic: BA-PA 4521</p>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Oct 24, 2023</td>
-                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">Active</span></td>
-                                <td class="px-6 py-4 font-semibold text-gray-900">Rs. 1,200</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50/80">
-                                <td class="px-6 py-4">
-                                    <p class="font-semibold text-gray-900">Suzuki Swift</p>
-                                    <p class="text-xs text-gray-500">Lic: BAG-MAT 9982</p>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Oct 20, 2023</td>
-                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Completed</span></td>
-                                <td class="px-6 py-4 font-semibold text-gray-900">Rs. 4,500</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50/80">
-                                <td class="px-6 py-4">
-                                    <p class="font-semibold text-gray-900">Vespa VXL 150</p>
-                                    <p class="text-xs text-gray-500">Lic: BA-6-PA 1102</p>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Oct 18, 2023</td>
-                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">Pending</span></td>
-                                <td class="px-6 py-4 font-semibold text-gray-900">Rs. 1,800</td>
-                            </tr>
+                        <% if (allBookings.isEmpty()) { %>
+                        <tr>
+                            <td colspan="4" class="px-6 py-6 text-center text-sm text-gray-500">No bookings found yet.</td>
+                        </tr>
+                        <% } %>
+                        <% for (int i = 0; i < allBookings.size() && i < 5; i++) {
+                            Booking booking = allBookings.get(i);
+                            String status = booking.getStatus() == null ? "PENDING" : booking.getStatus().toUpperCase();
+                            String badgeClass = "bg-blue-100 text-blue-800";
+                            if ("APPROVED".equals(status)) badgeClass = "bg-red-100 text-red-800";
+                            if ("COMPLETED".equals(status)) badgeClass = "bg-emerald-100 text-emerald-800";
+                            if ("REJECTED".equals(status)) badgeClass = "bg-gray-200 text-gray-700";
+                        %>
+                        <tr class="hover:bg-gray-50/80">
+                            <td class="px-6 py-4">
+                                <p class="font-semibold text-gray-900"><%= booking.getVehicleName() %></p>
+                                <p class="text-xs text-gray-500">Request #BK-<%= booking.getBookingId() %></p>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600"><%= booking.getStartDate() %> to <%= booking.getEndDate() %></td>
+                            <td class="px-6 py-4"><span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold <%= badgeClass %>"><%= status %></span></td>
+                            <td class="px-6 py-4 font-semibold text-gray-900">Rs. <%= String.format(java.util.Locale.US, "%,.2f", booking.getTotalPrice()) %></td>
+                        </tr>
+                        <% } %>
                         </tbody>
                     </table>
                 </div>
@@ -173,7 +178,7 @@
                     <p class="mt-2 text-sm text-gray-500">Our 24/7 support team is here to help with your rides and bookings.</p>
                     <div class="mt-5 grid grid-cols-2 gap-3">
                         <button type="button" class="rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200">Read FAQs</button>
-                        <button type="button" class="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Contact Support</button>
+                        <a href="${pageContext.request.contextPath}/contact" class="inline-flex items-center justify-center rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Contact Support</a>
                     </div>
                 </article>
             </section>

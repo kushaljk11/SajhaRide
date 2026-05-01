@@ -21,6 +21,7 @@
     String email     = esc.apply(user != null ? user.getEmail() : "");
     String status    = esc.apply(user != null ? user.getAccountStatus() : "");
     String role      = esc.apply(user != null ? user.getRole() : "");
+    boolean isRenter = user != null && user.getRole() != null && "RENTER".equalsIgnoreCase(user.getRole());
 
     String initial = (user != null && user.getFullName() != null && !user.getFullName().isEmpty())
             ? esc.apply(user.getFullName().substring(0,1).toUpperCase())
@@ -48,7 +49,16 @@
 
 <body class="bg-gray-50 min-h-screen">
 
+<% if (isRenter) { %>
+<div class="flex h-screen overflow-hidden">
+    <%@ include file="/WEB-INF/views/renter/components/sidebar.jsp" %>
+    <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <%@ include file="/WEB-INF/views/renter/components/topbar.jsp" %>
+        <main class="flex-1 overflow-y-auto">
+<% } %>
+
 <!-- Header -->
+<% if (!isRenter) { %>
 <header class="bg-red-800 text-white shadow-md">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
         <div>
@@ -64,6 +74,7 @@
         </a>
     </div>
 </header>
+<% } %>
 
 <!-- Main Layout -->
 <div class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -246,6 +257,12 @@
         }
     }
 </script>
+
+<% if (isRenter) { %>
+        </main>
+    </div>
+</div>
+<% } %>
 
 </body>
 </html>
