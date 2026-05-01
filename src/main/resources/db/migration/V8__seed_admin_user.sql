@@ -1,5 +1,5 @@
 INSERT INTO users
-    (fullName, email, password, phoneNumber, address, profileImagePath, role, trustScore, accountStatus)
+(fullName, email, password, phoneNumber, address, profileImagePath, role, trustScore, accountStatus)
 SELECT
     'Admin User',
     'admin@gmail.com',
@@ -10,12 +10,6 @@ SELECT
     'ADMIN',
     0,
     'ACTIVE'
-WHERE NOT EXISTS (
-    SELECT 1:wqa
-
-    FROM users
-    WHERE email = 'admin@gmail.com'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'admin@gmail.com'
 );
-
-
-
