@@ -2,6 +2,9 @@ package com.riderental.myriderental.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a system notification for a user.
+ */
 public class Notification {
     private int id;
     private int userId;

@@ -15,11 +15,17 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for exporting vehicle data to a CSV file.
+ */
 @WebServlet("/admin/vehicles/export-csv")
 public class ExportVehiclesController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles GET requests to generate and download the vehicles CSV file.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

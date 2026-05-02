@@ -11,11 +11,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Locale;
 
+/**
+ * Controller handling new user registration.
+ */
 @WebServlet("/register")
 @MultipartConfig
 public class RegisterController extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Shows the registration page.
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -23,6 +29,9 @@ public class RegisterController extends HttpServlet {
                 .forward(request, response);
     }
 
+    /**
+     * Processes the registration form.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

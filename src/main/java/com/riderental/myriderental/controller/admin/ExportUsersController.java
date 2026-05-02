@@ -14,11 +14,17 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for exporting user data to a CSV file.
+ */
 @WebServlet("/admin/users/export-csv")
 public class ExportUsersController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Handles GET requests to generate and download the users CSV file.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -14,11 +14,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+/**
+ * Controller for adding a new vehicle from the admin panel.
+ */
 @WebServlet("/admin/vehicles/create")
 public class AddVehicleController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Shows the add vehicle form.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,6 +36,9 @@ public class AddVehicleController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/admin/add-vehicle.jsp").forward(request, response);
     }
 
+    /**
+     * Processes the submission to create a new vehicle.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

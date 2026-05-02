@@ -13,9 +13,21 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+/**
+ * Filter to ensure the user is authenticated and has the RENTER role.
+ */
 @WebFilter("/renter/*")
 public class RenterAuthFilter implements Filter {
 
+    /**
+     * Checks if the user has renter permissions or allows specific callback routes.
+     *
+     * @param request the ServletRequest object
+     * @param response the ServletResponse object
+     * @param chain the FilterChain
+     * @throws IOException if an I/O error occurs
+     * @throws ServletException if a servlet-specific error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -56,6 +68,12 @@ public class RenterAuthFilter implements Filter {
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 
+    /**
+     * Identifies if the request is a callback from a payment gateway.
+     *
+     * @param req the HttpServletRequest object
+     * @return true if the request is a public payment callback, false otherwise
+     */
     private boolean isPublicPaymentCallback(HttpServletRequest req) {
         if (!"GET".equalsIgnoreCase(req.getMethod())) {
             return false;

@@ -19,10 +19,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.UUID;
 
+/**
+ * Service class for integrating with payment gateways (eSewa, Khalti).
+ */
 public class PaymentService {
 
     private static final DecimalFormat AMOUNT_FORMAT = new DecimalFormat("0.00");
 
+    /**
+     * Builds a payment request object for initiating an eSewa payment.
+     *
+     * @param bookingId the ID of the booking being paid for
+     * @param amount the total amount to be paid
+     * @return a PaymentRequest populated with eSewa-specific fields and signature
+     */
     public PaymentRequest buildEsewaRequest(String bookingId, double amount) {
         String formattedAmount = formatAmount(amount);
         String transactionUuid = generateTransactionUuid(bookingId);
@@ -51,6 +61,13 @@ public class PaymentService {
         return request;
     }
 
+    /**
+     * Verifies the status of an eSewa payment via a server-to-server API call.
+     *
+     * @param transactionUuid the unique transaction UUID associated with the payment
+     * @param totalAmount the total amount that was expected to be paid
+     * @return a PaymentResponse indicating success or failure along with gateway details
+     */
     public PaymentResponse verifyEsewa(String transactionUuid, String totalAmount) {
         PaymentResponse response = new PaymentResponse();
         response.setGateway(PaymentConfig.ESEWA_GATEWAY);
@@ -91,6 +108,14 @@ public class PaymentService {
         return response;
     }
 
+    /**
+     * Initiates a payment session with Khalti and retrieves the payment URL.
+     *
+     * @param bookingId the ID of the booking being paid for
+     * @param amount the total amount to be paid
+     * @return a PaymentRequest containing the Khalti payment URL and transaction index (pidx)
+     * @throws RuntimeException if the initiation API call fails
+     */
     public PaymentRequest initiateKhalti(String bookingId, double amount) {
         try {
             int amountInPaisa = (int) Math.round(amount * 100.0);
@@ -145,6 +170,12 @@ public class PaymentService {
         }
     }
 
+    /**
+     * Verifies the status of a Khalti payment via a server-to-server API call.
+     *
+     * @param pidx the unique payment index returned by Khalti during initiation
+     * @return a PaymentResponse indicating success or failure along with gateway details
+     */
     public PaymentResponse verifyKhalti(String pidx) {
         PaymentResponse response = new PaymentResponse();
         response.setGateway(PaymentConfig.KHALTI_GATEWAY);

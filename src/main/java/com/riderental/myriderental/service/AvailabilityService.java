@@ -5,11 +5,21 @@ import com.riderental.myriderental.dao.BookingDAO;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+/**
+ * Service class for handling vehicle availability logic.
+ */
 public class AvailabilityService {
 
     private final BookingDAO bookingDAO = new BookingDAO();
 
-    // CHECK IF A VEHICLE IS AVAILABLE FOR THE GIVEN DATE RANGE
+    /**
+     * Checks if a vehicle is available for the given date range.
+     * @param vehicleId the vehicle ID
+     * @param startDate the requested start date
+     * @param endDate the requested end date
+     * @return true if available, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean isAvailable(int vehicleId, LocalDate startDate, LocalDate endDate) throws SQLException {
 
         // Start date must be before end date
@@ -30,7 +40,12 @@ public class AvailabilityService {
         return !bookingDAO.hasOverlappingBooking(vehicleId, startDate, endDate);
     }
 
-    // VALIDATE DATE INPUTS FROM FORM
+    /**
+     * Validates date inputs from a form.
+     * @param startDateStr the start date as string
+     * @param endDateStr the end date as string
+     * @return an error message if invalid, or null if valid
+     */
     public String validate(String startDateStr, String endDateStr) {
 
         if (startDateStr == null || startDateStr.isBlank()) {
@@ -71,7 +86,13 @@ public class AvailabilityService {
         return null; // null means no error
     }
 
-    // CALCULATE TOTAL PRICE BASED ON DAYS AND PRICE PER DAY
+    /**
+     * Calculates the total price based on rental days and price per day.
+     * @param startDate the start date
+     * @param endDate the end date
+     * @param pricePerDay the vehicle's price per day
+     * @return the total calculated price
+     */
     public double calculateTotalPrice(LocalDate startDate, LocalDate endDate, double pricePerDay) {
         long days = java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate);
         return days * pricePerDay;

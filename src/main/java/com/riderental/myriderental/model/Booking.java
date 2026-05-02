@@ -3,6 +3,9 @@ package com.riderental.myriderental.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a booking entity within the system.
+ */
 public class Booking {
 
     private int bookingId;

@@ -8,8 +8,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Controller for handling the "Contact Us" page view.
+ */
 @WebServlet("/contact")
 public class ContactController extends HttpServlet {
+    /**
+     * Serves the contact us page.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

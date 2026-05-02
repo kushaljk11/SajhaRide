@@ -2,6 +2,9 @@ package com.riderental.myriderental.model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents a chat message between users.
+ */
 public class Message {
     private int messageId;
     private int senderId;

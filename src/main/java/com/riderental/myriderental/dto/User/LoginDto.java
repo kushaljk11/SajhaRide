@@ -1,5 +1,8 @@
 package com.riderental.myriderental.dto.User;
 
+/**
+ * Data Transfer Object for user login.
+ */
 public class LoginDto {
     private String email;
     private String password;

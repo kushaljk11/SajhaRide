@@ -14,11 +14,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for displaying a renter's booking history.
+ */
 @WebServlet("/booking/history")
 public class BookingHistoryController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
 
+    /**
+     * Handles GET requests to display the booking history view.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

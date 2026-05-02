@@ -11,6 +11,9 @@ import java.util.List;
 
 import com.riderental.myriderental.dao.PaymentDAO;
 
+/**
+ * Service class for handling booking business logic.
+ */
 public class BookingService {
 
     private final BookingDAO bookingDAO = new BookingDAO();
@@ -18,7 +21,15 @@ public class BookingService {
     private final PaymentDAO paymentDAO = new PaymentDAO();
     private final AvailabilityService availabilityService = new AvailabilityService();
 
-    // CREATE A NEW BOOKING REQUEST
+    /**
+     * Creates a new booking request.
+     * @param vehicleId the vehicle ID
+     * @param userId the renter's user ID
+     * @param startDate the requested start date
+     * @param endDate the requested end date
+     * @return the created Booking object
+     * @throws SQLException if a database error occurs
+     */
     public Booking requestBooking(int vehicleId, int userId,
                                   LocalDate startDate, LocalDate endDate) throws SQLException {
 
@@ -53,37 +64,71 @@ public class BookingService {
         return savedBooking;
     }
 
-    // APPROVE A BOOKING
+    /**
+     * Approves a booking.
+     * @param bookingId the booking ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean approveBooking(int bookingId) throws SQLException {
         return bookingDAO.updateStatus(bookingId, "APPROVED");
     }
 
-    // REJECT A BOOKING
+    /**
+     * Rejects a booking.
+     * @param bookingId the booking ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean rejectBooking(int bookingId) throws SQLException {
         return bookingDAO.updateStatus(bookingId, "REJECTED");
     }
 
-    // COMPLETE A BOOKING
+    /**
+     * Completes a booking.
+     * @param bookingId the booking ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean completeBooking(int bookingId) throws SQLException {
         return bookingDAO.updateStatus(bookingId, "COMPLETED");
     }
 
-    // GET ALL BOOKINGS FOR A RENTER
+    /**
+     * Retrieves all bookings for a renter.
+     * @param userId the renter's user ID
+     * @return a list of Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> getRenterBookings(int userId) throws SQLException {
         return bookingDAO.findByRenter(userId);
     }
 
-    // GET ALL BOOKINGS FOR AN OWNER
+    /**
+     * Retrieves all bookings for an owner's vehicles.
+     * @param ownerId the owner's user ID
+     * @return a list of Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> getOwnerBookings(int ownerId) throws SQLException {
         return bookingDAO.findByOwner(ownerId);
     }
 
-    // GET ALL BOOKINGS (ADMIN)
+    /**
+     * Retrieves all bookings (for Admin).
+     * @return a list of all Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> getAllBookings() throws SQLException {
         return bookingDAO.findAll();
     }
 
-    // GET PENDING BOOKINGS FOR AN OWNER
+    /**
+     * Retrieves pending bookings for an owner.
+     * @param ownerId the owner's user ID
+     * @return a list of pending Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> getOwnerPendingBookings(int ownerId) throws SQLException {
         List<Booking> all = bookingDAO.findByOwner(ownerId);
         List<Booking> pending = new java.util.ArrayList<>();
@@ -95,17 +140,30 @@ public class BookingService {
         return pending;
     }
 
-    // GET TOTAL EARNINGS FOR AN OWNER
+    /**
+     * Gets the total earnings for an owner.
+     * @param ownerId the owner's user ID
+     * @return the total earnings
+     * @throws SQLException if a database error occurs
+     */
     public double getOwnerEarnings(int ownerId) throws SQLException {
         return bookingDAO.calculateOwnerEarnings(ownerId);
     }
 
-    // GET PLATFORM TOTAL REVENUE (ADMIN)
+    /**
+     * Gets the platform total revenue (Admin).
+     * @return the total revenue
+     * @throws SQLException if a database error occurs
+     */
     public double getTotalRevenue() throws SQLException {
         return bookingDAO.calculateTotalRevenue();
     }
 
-    // GET BOOKING COUNTS FOR ADMIN DASHBOARD
+    /**
+     * Gets the total number of bookings for Admin dashboard.
+     * @return the total booking count
+     * @throws SQLException if a database error occurs
+     */
     public int getTotalBookingCount() throws SQLException {
         return bookingDAO.countAll();
     }

@@ -15,10 +15,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
 
+/**
+ * Servlet for securely serving user document files, such as KYC uploads.
+ */
 @WebServlet("/document/kyc")
 public class DocumentServlet extends HttpServlet {
     private final KycDAO kycDAO = new KycDAO();
 
+    /**
+     * Handles GET requests to retrieve and display a document file.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

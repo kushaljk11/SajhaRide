@@ -12,10 +12,16 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Servlet for handling notification-related actions, such as marking them as read.
+ */
 @WebServlet("/notifications/read")
 public class NotificationServlet extends HttpServlet {
     private final NotificationDAO notificationDAO = new NotificationDAO();
 
+    /**
+     * Handles POST requests to mark all notifications as read for the logged-in user.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);

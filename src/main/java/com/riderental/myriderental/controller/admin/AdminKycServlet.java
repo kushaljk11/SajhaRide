@@ -14,10 +14,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for handling KYC verifications by admins.
+ */
 @WebServlet("/admin/kyc")
 public class AdminKycServlet extends HttpServlet {
     private final KycDAO kycDAO = new KycDAO();
 
+    /**
+     * Displays a list of pending KYC verifications.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -39,6 +45,9 @@ public class AdminKycServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Processes KYC approval or rejection actions.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

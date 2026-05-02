@@ -7,8 +7,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling chat messages in the database.
+ */
 public class MessageDAO {
 
+    /**
+     * Saves a new message to the database.
+     * @param msg the Message object
+     * @return the saved Message with its ID
+     * @throws SQLException if a database error occurs
+     */
     public Message saveMessage(Message msg) throws SQLException {
         String sql = "INSERT INTO messages (sender_id, receiver_id, content) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -27,6 +36,13 @@ public class MessageDAO {
         return msg;
     }
 
+    /**
+     * Retrieves the conversation between two users.
+     * @param user1Id the first user ID
+     * @param user2Id the second user ID
+     * @return a list of Messages ordered by creation time
+     * @throws SQLException if a database error occurs
+     */
     public List<Message> getConversation(int user1Id, int user2Id) throws SQLException {
         String sql = "SELECT m.*, u1.fullName as sender_name, u2.fullName as receiver_name " +
                      "FROM messages m " +
@@ -62,6 +78,12 @@ public class MessageDAO {
         return messages;
     }
 
+    /**
+     * Retrieves a list of user IDs that a user has contacted or been contacted by.
+     * @param userId the user ID
+     * @return a list of contact user IDs
+     * @throws SQLException if a database error occurs
+     */
     public List<Integer> getContactedUserIds(int userId) throws SQLException {
         String sql = "SELECT DISTINCT sender_id AS contact_id FROM messages WHERE receiver_id = ? " +
                      "UNION " +

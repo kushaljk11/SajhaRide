@@ -11,10 +11,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Locale;
 
+/**
+ * Controller handling user login and session creation.
+ */
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Shows the login page.
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -22,6 +28,9 @@ public class LoginController extends HttpServlet {
                 .forward(request, response);
     }
 
+    /**
+     * Processes the login form submission.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

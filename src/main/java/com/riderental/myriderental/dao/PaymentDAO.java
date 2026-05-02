@@ -6,10 +6,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling payment transactions.
+ */
 public class PaymentDAO {
 
     /**
-     * Save a new payment record with PENDING status
+     * Saves a new payment record with a PENDING status.
+     *
+     * @param bookingId the associated booking ID
+     * @param gateway the payment gateway used (e.g., ESEWA, KHALTI)
+     * @param amount the payment amount
+     * @param transactionUuid the unique transaction UUID (for eSewa)
+     * @param pidx the payment index (for Khalti)
+     * @return the generated payment ID, or -1 if the insertion failed
+     * @throws SQLException if a database access error occurs
      */
     public int savePayment(int bookingId, String gateway, double amount,
                           String transactionUuid, String pidx) throws SQLException {
@@ -38,7 +49,13 @@ public class PaymentDAO {
     }
 
     /**
-     * Update payment status after verification
+     * Updates the status of an existing payment after gateway verification.
+     *
+     * @param gateway the payment gateway used
+     * @param transactionId the transaction ID (transaction UUID or pidx)
+     * @param status the new payment status (e.g., SUCCESS, FAILED)
+     * @param referenceId the reference ID provided by the payment gateway
+     * @throws SQLException if a database access error occurs
      */
     public void updatePaymentStatus(String gateway, String transactionId,
                                    String status, String referenceId) throws SQLException {
@@ -59,7 +76,11 @@ public class PaymentDAO {
     }
 
     /**
-     * Get payment by booking ID
+     * Retrieves a payment record by its associated booking ID.
+     *
+     * @param bookingId the booking ID
+     * @return the Payment record, or null if not found
+     * @throws SQLException if a database access error occurs
      */
     public Payment getPaymentByBookingId(int bookingId) throws SQLException {
         String sql = "SELECT payment_id, booking_id, gateway, amount, transaction_uuid, pidx, " +
@@ -81,7 +102,11 @@ public class PaymentDAO {
     }
 
     /**
-     * Get payment by transaction UUID (eSewa)
+     * Retrieves a payment record by its transaction UUID (typically for eSewa).
+     *
+     * @param uuid the transaction UUID
+     * @return the Payment record, or null if not found
+     * @throws SQLException if a database access error occurs
      */
     public Payment getPaymentByTransactionUuid(String uuid) throws SQLException {
         String sql = "SELECT payment_id, booking_id, gateway, amount, transaction_uuid, pidx, " +
@@ -103,7 +128,11 @@ public class PaymentDAO {
     }
 
     /**
-     * Get payment by pidx (Khalti)
+     * Retrieves a payment record by its payment index (typically for Khalti).
+     *
+     * @param pidx the payment index
+     * @return the Payment record, or null if not found
+     * @throws SQLException if a database access error occurs
      */
     public Payment getPaymentByPidx(String pidx) throws SQLException {
         String sql = "SELECT payment_id, booking_id, gateway, amount, transaction_uuid, pidx, " +
@@ -124,7 +153,13 @@ public class PaymentDAO {
         return null;
     }
 
-    // LIST PAYMENTS FOR ONE RENTER (based on booking user_id)
+    /**
+     * Retrieves a list of payments made by a specific renter.
+     *
+     * @param renterId the ID of the renter
+     * @return a list of Payment records associated with the renter
+     * @throws SQLException if a database access error occurs
+     */
     public List<Payment> findByRenterId(int renterId) throws SQLException {
         String sql = """
                 SELECT p.payment_id, p.booking_id, p.gateway, p.amount, p.transaction_uuid, p.pidx,
@@ -150,7 +185,13 @@ public class PaymentDAO {
         return payments;
     }
 
-    // LIST PAYMENTS FOR ONE OWNER (based on booked vehicles)
+    /**
+     * Retrieves a list of payments received by a specific vehicle owner.
+     *
+     * @param ownerId the ID of the vehicle owner
+     * @return a list of Payment records associated with the owner's vehicles
+     * @throws SQLException if a database access error occurs
+     */
     public List<Payment> findByOwnerId(int ownerId) throws SQLException {
         String sql = """
                 SELECT p.payment_id, p.booking_id, p.gateway, p.amount, p.transaction_uuid, p.pidx,
@@ -181,7 +222,14 @@ public class PaymentDAO {
         return payments;
     }
 
-    // SUM PAYMENT AMOUNT FOR A RENTER BY STATUS
+    /**
+     * Calculates the total amount of payments for a specific renter with a given status.
+     *
+     * @param renterId the ID of the renter
+     * @param status the payment status to filter by (e.g., "SUCCESS")
+     * @return the sum of the payment amounts
+     * @throws SQLException if a database access error occurs
+     */
     public double sumAmountByRenterAndStatus(int renterId, String status) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(p.amount), 0)
@@ -206,6 +254,14 @@ public class PaymentDAO {
         return 0;
     }
 
+    /**
+     * Calculates the total amount of payments for a specific owner with a given status.
+     *
+     * @param ownerId the ID of the owner
+     * @param status the payment status to filter by
+     * @return the sum of the payment amounts
+     * @throws SQLException if a database access error occurs
+     */
     public double sumAmountByOwnerAndStatus(int ownerId, String status) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(p.amount), 0)
@@ -231,6 +287,14 @@ public class PaymentDAO {
         return 0;
     }
 
+    /**
+     * Calculates the total amount of payments received by an owner today with a given status.
+     *
+     * @param ownerId the ID of the owner
+     * @param status the payment status to filter by
+     * @return the sum of today's payment amounts
+     * @throws SQLException if a database access error occurs
+     */
     public double sumAmountByOwnerAndToday(int ownerId, String status) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(p.amount), 0)
@@ -258,6 +322,14 @@ public class PaymentDAO {
         return 0;
     }
 
+    /**
+     * Calculates the total amount of payments received by an owner in the current week with a given status.
+     *
+     * @param ownerId the ID of the owner
+     * @param status the payment status to filter by
+     * @return the sum of the current week's payment amounts
+     * @throws SQLException if a database access error occurs
+     */
     public double sumAmountByOwnerAndCurrentWeek(int ownerId, String status) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(p.amount), 0)
@@ -285,6 +357,13 @@ public class PaymentDAO {
         return 0;
     }
 
+    /**
+     * Calculates the total pending payout amount for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the total sum of pending payouts
+     * @throws SQLException if a database access error occurs
+     */
     public double sumPendingOwnerPayout(int ownerId) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(p.amount), 0)

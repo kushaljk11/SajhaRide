@@ -1,5 +1,8 @@
 package com.riderental.myriderental.model;
 
+/**
+ * Represents a response from a payment gateway.
+ */
 public class PaymentResponse {
 
     private boolean success;
