@@ -14,6 +14,7 @@ public class User {
     private String role;
     private double trustScore;
     private String accountStatus;
+    private boolean isVerified;
 
     private LocalDateTime createdAt;
 
@@ -22,7 +23,7 @@ public class User {
 
     public User(int userId, String fullName, String email, String password, String phoneNumber,
                 String address, String profileImagePath, String role, double trustScore,
-                String accountStatus, LocalDateTime createdAt) {
+                String accountStatus, boolean isVerified, LocalDateTime createdAt) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
@@ -33,6 +34,7 @@ public class User {
         this.role = role;
         this.trustScore = trustScore;
         this.accountStatus = accountStatus;
+        this.isVerified = isVerified;
         this.createdAt = createdAt;
     }
 
@@ -122,5 +124,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
     }
 }

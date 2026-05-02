@@ -18,7 +18,7 @@
   boolean kycActive = currentPath.startsWith("/admin/kyc");
 %>
 <aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
-  <div class="mb-5 flex items-center gap-2 px-1">
+  <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img
       src="${pageContext.request.contextPath}/images/logo.svg"
       alt="SajhaRide"
@@ -32,7 +32,7 @@
         Admin Console
       </p>
     </div>
-  </div>
+  </a>
 
   <hr />
 
@@ -123,11 +123,17 @@
 
 <script>
   (function () {
-    var path = window.location.pathname.replace(/\/$/, "");
+    var path = window.location.pathname.replace(/\/$/, "") || "/";
     var links = document.querySelectorAll("a[data-admin-route]");
 
     links.forEach(function (link) {
-      var route = (link.getAttribute("data-admin-route") || "").replace(/\/$/, "");
+      var hrefPath;
+      try {
+        hrefPath = new URL(link.href, window.location.origin).pathname;
+      } catch (e) {
+        hrefPath = (link.getAttribute("href") || "");
+      }
+      var route = (hrefPath || "").replace(/\/$/, "") || "/";
       var isActive = path === route || path.indexOf(route + "/") === 0;
 
       link.classList.remove("bg-red-800", "font-semibold", "text-white");

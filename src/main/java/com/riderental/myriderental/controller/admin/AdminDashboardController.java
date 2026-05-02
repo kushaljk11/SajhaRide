@@ -60,6 +60,14 @@ public class AdminDashboardController extends HttpServlet {
             request.setAttribute("recentBookings", recentBookings);
             request.setAttribute("recentUsers", recentUsers);
 
+            com.riderental.myriderental.dao.BookingDAO bookingDAO = new com.riderental.myriderental.dao.BookingDAO();
+            List<Integer> weeklyBookings = bookingDAO.getLast7DaysBookings();
+            List<Integer> weeklyPosts = vehicleDAO.getLast7DaysPosts();
+            
+            // Pass as JavaScript arrays using Gson or simple formatting
+            request.setAttribute("weeklyBookingsStr", weeklyBookings.toString());
+            request.setAttribute("weeklyPostsStr", weeklyPosts.toString());
+
             request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp")
                     .forward(request, response);
 

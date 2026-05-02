@@ -1,7 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.riderental.myriderental.model.User" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.riderental.myriderental.model.Notification" %>
+<%@ page import="com.riderental.myriderental.dao.NotificationDAO" %>
 <%
   User loggedInUser = (User) session.getAttribute("loggedInUser");
+  NotificationDAO notifDAO = new NotificationDAO();
+  List<Notification> notifications = loggedInUser != null ? notifDAO.findByUserId(loggedInUser.getUserId()) : java.util.Collections.emptyList();
+  int unreadCount = loggedInUser != null ? notifDAO.getUnreadCount(loggedInUser.getUserId()) : 0;
+  String topbarCtx = request.getContextPath();
   String displayName = (loggedInUser != null && loggedInUser.getFullName() != null && !loggedInUser.getFullName().isBlank())
       ? loggedInUser.getFullName()
       : "Profile";
@@ -10,32 +17,57 @@
 <header
   class="flex h-16 items-center justify-end gap-2.5 shadow-[2px_0_8px_rgba(153,27,27,0.18)] bg-white px-5"
 >
-  <button
-    class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-red-800 bg-gray-100 text-red-800 transition-colors duration-200 hover:border-gray-400 hover:bg-indigo-50"
-    type="button"
-    aria-label="Notifications"
-    title="Notifications"
-  >
-    <svg
-      class="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
+  <div class="relative">
+    <button
+      class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-red-800 bg-gray-100 text-red-800 transition-colors duration-200 hover:border-gray-400 hover:bg-indigo-50"
+      type="button"
+      aria-label="Notifications"
+      title="Notifications"
+      onclick="toggleOwnerNotifications()"
     >
-      <path
-        d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"
-      ></path>
-      <path d="M9.5 17a2.5 2.5 0 0 0 5 0"></path>
-    </svg>
-  </button>
+      <svg
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"
+        ></path>
+        <path d="M9.5 17a2.5 2.5 0 0 0 5 0"></path>
+      </svg>
+      <% if (unreadCount > 0) { %>
+      <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full"><%= unreadCount %></span>
+      <% } %>
+    </button>
+
+    <div id="ownerNotificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-50 border border-gray-200">
+      <div class="py-2 px-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+        <span class="font-bold text-gray-700">Notifications</span>
+        <button onclick="markOwnerNotificationsRead()" class="text-xs text-blue-600 hover:text-blue-800">Mark all as read</button>
+      </div>
+      <div class="max-h-64 overflow-y-auto">
+        <% if (notifications.isEmpty()) { %>
+          <div class="px-4 py-3 text-sm text-gray-500">No new notifications.</div>
+        <% } else {
+             for (Notification n : notifications) { %>
+          <div class="px-4 py-3 border-b border-gray-100 <%= n.isRead() ? "bg-white" : "bg-blue-50" %>">
+            <p class="text-sm text-gray-800"><%= n.getMessage() %></p>
+            <span class="text-xs text-gray-400"><%= n.getCreatedAt() != null ? n.getCreatedAt().toLocalDate() + " " + n.getCreatedAt().toLocalTime().withNano(0) : "" %></span>
+          </div>
+        <%   }
+           } %>
+      </div>
+    </div>
+  </div>
 
   <div class="group relative">
     <a
-      href="/profile"
+      href="<%= topbarCtx %>/profile"
       class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-red-800 text-white transition-colors duration-200 hover:border-red-800 hover:bg-red-900"
       aria-label="Open profile"
       title="Open profile"
@@ -59,3 +91,15 @@
     </div>
   </div>
 </header>
+
+<script>
+  function toggleOwnerNotifications() {
+    document.getElementById('ownerNotificationDropdown').classList.toggle('hidden');
+  }
+  function markOwnerNotificationsRead() {
+    fetch('<%= request.getContextPath() %>/notifications/read', { method: 'POST' })
+      .then(res => {
+        if (res.ok) window.location.reload();
+      });
+  }
+</script>

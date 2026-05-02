@@ -1,5 +1,6 @@
 package com.riderental.myriderental.controller.booking;
 
+import com.riderental.myriderental.dao.BookingDAO;
 import com.riderental.myriderental.model.User;
 import com.riderental.myriderental.service.BookingService;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 public class RejectBookingController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
+    private final BookingDAO bookingDAO = new BookingDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,8 +29,8 @@ public class RejectBookingController extends HttpServlet {
             return;
         }
 
-        // Only owners can reject bookings
-        if (!"OWNER".equals(sessionUser.getRole())) {
+        String role = sessionUser.getRole() == null ? "" : sessionUser.getRole().trim();
+        if (!"OWNER".equalsIgnoreCase(role) && !"RENTER".equalsIgnoreCase(role)) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -41,6 +43,10 @@ public class RejectBookingController extends HttpServlet {
 
         try {
             int bookingId = Integer.parseInt(bookingIdParam);
+            if (!bookingDAO.isOwnedBy(bookingId, sessionUser.getUserId())) {
+                response.sendRedirect(request.getContextPath() + "/owner/dashboard");
+                return;
+            }
             bookingService.rejectBooking(bookingId);
 
             response.sendRedirect(request.getContextPath()

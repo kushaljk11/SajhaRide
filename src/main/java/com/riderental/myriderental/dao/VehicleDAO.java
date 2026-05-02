@@ -222,6 +222,23 @@ public class VehicleDAO {
         return 0;
     }
 
+    // GET LAST 7 DAYS POST COUNTS
+    public List<Integer> getLast7DaysPosts() throws SQLException {
+        List<Integer> counts = new ArrayList<>();
+        String sql = "SELECT COUNT(*) FROM vehicles WHERE DATE(created_at) = CURDATE() - INTERVAL ? DAY";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (int i = 6; i >= 0; i--) {
+                stmt.setInt(1, i);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) counts.add(rs.getInt(1));
+                    else counts.add(0);
+                }
+            }
+        }
+        return counts;
+    }
+
     // ALIAS for admin naming
     public int getTotalVehicles() throws SQLException {
         return countAll();
@@ -250,7 +267,7 @@ public class VehicleDAO {
         if (statuses == null || statuses.length == 0) {
             return 0;
         }
-
+        
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM vehicles WHERE availability_status IN (");
         for (int i = 0; i < statuses.length; i++) {
             if (i > 0) sql.append(",");
