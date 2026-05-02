@@ -74,6 +74,19 @@ public class RequestBookingController extends HttpServlet {
             return;
         }
 
+        try {
+            com.riderental.myriderental.dao.KycDAO kycDAO = new com.riderental.myriderental.dao.KycDAO();
+            com.riderental.myriderental.model.KycVerification kyc = kycDAO.findByUserId(sessionUser.getUserId());
+            
+            if (kyc == null || !"APPROVED".equals(kyc.getStatus())) {
+                request.getSession().setAttribute("profileError", "You must upload and verify your driving license in your profile before you can book a vehicle.");
+                response.sendRedirect(request.getContextPath() + "/profile");
+                return;
+            }
+        } catch (SQLException e) {
+            throw new ServletException("Error verifying KYC status", e);
+        }
+
         String vehicleIdParam = request.getParameter("vehicleId");
         String startDateStr = request.getParameter("startDate");
         String endDateStr = request.getParameter("endDate");
