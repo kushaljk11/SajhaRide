@@ -250,7 +250,7 @@ public class VehicleDAO {
         if (statuses == null || statuses.length == 0) {
             return 0;
         }
-
+        
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM vehicles WHERE availability_status IN (");
         for (int i = 0; i < statuses.length; i++) {
             if (i > 0) sql.append(",");

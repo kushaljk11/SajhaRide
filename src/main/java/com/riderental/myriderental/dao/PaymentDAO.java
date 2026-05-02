@@ -150,6 +150,37 @@ public class PaymentDAO {
         return payments;
     }
 
+    // LIST PAYMENTS FOR ONE OWNER (based on booked vehicles)
+    public List<Payment> findByOwnerId(int ownerId) throws SQLException {
+        String sql = """
+                SELECT p.payment_id, p.booking_id, p.gateway, p.amount, p.transaction_uuid, p.pidx,
+                       p.status, p.reference_id, p.created_at,
+                       b.status AS booking_status,
+                       u.fullName AS renter_name,
+                       v.vehicle_name AS vehicle_name
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                JOIN users u ON b.user_id = u.userId
+                WHERE v.owner_id = ?
+                ORDER BY p.created_at DESC
+                """;
+
+        List<Payment> payments = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ownerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    payments.add(mapResultSetToPayment(rs));
+                }
+            }
+        }
+
+        return payments;
+    }
+
     // SUM PAYMENT AMOUNT FOR A RENTER BY STATUS
     public double sumAmountByRenterAndStatus(int renterId, String status) throws SQLException {
         String sql = """
@@ -175,6 +206,110 @@ public class PaymentDAO {
         return 0;
     }
 
+    public double sumAmountByOwnerAndStatus(int ownerId, String status) throws SQLException {
+        String sql = """
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                WHERE v.owner_id = ? AND p.status = ?
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ownerId);
+            stmt.setString(2, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public double sumAmountByOwnerAndToday(int ownerId, String status) throws SQLException {
+        String sql = """
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                WHERE v.owner_id = ?
+                  AND p.status = ?
+                  AND DATE(p.created_at) = CURRENT_DATE()
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ownerId);
+            stmt.setString(2, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public double sumAmountByOwnerAndCurrentWeek(int ownerId, String status) throws SQLException {
+        String sql = """
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                WHERE v.owner_id = ?
+                  AND p.status = ?
+                  AND YEARWEEK(p.created_at, 1) = YEARWEEK(CURDATE(), 1)
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ownerId);
+            stmt.setString(2, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public double sumPendingOwnerPayout(int ownerId) throws SQLException {
+        String sql = """
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM payments p
+                JOIN bookings b ON p.booking_id = b.booking_id
+                JOIN vehicles v ON b.vehicle_id = v.vehicle_id
+                WHERE v.owner_id = ?
+                  AND p.status = 'PENDING'
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ownerId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+
     private Payment mapResultSetToPayment(ResultSet rs) throws SQLException {
         Payment payment = new Payment();
         payment.setPaymentId(rs.getInt("payment_id"));
@@ -186,6 +321,9 @@ public class PaymentDAO {
         payment.setStatus(rs.getString("status"));
         payment.setReferenceId(rs.getString("reference_id"));
         payment.setCreatedAt(rs.getTimestamp("created_at"));
+        try { payment.setBookingStatus(rs.getString("booking_status")); } catch (SQLException ignored) {}
+        try { payment.setRenterName(rs.getString("renter_name")); } catch (SQLException ignored) {}
+        try { payment.setVehicleName(rs.getString("vehicle_name")); } catch (SQLException ignored) {}
         return payment;
     }
 
@@ -202,6 +340,9 @@ public class PaymentDAO {
         private String status;
         private String referenceId;
         private Timestamp createdAt;
+        private String bookingStatus;
+        private String renterName;
+        private String vehicleName;
 
         // Getters and Setters
         public int getPaymentId() { return paymentId; }
@@ -230,6 +371,15 @@ public class PaymentDAO {
 
         public Timestamp getCreatedAt() { return createdAt; }
         public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+        public String getBookingStatus() { return bookingStatus; }
+        public void setBookingStatus(String bookingStatus) { this.bookingStatus = bookingStatus; }
+
+        public String getRenterName() { return renterName; }
+        public void setRenterName(String renterName) { this.renterName = renterName; }
+
+        public String getVehicleName() { return vehicleName; }
+        public void setVehicleName(String vehicleName) { this.vehicleName = vehicleName; }
     }
 }
 
