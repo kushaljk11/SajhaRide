@@ -58,8 +58,8 @@ public class RegisterController extends HttpServlet {
             user.setProfileImagePath(saveProfileImage(request.getPart("profileImage"), request));
 
             User savedUser = userDAO.create(user);
-            request.getSession().setAttribute("loggedInUser", savedUser);
-            response.sendRedirect(request.getContextPath() + "/profile");
+            request.getSession().setAttribute("registeredRole", savedUser.getRole());
+            response.sendRedirect(request.getContextPath() + "/registration-success");
         } catch (SQLException e) {
             throw new ServletException("Unable to register user", e);
         }

@@ -25,11 +25,11 @@
           </p>
 
           <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <a href="<%= ctx %>/vehicles/list"
+            <a href="<%= ctx %>/login"
               class="inline-flex min-w-[170px] items-center justify-center rounded-xl bg-red-800 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
               Find a Ride
             </a>
-            <a href="<%= ctx %>/auth/register"
+            <a href="<%= ctx %>/login"
               class="inline-flex min-w-[170px] items-center justify-center rounded-xl border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-red-800 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
               List Your Vehicle
             </a>
@@ -628,10 +628,10 @@
             </p>
 
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-              <a href="<%= ctx %>/vehicles/list" class="inline-flex min-w-[170px] items-center justify-center rounded-xl bg-red-800 border border-white px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
+              <a href="<%= ctx %>/login" class="inline-flex min-w-[170px] items-center justify-center rounded-xl bg-red-800 border border-white px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
                 Book a Ride
               </a>
-              <a href="<%= ctx %>/auth/register" class="inline-flex min-w-[170px] items-center justify-center rounded-xl border border-red-200 bg-white px-7 py-3 text-sm font-semibold text-red-800 shadow-sm transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
+              <a href="<%= ctx %>/login" class="inline-flex min-w-[170px] items-center justify-center rounded-xl border border-red-200 bg-white px-7 py-3 text-sm font-semibold text-red-800 shadow-sm transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2">
                 List Your Vehicle
               </a>
             </div>

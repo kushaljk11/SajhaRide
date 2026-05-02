@@ -55,7 +55,8 @@ public class AddNewPost extends HttpServlet {
             vehicle.setLocation(trim(request.getParameter("location")));
             vehicle.setDescription(trim(request.getParameter("description")));
             vehicle.setAvailabilityStatus(resolveAvailability(request.getParameter("availabilityStatus")));
-            vehicle.setImagePath(saveVehicleImage(request.getPart("vehicleImage"), request));
+            // Set image to null initially, we'll update it after getting the ID
+            vehicle.setImagePath(null);
             vehicle.setCreatedAt(LocalDateTime.now());
 
             if (vehicle.getVehicleName().isBlank() || vehicle.getVehicleType().isBlank() || vehicle.getLocation().isBlank()) {
@@ -68,7 +69,15 @@ public class AddNewPost extends HttpServlet {
                 return;
             }
 
-            vehicleDAO.create(vehicle);
+            Vehicle createdVehicle = vehicleDAO.create(vehicle);
+            
+            // Now save the image using the newly generated vehicle ID
+            String imagePath = saveVehicleImage(request.getPart("vehicleImage"), request, createdVehicle.getVehicleId());
+            if (imagePath != null) {
+                createdVehicle.setImagePath(imagePath);
+                vehicleDAO.update(createdVehicle);
+            }
+
             response.sendRedirect(request.getContextPath() + "/owner/myvehicle?success=created");
         } catch (SQLException e) {
             throw new ServletException("Unable to create owner vehicle", e);
@@ -138,7 +147,7 @@ public class AddNewPost extends HttpServlet {
         };
     }
 
-    private String saveVehicleImage(Part imagePart, HttpServletRequest request) throws IOException, ServletException {
+    private String saveVehicleImage(Part imagePart, HttpServletRequest request, int vehicleId) throws IOException, ServletException {
         if (imagePart == null || imagePart.getSize() == 0) {
             return null;
         }
@@ -154,14 +163,14 @@ public class AddNewPost extends HttpServlet {
             extension = submittedFileName.substring(dotIndex);
         }
 
-        String fileName = System.currentTimeMillis() + "-" + Math.abs(submittedFileName.hashCode()) + extension;
-        String uploadsPath = request.getServletContext().getRealPath("/uploads");
+        String fileName = vehicleId + extension;
+        String uploadsPath = request.getServletContext().getRealPath("/uploads/vehicle");
         File uploadsDir = new File(uploadsPath);
         if (!uploadsDir.exists() && !uploadsDir.mkdirs()) {
             throw new ServletException("Unable to create uploads directory");
         }
 
         imagePart.write(new File(uploadsDir, fileName).getAbsolutePath());
-        return "uploads/" + fileName;
+        return "uploads/vehicle/" + fileName;
     }
 }
