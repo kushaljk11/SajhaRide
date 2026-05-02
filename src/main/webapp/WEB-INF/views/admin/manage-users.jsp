@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="jakarta.servlet.http.HttpServletRequest" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +11,11 @@
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
 
+  <%-- convenience ctx variable to use in scriptlets (request is ServletRequest) --%>
+  <%
+    String ctx = ((HttpServletRequest) request).getContextPath();
+  %>
+
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
     <jsp:include page="components/topbar.jsp" />
 
@@ -21,23 +26,26 @@
           <h1 class="mt-2 text-4xl font-semibold tracking-tight text-gray-900">User Management</h1>
           <p class="mt-2 text-sm text-gray-600">Search, review, and manage riders, owners, and admin accounts.</p>
         </div>
-        <button class="rounded-xl bg-red-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ Add User</button>
+        <div class="flex flex-wrap gap-3">
+          <a href="<%= ctx + "/admin/users/export-csv" %>" class="rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Export CSV</a>
+          <a href="<%= ctx + "/admin/users/create" %>" class="rounded-xl bg-red-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ Add User</a>
+        </div>
       </section>
 
       <section class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         <article class="rounded-3xl bg-blue-50 p-5 ring-1 ring-blue-100">
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">Total Users</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">1,240</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("totalUsers") != null ? request.getAttribute("totalUsers") : "0" %></p>
           <p class="mt-1 text-sm text-gray-500">Registered accounts</p>
         </article>
         <article class="rounded-3xl bg-red-50 p-5 ring-1 ring-red-100">
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-red-700">Active Today</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">342</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("activeToday") != null ? request.getAttribute("activeToday") : "0" %></p>
           <p class="mt-1 text-sm text-gray-500">Logged-in users</p>
         </article>
         <article class="rounded-3xl bg-emerald-50 p-5 ring-1 ring-emerald-100">
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">New Requests</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">18</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("newRequests") != null ? request.getAttribute("newRequests") : "0" %></p>
           <p class="mt-1 text-sm text-gray-500">Pending approvals</p>
         </article>
       </section>
@@ -76,99 +84,52 @@
             </tr>
             </thead>
             <tbody>
+            <%
+              java.util.List<com.riderental.myriderental.model.User> users = (java.util.List<com.riderental.myriderental.model.User>) request.getAttribute("users");
+              if (users != null) {
+                for (com.riderental.myriderental.model.User u : users) {
+            %>
             <tr class="border-b border-gray-100">
               <td class="px-3 py-4">
                 <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/about.png" alt="Arjun Thapa" class="h-11 w-11 rounded-full object-cover" />
+                  <img src="<%= u.getProfileImagePath() == null || u.getProfileImagePath().isBlank() ? (ctx + "/images/about.png") : u.getProfileImagePath() %>" alt="<%= u.getFullName() %>" class="h-11 w-11 rounded-full object-cover" />
                   <div>
-                    <p class="font-semibold text-gray-900">Arjun Thapa</p>
-                    <p class="text-xs text-gray-500">arjun.thapa@gmail.com</p>
+                    <p class="font-semibold text-gray-900"><%= u.getFullName() %></p>
+                    <p class="text-xs text-gray-500"><%= u.getEmail() %></p>
                   </div>
                 </div>
               </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Owner</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
-              <td class="px-3 py-4 text-gray-600">Oct 12, 2023</td>
+              <td class="px-3 py-4"><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700"><%= u.getRole() == null ? "-" : u.getRole() %></span></td>
+              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"><%= u.getAccountStatus() == null ? "Active" : u.getAccountStatus() %></span></td>
+              <td class="px-3 py-4 text-gray-600"><%= u.getCreatedAt() == null ? "-" : u.getCreatedAt().toLocalDate().toString() %></td>
               <td class="px-3 py-4">
                 <div class="flex justify-end gap-2 text-gray-400">
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Edit user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Suspend user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Delete user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg></button>
+                  <form action="<%= ctx + "/admin/users/edit" %>" method="get" style="display:inline-block;">
+                    <input type="hidden" name="id" value="<%= u.getUserId() %>" />
+                    <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Edit user">Edit</button>
+                  </form>
+                  <form action="<%= ctx + "/admin/users/suspend" %>" method="post" style="display:inline-block;">
+                    <input type="hidden" name="id" value="<%= u.getUserId() %>" />
+                    <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Suspend user">Suspend</button>
+                  </form>
+                  <form action="<%= ctx + "/admin/users/delete" %>" method="post" style="display:inline-block;" onsubmit="return confirm('Delete user?');">
+                    <input type="hidden" name="id" value="<%= u.getUserId() %>" />
+                    <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Delete user">Delete</button>
+                  </form>
                 </div>
               </td>
             </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/register.png" alt="Priya Sharma" class="h-11 w-11 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Priya Sharma</p>
-                    <p class="text-xs text-gray-500">priya.sajharide@gmail.com</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">Renter</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
-              <td class="px-3 py-4 text-gray-600">Nov 04, 2023</td>
-              <td class="px-3 py-4">
-                <div class="flex justify-end gap-2 text-gray-400">
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Edit user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Suspend user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Delete user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg></button>
-                </div>
-              </td>
-            </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/logoho.png" alt="Bibek Shrestha" class="h-11 w-11 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Bibek Shrestha</p>
-                    <p class="text-xs text-gray-500">bibek.shrestha@yahoo.com</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Owner</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">Inactive</span></td>
-              <td class="px-3 py-4 text-gray-600">Jan 15, 2024</td>
-              <td class="px-3 py-4">
-                <div class="flex justify-end gap-2 text-gray-400">
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Edit user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Suspend user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Delete user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg></button>
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/about.png" alt="Sunita Rai" class="h-11 w-11 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Sunita Rai</p>
-                    <p class="text-xs text-gray-500">sunita.rai@ride.com</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">Renter</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
-              <td class="px-3 py-4 text-gray-600">Feb 02, 2024</td>
-              <td class="px-3 py-4">
-                <div class="flex justify-end gap-2 text-gray-400">
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Edit user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Suspend user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path></svg></button>
-                  <button class="rounded-lg border border-gray-200 p-2 hover:bg-gray-50" aria-label="Delete user"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg></button>
-                </div>
-              </td>
-            </tr>
+            <%    }
+              } else {
+            %>
+            <tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No users found.</td></tr>
+            <% } %>
             </tbody>
           </table>
         </div>
 
         <div class="mt-4 flex flex-col gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-          <p>Showing 1-4 of 1,240 users</p>
+          <p>Showing <span id="rowCount">1</span>-<span id="pageSize">10</span> of <%= request.getAttribute("totalUsers") != null ? request.getAttribute("totalUsers") : "0" %> users</p>
           <div class="flex items-center gap-2">
             <button class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-400">&lt;</button>
             <button class="rounded-lg bg-red-800 px-3 py-2 font-semibold text-white">1</button>
