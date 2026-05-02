@@ -123,11 +123,17 @@
 
 <script>
   (function () {
-    var path = window.location.pathname.replace(/\/$/, "");
+    var path = window.location.pathname.replace(/\/$/, "") || "/";
     var links = document.querySelectorAll("a[data-admin-route]");
 
     links.forEach(function (link) {
-      var route = (link.getAttribute("data-admin-route") || "").replace(/\/$/, "");
+      var hrefPath;
+      try {
+        hrefPath = new URL(link.href, window.location.origin).pathname;
+      } catch (e) {
+        hrefPath = (link.getAttribute("href") || "");
+      }
+      var route = (hrefPath || "").replace(/\/$/, "") || "/";
       var isActive = path === route || path.indexOf(route + "/") === 0;
 
       link.classList.remove("bg-red-800", "font-semibold", "text-white");

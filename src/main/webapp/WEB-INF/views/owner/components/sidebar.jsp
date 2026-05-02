@@ -19,6 +19,7 @@
   boolean paymentsActive = currentPath.startsWith("/owner/payments");
   boolean settingsActive = currentPath.startsWith("/owner/settings");
   boolean chatActive = currentPath.startsWith("/owner/chat");
+  boolean profileActive = currentPath.startsWith("/profile");
 %>
 <aside
   class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]"
@@ -183,30 +184,53 @@
       Chat
     </a>
 
+    <a
+      href="${pageContext.request.contextPath}/profile"
+      data-owner-route="/profile"
+      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= profileActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>"
+      <%= profileActive ? "aria-current=\"page\"" : "" %>
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="8" r="3"></circle>
+        <path d="M5 19c0-3.5 3-6 7-6s7 2.5 7 6"></path>
+      </svg>
+      Profile
+    </a>
+
   </nav>
+
+  <div class="mt-auto pt-4 border-t border-gray-100 pb-4">
+    <a href="${pageContext.request.contextPath}/logout"
+       class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-800 transition"
+    >
+      <svg
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      Logout
+    </a>
+  </div>
 </aside>
 
 <script>
   (function () {
-    var path = window.location.pathname.replace(/\/$/, "");
+    var path = window.location.pathname.replace(/\/$/, "") || "/";
     var links = document.querySelectorAll("a[data-owner-route]");
 
     links.forEach(function (link) {
-      var route = (link.getAttribute("data-owner-route") || "").replace(/\/$/, "");
+      var hrefPath;
+      try {
+        hrefPath = new URL(link.href, window.location.origin).pathname;
+      } catch (e) {
+        hrefPath = (link.getAttribute("href") || "");
+      }
+      var route = (hrefPath || "").replace(/\/$/, "") || "/";
       var isActive = path === route || path.indexOf(route + "/") === 0;
-
-      if (route === "/owner/bookings" && path.indexOf("/owner/bookings") === 0) {
-        isActive = true;
-      }
-      if (route === "/owner/payments" && path.indexOf("/owner/payments") === 0) {
-        isActive = true;
-      }
-      if (route === "/owner/settings" && path.indexOf("/owner/settings") === 0) {
-        isActive = true;
-      }
-      if (route === "/owner/chat" && path.indexOf("/owner/chat") === 0) {
-        isActive = true;
-      }
 
       link.classList.remove("bg-red-800", "font-semibold", "text-white");
       link.classList.remove("font-medium", "text-gray-600", "hover:bg-gray-200", "hover:text-gray-900");

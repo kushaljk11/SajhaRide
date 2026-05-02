@@ -227,6 +227,23 @@ public class BookingDAO {
         return 0;
     }
 
+    // GET LAST 7 DAYS BOOKING COUNTS
+    public List<Integer> getLast7DaysBookings() throws SQLException {
+        List<Integer> counts = new ArrayList<>();
+        String sql = "SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = CURDATE() - INTERVAL ? DAY";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (int i = 6; i >= 0; i--) {
+                stmt.setInt(1, i);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) counts.add(rs.getInt(1));
+                    else counts.add(0);
+                }
+            }
+        }
+        return counts;
+    }
+
     // COUNT BOOKINGS BY STATUS
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings WHERE status = ?";

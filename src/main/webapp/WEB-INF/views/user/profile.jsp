@@ -16,6 +16,7 @@
                 String status = esc.apply(user != null ? user.getAccountStatus() : "");
                 String role = esc.apply(user != null ? user.getRole() : "");
                 boolean isRenter = user != null && user.getRole() != null && "RENTER".equalsIgnoreCase(user.getRole());
+                boolean isOwner = user != null && user.getRole() != null && "OWNER".equalsIgnoreCase(user.getRole());
 
                 String initial = (user != null && user.getFullName() != null && !user.getFullName().isEmpty())
                 ? esc.apply(user.getFullName().substring(0,1).toUpperCase())
@@ -44,16 +45,24 @@
 
                 <body class="bg-gray-50 min-h-screen">
 
-                    <% if (isRenter) { %>
+                    <% if (isRenter || isOwner) { %>
                         <div class="flex h-screen overflow-hidden">
-                            <%@ include file="/WEB-INF/views/renter/components/sidebar.jsp" %>
+                            <% if (isRenter) { %>
+                                <%@ include file="/WEB-INF/views/renter/components/sidebar.jsp" %>
+                            <% } else if (isOwner) { %>
+                                <%@ include file="/WEB-INF/views/owner/components/sidebar.jsp" %>
+                            <% } %>
                                 <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-                                    <%@ include file="/WEB-INF/views/renter/components/topbar.jsp" %>
-                                        <main class="flex-1 overflow-y-auto">
+                                    <% if (isRenter) { %>
+                                        <%@ include file="/WEB-INF/views/renter/components/topbar.jsp" %>
+                                    <% } else if (isOwner) { %>
+                                        <%@ include file="/WEB-INF/views/owner/components/topbar.jsp" %>
+                                    <% } %>
+                                        <main class="flex-1 overflow-y-auto bg-gray-50">
                                             <% } %>
 
                                                 <!-- Header -->
-                                                <% if (!isRenter) { %>
+                                                <% if (!isRenter && !isOwner) { %>
                                                     <header class="bg-red-800 text-white shadow-md">
                                                         <div
                                                             class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
@@ -95,9 +104,11 @@
                                                                         </div>
 
                                                                         <h2
-                                                                            class="mt-4 text-lg font-semibold text-gray-800">
-                                                                            <%= fullName.isEmpty() ? "User" : fullName
-                                                                                %>
+                                                                            class="mt-4 text-lg font-semibold text-gray-800 flex items-center justify-center">
+                                                                            <%= fullName.isEmpty() ? "User" : fullName %>
+                                                                            <% if (user != null && user.isVerified()) { %>
+                                                                                <svg class="w-5 h-5 text-blue-500 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                                            <% } %>
                                                                         </h2>
 
                                                                         <p class="text-sm text-gray-500 mt-1">
@@ -284,7 +295,7 @@
                                                                     <div class="mb-6 flex justify-between items-center">
                                                                         <div>
                                                                             <h2 class="text-2xl font-bold text-gray-800">Identity Verification</h2>
-                                                                            <p class="text-sm text-gray-500 mt-1">Upload your driving license for verification</p>
+                                                                            <p class="text-sm text-gray-500 mt-1">Upload your <%= "OWNER".equalsIgnoreCase(role) ? "vehicle document" : "driving license" %> for verification</p>
                                                                         </div>
                                                                         <%
                                                                             com.riderental.myriderental.model.KycVerification kyc = (com.riderental.myriderental.model.KycVerification) request.getAttribute("kyc");
@@ -313,14 +324,18 @@
                                                                         <div>
                                                                             <label class="block text-sm font-medium text-gray-600 mb-2">Document Type</label>
                                                                             <select name="documentType" required class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-800">
-                                                                                <option value="LICENSE">Driving License</option>
+                                                                                <% if ("OWNER".equalsIgnoreCase(role)) { %>
+                                                                                    <option value="VEHICLE_DOCUMENT">Vehicle Document</option>
+                                                                                <% } else { %>
+                                                                                    <option value="LICENSE">Driving License</option>
+                                                                                <% } %>
                                                                             </select>
                                                                         </div>
                                                                         <div>
                                                                             <label class="block text-sm font-medium text-gray-600 mb-2">Upload Document</label>
                                                                             <label for="kycDocument" class="block border-2 border-dashed border-gray-300 rounded-xl p-5 bg-gray-50 hover:border-red-800 cursor-pointer transition">
                                                                                 <div class="text-center">
-                                                                                    <p class="font-medium text-gray-700">Click to upload driving license</p>
+                                                                                    <p class="font-medium text-gray-700">Click to upload document</p>
                                                                                     <p class="text-sm text-gray-400">PDF, JPG, PNG — max 5 MB</p>
                                                                                     <p id="kycFileNameDisplay" class="text-red-800 text-sm mt-2 hidden"></p>
                                                                                 </div>
@@ -359,7 +374,7 @@
                                                             }
                                                         </script>
 
-                                                        <% if (isRenter) { %>
+                                                        <% if (isRenter || isOwner) { %>
                                         </main>
                                 </div>
                         </div>

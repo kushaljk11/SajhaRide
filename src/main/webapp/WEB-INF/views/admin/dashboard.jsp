@@ -67,25 +67,98 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-7 items-end gap-3 rounded-3xl bg-gray-50 p-6">
-            <div class="h-16 rounded-t-2xl bg-red-100"></div>
-            <div class="h-28 rounded-t-2xl bg-red-200"></div>
-            <div class="h-20 rounded-t-2xl bg-blue-200"></div>
-            <div class="h-36 rounded-t-2xl bg-red-300"></div>
-            <div class="h-24 rounded-t-2xl bg-blue-300"></div>
-            <div class="h-40 rounded-t-2xl bg-red-200"></div>
-            <div class="h-30 rounded-t-2xl bg-red-300"></div>
+          <div class="relative w-full h-72 mt-6 rounded-3xl bg-gray-50 p-4">
+            <canvas id="activityChart"></canvas>
           </div>
+          
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              const ctx = document.getElementById('activityChart').getContext('2d');
+              
+              let blueGradient = ctx.createLinearGradient(0, 0, 0, 300);
+              blueGradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)'); 
+              blueGradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+              
+              let redGradient = ctx.createLinearGradient(0, 0, 0, 300);
+              redGradient.addColorStop(0, 'rgba(153, 27, 27, 0.25)'); 
+              redGradient.addColorStop(1, 'rgba(153, 27, 27, 0.0)');
+              
+              const labels = [];
+              for (let i = 6; i >= 0; i--) {
+                  const d = new Date();
+                  d.setDate(d.getDate() - i);
+                  labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+              }
 
-          <div class="mt-5 grid grid-cols-7 gap-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
-          </div>
+              const weeklyBookings = ${not empty weeklyBookingsStr ? weeklyBookingsStr : '[0,0,0,0,0,0,0]'};
+              const weeklyPosts = ${not empty weeklyPostsStr ? weeklyPostsStr : '[0,0,0,0,0,0,0]'};
+
+              new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: labels,
+                  datasets: [
+                    {
+                      label: 'Bookings',
+                      data: weeklyBookings,
+                      borderColor: '#2563eb',
+                      backgroundColor: blueGradient,
+                      borderWidth: 3,
+                      tension: 0.4,
+                      fill: true,
+                      pointBackgroundColor: '#ffffff',
+                      pointBorderColor: '#2563eb',
+                      pointBorderWidth: 2,
+                      pointRadius: 4,
+                      pointHoverRadius: 6
+                    },
+                    {
+                      label: 'New Posts',
+                      data: weeklyPosts,
+                      borderColor: '#991b1b',
+                      backgroundColor: redGradient,
+                      borderWidth: 3,
+                      tension: 0.4,
+                      fill: true,
+                      pointBackgroundColor: '#ffffff',
+                      pointBorderColor: '#991b1b',
+                      pointBorderWidth: 2,
+                      pointRadius: 4,
+                      pointHoverRadius: 6
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                      titleFont: { size: 13 },
+                      bodyFont: { size: 13 },
+                      padding: 12,
+                      cornerRadius: 8,
+                      intersect: false,
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: { display: false, drawBorder: false },
+                      ticks: { color: '#9ca3af', font: { size: 12, weight: '600' } }
+                    },
+                    y: {
+                      grid: { color: '#f3f4f6', drawBorder: false, borderDash: [5, 5] },
+                      ticks: { color: '#9ca3af', padding: 10, stepSize: 10 },
+                      beginAtZero: true
+                    }
+                  },
+                  interaction: { mode: 'index', intersect: false }
+                }
+              });
+            });
+          </script>
         </article>
 
         <aside class="space-y-6">

@@ -14,8 +14,8 @@ public class UserDAO {
     public User create(User user) throws SQLException {
         String sql = """
                 INSERT INTO users
-                (fullName, email, password, phoneNumber, address, profileImagePath, role, trustScore, accountStatus)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (fullName, email, password, phoneNumber, address, profileImagePath, role, trustScore, accountStatus, is_verified)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -30,6 +30,7 @@ public class UserDAO {
             stmt.setString(7, user.getRole());
             stmt.setDouble(8, user.getTrustScore());
             stmt.setString(9, user.getAccountStatus());
+            stmt.setBoolean(10, user.isVerified());
 
             stmt.executeUpdate();
 
@@ -152,7 +153,7 @@ public class UserDAO {
         String sql = """
                 UPDATE users
                 SET fullName = ?, email = ?, password = ?, phoneNumber = ?, address = ?,
-                    profileImagePath = ?, role = ?, trustScore = ?, accountStatus = ?
+                    profileImagePath = ?, role = ?, trustScore = ?, accountStatus = ?, is_verified = ?
                 WHERE userId = ?
                 """;
 
@@ -168,7 +169,8 @@ public class UserDAO {
             stmt.setString(7, user.getRole());
             stmt.setDouble(8, user.getTrustScore());
             stmt.setString(9, user.getAccountStatus());
-            stmt.setInt(10, user.getUserId());
+            stmt.setBoolean(10, user.isVerified());
+            stmt.setInt(11, user.getUserId());
 
             return stmt.executeUpdate() > 0;
         }
@@ -221,6 +223,7 @@ public class UserDAO {
         user.setRole(rs.getString("role"));
         user.setTrustScore(rs.getDouble("trustScore"));
         user.setAccountStatus(rs.getString("accountStatus"));
+        user.setVerified(rs.getBoolean("is_verified"));
 
         Timestamp ts = rs.getTimestamp("createdAt");
         if (ts != null) {

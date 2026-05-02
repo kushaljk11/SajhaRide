@@ -66,6 +66,20 @@ public class AdminKycServlet extends HttpServlet {
             if ("approve".equals(action)) {
                 boolean success = kycDAO.updateStatus(kycId, "APPROVED", null, user.getUserId());
                 if (success) {
+                    KycVerification kyc = kycDAO.findById(kycId);
+                    if (kyc != null) {
+                        com.riderental.myriderental.dao.UserDAO userDAO = new com.riderental.myriderental.dao.UserDAO();
+                        User kycUser = userDAO.findById(kyc.getUserId());
+                        if (kycUser != null) {
+                            kycUser.setVerified(true);
+                            userDAO.update(kycUser);
+                        }
+                        com.riderental.myriderental.dao.NotificationDAO notifDAO = new com.riderental.myriderental.dao.NotificationDAO();
+                        com.riderental.myriderental.model.Notification notif = new com.riderental.myriderental.model.Notification();
+                        notif.setUserId(kyc.getUserId());
+                        notif.setMessage("Congratulations! Your KYC document has been approved and your account is now verified.");
+                        notifDAO.create(notif);
+                    }
                     session.setAttribute("successMessage", "KYC verification approved successfully.");
                 } else {
                     session.setAttribute("errorMessage", "Failed to approve KYC.");
@@ -79,6 +93,14 @@ public class AdminKycServlet extends HttpServlet {
                 }
                 boolean success = kycDAO.updateStatus(kycId, "REJECTED", reason.trim(), user.getUserId());
                 if (success) {
+                    KycVerification kyc = kycDAO.findById(kycId);
+                    if (kyc != null) {
+                        com.riderental.myriderental.dao.NotificationDAO notifDAO = new com.riderental.myriderental.dao.NotificationDAO();
+                        com.riderental.myriderental.model.Notification notif = new com.riderental.myriderental.model.Notification();
+                        notif.setUserId(kyc.getUserId());
+                        notif.setMessage("Your KYC document was rejected. Reason: " + reason.trim());
+                        notifDAO.create(notif);
+                    }
                     session.setAttribute("successMessage", "KYC verification rejected.");
                 } else {
                     session.setAttribute("errorMessage", "Failed to reject KYC.");

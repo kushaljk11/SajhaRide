@@ -33,7 +33,7 @@ public class UploadKycServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = session != null ? (User) session.getAttribute("loggedInUser") : null;
         
-        if (user == null || (!"RENTER".equalsIgnoreCase(user.getRole()) && !"CUSTOMER".equalsIgnoreCase(user.getRole()))) {
+        if (user == null || (!"RENTER".equalsIgnoreCase(user.getRole()) && !"CUSTOMER".equalsIgnoreCase(user.getRole()) && !"OWNER".equalsIgnoreCase(user.getRole()))) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
@@ -78,9 +78,20 @@ public class UploadKycServlet extends HttpServlet {
             kyc.setDocumentPath("kyc/" + fileName); // store relative to kyc upload dir
             kyc.setDocumentType(documentType);
             
-            kycDAO.createKycRequest(kyc);
-            
-            request.getSession().setAttribute("profileSuccess", "KYC document uploaded successfully and is pending review.");
+            boolean success = kycDAO.createKycRequest(kyc);
+
+            if (success) {
+                com.riderental.myriderental.dao.NotificationDAO notifDAO = new com.riderental.myriderental.dao.NotificationDAO();
+                java.util.List<Integer> adminIds = notifDAO.getAllAdminIds();
+                for (int adminId : adminIds) {
+                    com.riderental.myriderental.model.Notification notif = new com.riderental.myriderental.model.Notification();
+                    notif.setUserId(adminId);
+                    notif.setMessage("New KYC document uploaded by " + user.getFullName() + ".");
+                    notifDAO.create(notif);
+                }
+                
+                request.getSession().setAttribute("profileSuccess", "Your verification document has been uploaded and is pending approval.");
+            }
         } catch (SQLException e) {
             request.getSession().setAttribute("profileError", "Database error occurred while saving verification request.");
             e.printStackTrace();

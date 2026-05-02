@@ -86,6 +86,23 @@ public class AddNewPost extends HttpServlet {
 
         String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
         if ("owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role)) {
+            if ("owner".equalsIgnoreCase(role)) {
+                try {
+                    com.riderental.myriderental.dao.UserDAO userDAO = new com.riderental.myriderental.dao.UserDAO();
+                    User freshUser = userDAO.findById(loggedInUser.getUserId());
+                    if (freshUser != null && !freshUser.isVerified()) {
+                        request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
+                        response.sendRedirect(request.getContextPath() + "/profile");
+                        return false;
+                    }
+                } catch (Exception e) {
+                    if (!loggedInUser.isVerified()) {
+                        request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
+                        response.sendRedirect(request.getContextPath() + "/profile");
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 
