@@ -16,12 +16,22 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for handling vehicle updates by owners.
+ */
 @WebServlet("/owner/vehicle/update")
 @MultipartConfig
 public class UpdateVehicleController extends HttpServlet {
 
 	private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+	/**
+	 * Handles GET requests to display the vehicle update form.
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (!ensureOwnerAccess(request, response)) {
@@ -57,6 +67,13 @@ public class UpdateVehicleController extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Handles POST requests to process the vehicle update.
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (!ensureOwnerAccess(request, response)) {
@@ -101,6 +118,13 @@ public class UpdateVehicleController extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Ensures that the requesting user has owner access.
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @return true if the user is an owner, false otherwise
+	 * @throws IOException if an I/O error occurs during redirection
+	 */
 	private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		User sessionUser = getSessionUser(request);
 		if (sessionUser == null) {
@@ -117,18 +141,38 @@ public class UpdateVehicleController extends HttpServlet {
 		return false;
 	}
 
+	/**
+	 * Retrieves the logged-in user from the session.
+	 * @param request the HTTP request
+	 * @return the logged-in User, or null if not found
+	 */
 	private User getSessionUser(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		return session == null ? null : (User) session.getAttribute("loggedInUser");
 	}
 
+	/**
+	 * Trims a string value safely.
+	 * @param value the string to trim
+	 * @return the trimmed string, or empty string if null
+	 */
 	private String trim(String value) { return value == null ? "" : value.trim(); }
 
+	/**
+	 * Parses a double value safely.
+	 * @param value the string to parse
+	 * @return the parsed double, or 0.0 if invalid
+	 */
 	private double parseDouble(String value) {
 		try { return value == null || value.isBlank() ? 0.0 : Double.parseDouble(value.trim()); }
 		catch (NumberFormatException e) { return 0.0; }
 	}
 
+	/**
+	 * Resolves the availability status of a vehicle.
+	 * @param raw the raw status string
+	 * @return the normalized status string
+	 */
 	private String resolveAvailability(String raw) {
 		if (raw == null || raw.isBlank()) return "AVAILABLE";
 		String normalized = raw.trim().toUpperCase();
@@ -138,6 +182,15 @@ public class UpdateVehicleController extends HttpServlet {
 		};
 	}
 
+	/**
+	 * Saves an uploaded vehicle image to the server.
+	 * @param imagePart the Part containing the uploaded image
+	 * @param request the HTTP request
+	 * @param vehicleId the ID of the vehicle
+	 * @return the relative path to the saved image, or null if no image was uploaded
+	 * @throws IOException if an I/O error occurs
+	 * @throws ServletException if a servlet-specific error occurs
+	 */
 	private String saveVehicleImage(Part imagePart, HttpServletRequest request, int vehicleId) throws IOException, ServletException {
 		if (imagePart == null || imagePart.getSize() == 0) return null;
 		String submittedFileName = imagePart.getSubmittedFileName();

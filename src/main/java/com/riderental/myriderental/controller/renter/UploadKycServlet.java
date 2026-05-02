@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
+/**
+ * Servlet for handling KYC document uploads by users.
+ */
 @WebServlet("/user/kyc/upload")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
@@ -26,6 +29,13 @@ import java.util.UUID;
 public class UploadKycServlet extends HttpServlet {
     private final KycDAO kycDAO = new KycDAO();
 
+    /**
+     * Handles POST requests to upload a KYC document.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

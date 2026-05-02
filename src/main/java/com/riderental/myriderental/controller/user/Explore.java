@@ -14,8 +14,18 @@ import java.sql.SQLException;
 import java.util.List;
 import com.riderental.myriderental.model.Vehicle;
 
+/**
+ * Controller for displaying the vehicle exploration page.
+ */
 @WebServlet("/explore")
 public class Explore extends HttpServlet {
+    /**
+     * Handles GET requests to display the explore page with available vehicles.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User loggedInUser = session == null ? null : (User) session.getAttribute("loggedInUser");

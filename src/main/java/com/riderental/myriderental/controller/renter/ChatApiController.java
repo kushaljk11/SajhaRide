@@ -18,12 +18,22 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * REST API controller for handling chat messages between renters and owners.
+ */
 @WebServlet("/api/chat/*")
 public class ChatApiController extends HttpServlet {
 
     private final MessageDAO messageDAO = new MessageDAO();
     private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
+    /**
+     * Handles GET requests to retrieve chat history with a specific user.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User sessionUser = getSessionUser(request);
@@ -52,6 +62,13 @@ public class ChatApiController extends HttpServlet {
         }
     }
 
+    /**
+     * Handles POST requests to send a new chat message.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User sessionUser = getSessionUser(request);
@@ -82,6 +99,11 @@ public class ChatApiController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");

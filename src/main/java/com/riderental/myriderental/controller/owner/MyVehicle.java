@@ -15,12 +15,22 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for displaying the list of an owner's vehicles.
+ */
 @WebServlet("/owner/myvehicle")
 public class MyVehicle extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
     private final OwnerDashboardDAO ownerDashboardDAO = new OwnerDashboardDAO();
 
+    /**
+     * Handles GET requests to display the owner's vehicles.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -45,11 +55,21 @@ public class MyVehicle extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
     }
 
+    /**
+     * Ensures that the requesting user has owner access.
+     * @param loggedInUser the currently logged-in user
+     * @return true if the user is an owner, false otherwise
+     */
     private boolean ensureOwnerAccess(User loggedInUser) {
         String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
         return "owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role);
