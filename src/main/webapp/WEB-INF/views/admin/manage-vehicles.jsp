@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="jakarta.servlet.http.HttpServletRequest" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +11,11 @@
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
 
+  <%-- context path helper for scriptlets --%>
+  <%
+    String ctx = ((HttpServletRequest) request).getContextPath();
+  %>
+
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
     <jsp:include page="components/topbar.jsp" />
 
@@ -22,31 +27,31 @@
           <p class="mt-2 text-sm text-gray-600">Audit and regulate listings across the platform.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <button class="rounded-xl bg-red-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ New Listing</button>
-          <button class="rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Export CSV</button>
+          <a href="<%= ctx + "/admin/vehicles/export-csv" %>" class="rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Export CSV</a>
+          <a href="<%= ctx + "/admin/vehicles/create" %>" class="rounded-xl bg-red-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ New Listing</a>
         </div>
       </section>
 
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Active Posts</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">1,284</p>
-          <p class="mt-2 text-sm text-emerald-700">+12%</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("activePosts") != null ? request.getAttribute("activePosts") : "0" %></p>
+          <p class="mt-2 text-sm text-emerald-700">AVAILABLE vehicles</p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Awaiting Approval</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">42</p>
-          <p class="mt-2 text-sm text-amber-700">8 pending</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("awaitingApproval") != null ? request.getAttribute("awaitingApproval") : "0" %></p>
+          <p class="mt-2 text-sm text-amber-700">PENDING vehicles</p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-rose-700">Blocked Listings</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">18</p>
-          <p class="mt-2 text-sm text-rose-700">-2%</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("blockedListings") != null ? request.getAttribute("blockedListings") : "0" %></p>
+          <p class="mt-2 text-sm text-rose-700">BLOCKED/MAINTENANCE</p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-700">Total Booking Value</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">Rs. 842k</p>
-          <p class="mt-2 text-sm text-gray-500">Peak: 3PM</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">Rs. <%= String.format("%.0f", request.getAttribute("totalBookingValue") != null ? (Double) request.getAttribute("totalBookingValue") : 0) %></p>
+          <p class="mt-2 text-sm text-gray-500">Total revenue</p>
         </article>
       </section>
 
@@ -84,111 +89,46 @@
             </tr>
             </thead>
             <tbody>
+            <%
+              java.util.List<com.riderental.myriderental.model.Vehicle> vehicles = (java.util.List<com.riderental.myriderental.model.Vehicle>) request.getAttribute("vehicles");
+              if (vehicles != null) {
+                for (com.riderental.myriderental.model.Vehicle v : vehicles) {
+            %>
             <tr class="border-b border-gray-100">
               <td class="px-3 py-4">
                 <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/about.png" alt="Toyota Corolla" class="h-12 w-16 rounded-lg object-cover" />
+                  <img src="<%= v.getImagePath() == null || v.getImagePath().isBlank() ? (ctx + "/images/about.png") : v.getImagePath() %>" alt="<%= v.getVehicleName() %>" class="h-12 w-16 rounded-lg object-cover" />
                   <div>
-                    <p class="font-semibold text-gray-900">Toyota Corolla 2022</p>
-                    <p class="text-xs text-gray-500">BA 3 PA 8921 • Blue</p>
+                    <p class="font-semibold text-gray-900"><%= v.getVehicleName() %></p>
+                    <p class="text-xs text-gray-500"><%= v.getLocation() == null ? "" : v.getLocation() %></p>
                   </div>
                 </div>
               </td>
               <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Anish Shrestha</p>
-                <p class="text-xs text-gray-500">Koteshwor, KTM</p>
+                <p class="font-semibold text-gray-900"><%= v.getOwnerId() %></p>
+                <p class="text-xs text-gray-500">Owner ID</p>
               </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Sedan</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">Rs. 3,500 <span class="text-xs font-normal text-gray-500">/day</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
+              <td class="px-3 py-4"><span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"><%= v.getVehicleType() == null ? "-" : v.getVehicleType() %></span></td>
+              <td class="px-3 py-4 font-semibold text-gray-900">Rs. <%= v.getPricePerDay() %> <span class="text-xs font-normal text-gray-500">/day</span></td>
+              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"><%= v.getAvailabilityStatus() == null ? "Unknown" : v.getAvailabilityStatus() %></span></td>
               <td class="px-3 py-4 text-right">
                 <div class="inline-flex gap-2">
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Edit</button>
+                  <a href="<%= ctx + "/admin/vehicles/view?id=" + v.getVehicleId() %>" class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</a>
+                  <a href="<%= ctx + "/admin/vehicles/edit?id=" + v.getVehicleId() %>" class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Edit</a>
                 </div>
               </td>
             </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/register.png" alt="Hyundai Tucson" class="h-12 w-16 rounded-lg object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Hyundai Tucson</p>
-                    <p class="text-xs text-gray-500">Bag 2 KHA 7701 • Black</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Maya Kapali</p>
-                <p class="text-xs text-gray-500">Patan, Lalitpur</p>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">SUV</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">Rs. 6,200 <span class="text-xs font-normal text-gray-500">/day</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Pending</span></td>
-              <td class="px-3 py-4 text-right">
-                <div class="inline-flex gap-2">
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Approve</button>
-                </div>
-              </td>
-            </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/logoho.png" alt="Royal Enfield Classic" class="h-12 w-16 rounded-lg object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Royal Enfield Classic</p>
-                    <p class="text-xs text-gray-500">BA 9 PA 0921 • Silver</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Rohan Basnet</p>
-                <p class="text-xs text-gray-500">Banepa</p>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">Motorbike</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">Rs. 1,500 <span class="text-xs font-normal text-gray-500">/day</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Blocked</span></td>
-              <td class="px-3 py-4 text-right">
-                <div class="inline-flex gap-2">
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Unblock</button>
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="px-3 py-4">
-                <div class="flex items-center gap-3">
-                  <img src="${pageContext.request.contextPath}/images/about.png" alt="Suzuki Swift" class="h-12 w-16 rounded-lg object-cover" />
-                  <div>
-                    <p class="font-semibold text-gray-900">Suzuki Swift 2021</p>
-                    <p class="text-xs text-gray-500">BA 2 CHA 4523 • Red</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Jenish Lama</p>
-                <p class="text-xs text-gray-500">Dhobighat, Lalitpur</p>
-              </td>
-              <td class="px-3 py-4"><span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">Hatchback</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">Rs. 2,800 <span class="text-xs font-normal text-gray-500">/day</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
-              <td class="px-3 py-4 text-right">
-                <div class="inline-flex gap-2">
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-                  <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Edit</button>
-                </div>
-              </td>
-            </tr>
+            <%    }
+              } else {
+            %>
+            <tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">No vehicles found.</td></tr>
+            <% } %>
             </tbody>
           </table>
         </div>
 
         <div class="mt-4 flex flex-col gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-          <p>Showing 1-10 of 1,344 results</p>
+          <p>Showing <span id="rowCount">1</span>-<span id="pageSize">10</span> of <%= request.getAttribute("totalVehicles") != null ? request.getAttribute("totalVehicles") : "0" %> vehicles</p>
           <div class="flex items-center gap-2">
             <button class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-400">&lt;</button>
             <button class="rounded-lg bg-red-800 px-3 py-2 font-semibold text-white">1</button>

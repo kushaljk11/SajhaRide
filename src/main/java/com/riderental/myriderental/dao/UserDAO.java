@@ -96,6 +96,57 @@ public class UserDAO {
         return users;
     }
 
+    // COUNT ALL USERS
+    public int getTotalUsers() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    // COUNT USERS BY STATUS
+    public int countByStatus(String status) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE accountStatus = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    // COUNT USERS BY ROLE
+    public int countByRole(String role) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, role);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     // UPDATE FULL USER
     public boolean update(User user) throws SQLException {
         String sql = """

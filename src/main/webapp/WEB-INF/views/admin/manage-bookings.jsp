@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="jakarta.servlet.http.HttpServletRequest" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +11,11 @@
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
 
+  <%-- ctx helper for scriptlets --%>
+  <%
+    String ctx = ((HttpServletRequest) request).getContextPath();
+  %>
+
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
     <jsp:include page="components/topbar.jsp" />
 
@@ -22,29 +27,29 @@
           <p class="mt-2 text-sm text-gray-600">Review reservations, monitor revenue, and handle cancellations from one screen.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <button class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Export CSV</button>
-          <button class="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ New Booking</button>
+          <a href="<%= ctx + "/admin/bookings/export-csv" %>" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Export CSV</a>
+          <a href="<%= ctx + "/admin/bookings/create" %>" class="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">+ New Booking</a>
         </div>
       </section>
 
       <section class="grid grid-cols-1 gap-4 md:grid-cols-4">
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700">Total Bookings</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">1,284</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900"><%= request.getAttribute("totalBookings") == null ? 0 : request.getAttribute("totalBookings") %></p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-red-700">Total Revenue</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">NPR 452,000</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">NPR <%= request.getAttribute("totalRevenue") == null ? 0 : request.getAttribute("totalRevenue") %></p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Active Rides</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">42</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">--</p>
           <p class="mt-2 text-sm text-gray-500">Stable</p>
         </article>
         <article class="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-rose-700">Cancellations</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">14</p>
-          <p class="mt-2 text-sm text-gray-500">-2% this week</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">--</p>
+          <p class="mt-2 text-sm text-gray-500">-</p>
         </article>
       </section>
 
@@ -84,81 +89,34 @@
             </tr>
             </thead>
             <tbody>
+            <%
+              java.util.List<com.riderental.myriderental.model.Booking> bookings = (java.util.List<com.riderental.myriderental.model.Booking>) request.getAttribute("bookings");
+              if (bookings != null) {
+                for (com.riderental.myriderental.model.Booking b : bookings) {
+            %>
             <tr class="border-b border-gray-100">
-              <td class="px-3 py-4 font-semibold text-gray-900">#SR-9842</td>
+              <td class="px-3 py-4 font-semibold text-gray-900">#<%= b.getBookingId() %></td>
               <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Anup Sharma</p>
-                <p class="text-xs text-gray-500">Verified Pro</p>
+                <p class="font-semibold text-gray-900"><%= b.getRenterName() == null ? b.getUserId() : b.getRenterName() %></p>
+                <p class="text-xs text-gray-500">Renter</p>
               </td>
               <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Ramesh KC</p>
-                <p class="text-xs text-gray-500">Top Owner</p>
-              </td>
-              <td class="px-3 py-4">Honda XR 190L</td>
-              <td class="px-3 py-4 text-gray-600">Oct 12 - Oct 14<br /><span class="text-xs text-gray-400">2 Days</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">NPR 4,500</td>
-              <td class="px-3 py-4 text-right">
-                <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-              </td>
-            </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4 font-semibold text-gray-900">#SR-9840</td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Priya Thapa</p>
-                <p class="text-xs text-gray-500">New User</p>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Bishnu Gurung</p>
+                <p class="font-semibold text-gray-900"><%= b.getVehicleName() == null ? b.getVehicleId() : b.getVehicleName() %></p>
                 <p class="text-xs text-gray-500">Owner</p>
               </td>
-              <td class="px-3 py-4">Hyundai Creta</td>
-              <td class="px-3 py-4 text-gray-600">Oct 10 - Oct 11<br /><span class="text-xs text-gray-400">1 Day</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Completed</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">NPR 8,200</td>
+              <td class="px-3 py-4"><%= b.getVehicleName() == null ? ("#" + b.getVehicleId()) : b.getVehicleName() %></td>
+              <td class="px-3 py-4 text-gray-600"><%= b.getStartDate() %> - <%= b.getEndDate() %><br /><span class="text-xs text-gray-400"><%= java.time.temporal.ChronoUnit.DAYS.between(b.getStartDate(), b.getEndDate()) %> Days</span></td>
+              <td class="px-3 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"><%= b.getStatus() %></span></td>
+              <td class="px-3 py-4 font-semibold text-gray-900">NPR <%= b.getTotalPrice() %></td>
               <td class="px-3 py-4 text-right">
-                <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
+                <a href="<%= ctx + "/admin/bookings/view?id=" + b.getBookingId() %>" class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</a>
               </td>
             </tr>
-
-            <tr class="border-b border-gray-100">
-              <td class="px-3 py-4 font-semibold text-gray-900">#SR-9838</td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Raji Maharjan</p>
-                <p class="text-xs text-gray-500">Verified</p>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Sunita Adhikari</p>
-                <p class="text-xs text-gray-500">Power Host</p>
-              </td>
-              <td class="px-3 py-4">NIU NQi Sport</td>
-              <td class="px-3 py-4 text-gray-600">Oct 15 - Oct 15<br /><span class="text-xs text-gray-400">5 Hours</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Pending</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">NPR 1,500</td>
-              <td class="px-3 py-4 text-right">
-                <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="px-3 py-4 font-semibold text-gray-900">#SR-9832</td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Kiran Lama</p>
-                <p class="text-xs text-gray-500">Standard</p>
-              </td>
-              <td class="px-3 py-4">
-                <p class="font-semibold text-gray-900">Nabin Bajracharya</p>
-                <p class="text-xs text-gray-500">Business</p>
-              </td>
-              <td class="px-3 py-4">Royal Enfield Classic 350</td>
-              <td class="px-3 py-4 text-gray-600">Oct 05 - Oct 08<br /><span class="text-xs text-gray-400">3 Days</span></td>
-              <td class="px-3 py-4"><span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Cancelled</span></td>
-              <td class="px-3 py-4 font-semibold text-gray-900">NPR 0</td>
-              <td class="px-3 py-4 text-right">
-                <button class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">View</button>
-              </td>
-            </tr>
+            <%    }
+              } else {
+            %>
+            <tr><td colspan="8" class="px-3 py-4 text-center text-gray-500">No bookings found.</td></tr>
+            <% } %>
             </tbody>
           </table>
         </div>
