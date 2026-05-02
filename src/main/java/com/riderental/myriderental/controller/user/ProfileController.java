@@ -1,7 +1,9 @@
 package com.riderental.myriderental.controller.user;
 
 import com.riderental.myriderental.dao.UserDAO;
+import com.riderental.myriderental.dao.KycDAO;
 import com.riderental.myriderental.model.User;
+import com.riderental.myriderental.model.KycVerification;
 import com.riderental.myriderental.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -20,6 +22,7 @@ import java.sql.SQLException;
 @MultipartConfig
 public class ProfileController extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
+    private final KycDAO kycDAO = new KycDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,6 +37,10 @@ public class ProfileController extends HttpServlet {
             User freshUser = userDAO.findById(sessionUser.getUserId());
             request.getSession().setAttribute("loggedInUser", freshUser);
             request.setAttribute("user", freshUser);
+            
+            KycVerification kyc = kycDAO.findByUserId(freshUser.getUserId());
+            request.setAttribute("kyc", kyc);
+            
             request.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Unable to load profile", e);

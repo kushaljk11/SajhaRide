@@ -288,6 +288,17 @@ public class VehicleDAO {
         vehicle.setAvailabilityStatus(rs.getString("availability_status"));
         vehicle.setImagePath(rs.getString("image_path"));
 
+        // Extract owner details if available (from JOIN queries)
+        try {
+            vehicle.setOwnerName(rs.getString("owner_name"));
+            vehicle.setOwnerEmail(rs.getString("owner_email"));
+            vehicle.setOwnerPhoneNumber(rs.getString("owner_phone_number"));
+            vehicle.setOwnerAddress(rs.getString("owner_address"));
+            vehicle.setOwnerProfileImagePath(rs.getString("owner_profile_image_path"));
+        } catch (SQLException e) {
+            // Owner fields not available in this query result
+        }
+
         Timestamp ts = rs.getTimestamp("created_at");
         if (ts != null) {
             vehicle.setCreatedAt(ts.toLocalDateTime());

@@ -15,6 +15,7 @@
   boolean usersActive = currentPath.startsWith("/admin/users");
   boolean vehiclesActive = currentPath.startsWith("/admin/vehicles");
   boolean bookingsActive = currentPath.startsWith("/admin/bookings");
+  boolean kycActive = currentPath.startsWith("/admin/kyc");
 %>
 <aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
   <div class="mb-5 flex items-center gap-2 px-1">
@@ -90,6 +91,18 @@
         <path d="M3 10h18"></path>
       </svg>
       Booking Management
+    </a>
+
+    <a
+      href="${pageContext.request.contextPath}/admin/kyc"
+      data-admin-route="/admin/kyc"
+      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= kycActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>"
+      <%= kycActive ? "aria-current=\"page\"" : "" %>
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      KYC Management
     </a>
   </nav>
 
