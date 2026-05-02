@@ -13,12 +13,18 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for handling the approval of a booking request by a vehicle owner.
+ */
 @WebServlet("/booking/approve")
 public class ApproveBookingController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
     private final BookingDAO bookingDAO = new BookingDAO();
 
+    /**
+     * Processes POST requests to approve a specific booking.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

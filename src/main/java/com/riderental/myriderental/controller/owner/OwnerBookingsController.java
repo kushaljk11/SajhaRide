@@ -16,12 +16,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for viewing an owner's bookings.
+ */
 @WebServlet("/owner/bookings")
 public class OwnerBookingsController extends HttpServlet {
 
     private final BookingDAO bookingDAO = new BookingDAO();
     private final OwnerDashboardDAO ownerDashboardDAO = new OwnerDashboardDAO();
 
+    /**
+     * Handles GET requests to display the owner's bookings.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -65,11 +75,21 @@ public class OwnerBookingsController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
     }
 
+    /**
+     * Ensures that the requesting user has owner access.
+     * @param user the currently logged-in user
+     * @return true if the user is an owner, false otherwise
+     */
     private boolean ensureOwnerAccess(User user) {
         String role = user.getRole() == null ? "" : user.getRole().trim();
         return "owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role);

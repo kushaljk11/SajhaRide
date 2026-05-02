@@ -8,8 +8,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling KYC verification database operations.
+ */
 public class KycDAO {
 
+    /**
+     * Creates a new KYC verification request.
+     * @param kyc the KycVerification object
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean createKycRequest(KycVerification kyc) throws SQLException {
         String sql = "INSERT INTO renter_verifications (user_id, document_path, document_type, status) VALUES (?, ?, ?, 'PENDING')";
         
@@ -24,6 +33,12 @@ public class KycDAO {
         }
     }
 
+    /**
+     * Finds the latest KYC verification request for a user.
+     * @param userId the user ID
+     * @return the KycVerification object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public KycVerification findByUserId(int userId) throws SQLException {
         String sql = "SELECT * FROM renter_verifications WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1";
         
@@ -41,6 +56,12 @@ public class KycDAO {
         return null;
     }
 
+    /**
+     * Finds a KYC verification request by its ID.
+     * @param id the request ID
+     * @return the KycVerification object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public KycVerification findById(int id) throws SQLException {
         String sql = "SELECT * FROM renter_verifications WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -57,6 +78,11 @@ public class KycDAO {
         return null;
     }
 
+    /**
+     * Retrieves all pending KYC verification requests.
+     * @return a list of pending KycVerification objects
+     * @throws SQLException if a database error occurs
+     */
     public List<KycVerification> findAllPending() throws SQLException {
         String sql = "SELECT k.*, u.fullName FROM renter_verifications k JOIN users u ON k.user_id = u.userId WHERE k.status = 'PENDING' ORDER BY k.uploaded_at ASC";
         List<KycVerification> list = new ArrayList<>();
@@ -74,6 +100,15 @@ public class KycDAO {
         return list;
     }
 
+    /**
+     * Updates the status of a KYC verification request.
+     * @param id the request ID
+     * @param status the new status
+     * @param reason the rejection reason (if any)
+     * @param adminId the ID of the admin reviewing the request
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean updateStatus(int id, String status, String reason, int adminId) throws SQLException {
         String sql = "UPDATE renter_verifications SET status = ?, rejection_reason = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ? WHERE id = ?";
         

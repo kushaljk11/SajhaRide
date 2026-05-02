@@ -11,11 +11,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for displaying the details of a specific vehicle.
+ */
 @WebServlet("/vehicle-details")
 public class VehicleDetailsController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles GET requests to show the vehicle details page.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

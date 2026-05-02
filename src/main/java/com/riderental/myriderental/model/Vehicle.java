@@ -2,6 +2,9 @@ package com.riderental.myriderental.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a vehicle entity available for rental.
+ */
 public class Vehicle {
 
     private int vehicleId;

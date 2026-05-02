@@ -4,7 +4,7 @@ import com.riderental.myriderental.model.User;
 import com.riderental.myriderental.dao.VehicleDAO;
 import jakarta.servlet.ServletException;
 import java.sql.SQLException;
-import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +13,16 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+/**
+ * Controller for managing vehicles from the admin panel.
+ */
 @WebServlet("/admin/vehicles")
 public class ManageVehiclesController extends HttpServlet {
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles GET requests to view the manage vehicles page.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -13,11 +13,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+/**
+ * Controller for adding a new user from the admin panel.
+ */
 @WebServlet("/admin/users/create")
 public class AddUserController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Shows the add user form.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,6 +35,9 @@ public class AddUserController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/admin/add-user.jsp").forward(request, response);
     }
 
+    /**
+     * Processes the submission to create a new user.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

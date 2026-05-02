@@ -10,8 +10,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling user's saved (bookmarked) vehicles.
+ */
 public class SavedVehicleDAO {
 
+    /**
+     * Checks if a vehicle is already saved by a user.
+     * @param userId the user ID
+     * @param vehicleId the vehicle ID
+     * @return true if saved, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean isSaved(int userId, int vehicleId) throws SQLException {
         String sql = "SELECT 1 FROM saved_vehicles WHERE user_id = ? AND vehicle_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -24,6 +34,12 @@ public class SavedVehicleDAO {
         }
     }
 
+    /**
+     * Adds a vehicle to a user's saved list.
+     * @param userId the user ID
+     * @param vehicleId the vehicle ID
+     * @throws SQLException if a database error occurs
+     */
     public void addSavedVehicle(int userId, int vehicleId) throws SQLException {
         if (!isSaved(userId, vehicleId)) {
             String sql = "INSERT INTO saved_vehicles (user_id, vehicle_id) VALUES (?, ?)";
@@ -36,6 +52,12 @@ public class SavedVehicleDAO {
         }
     }
 
+    /**
+     * Removes a vehicle from a user's saved list.
+     * @param userId the user ID
+     * @param vehicleId the vehicle ID
+     * @throws SQLException if a database error occurs
+     */
     public void removeSavedVehicle(int userId, int vehicleId) throws SQLException {
         String sql = "DELETE FROM saved_vehicles WHERE user_id = ? AND vehicle_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -46,6 +68,12 @@ public class SavedVehicleDAO {
         }
     }
 
+    /**
+     * Retrieves all saved vehicles for a specific user.
+     * @param userId the user ID
+     * @return a list of saved Vehicles
+     * @throws SQLException if a database error occurs
+     */
     public List<Vehicle> getSavedVehicles(int userId) throws SQLException {
         String sql = "SELECT v.* FROM vehicles v " +
                      "JOIN saved_vehicles sv ON v.vehicle_id = sv.vehicle_id " +

@@ -8,9 +8,15 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Controller handling user logout.
+ */
 @WebServlet("/logout")
 public class LogoutController extends HttpServlet {
 
+    /**
+     * Invalidates the session and redirects to login.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

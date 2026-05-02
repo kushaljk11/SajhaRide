@@ -1,5 +1,8 @@
 package com.riderental.myriderental.model;
 
+/**
+ * Represents a payment request sent to a payment gateway.
+ */
 public class PaymentRequest {
 
     // Common

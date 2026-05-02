@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+/**
+ * Controller for handling the initiation and submission of new booking requests.
+ */
 @WebServlet("/booking/request")
 public class RequestBookingController extends HttpServlet {
 
@@ -24,7 +27,9 @@ public class RequestBookingController extends HttpServlet {
     private final AvailabilityService availabilityService = new AvailabilityService();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
-    // SHOW BOOKING FORM
+    /**
+     * Handles GET requests to display the booking form for a specific vehicle.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -63,7 +68,9 @@ public class RequestBookingController extends HttpServlet {
         }
     }
 
-    // SUBMIT BOOKING REQUEST
+    /**
+     * Processes POST requests containing the booking form submission data.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -15,6 +15,9 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Servlet for handling payment initiation and verification flows via eSewa and Khalti.
+ */
 @WebServlet("/renter/payment")
 public class PaymentServlet extends HttpServlet {
 
@@ -22,6 +25,9 @@ public class PaymentServlet extends HttpServlet {
 
     private final PaymentService paymentService = new PaymentService();
 
+    /**
+     * Handles GET requests, primarily for processing redirects from payment gateways.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -39,6 +45,9 @@ public class PaymentServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles POST requests to initiate payments.
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

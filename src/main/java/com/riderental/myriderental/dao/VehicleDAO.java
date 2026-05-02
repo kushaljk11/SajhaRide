@@ -8,9 +8,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling Vehicle database operations.
+ */
 public class VehicleDAO {
 
-    // CREATE VEHICLE
+    /**
+     * Creates a new vehicle in the database.
+     * @param vehicle the Vehicle object
+     * @return the created Vehicle with its new ID
+     * @throws SQLException if a database error occurs
+     */
     public Vehicle create(Vehicle vehicle) throws SQLException {
         String sql = """
                 INSERT INTO vehicles
@@ -43,12 +51,22 @@ public class VehicleDAO {
         }
     }
 
-    // FIND BY ID
+    /**
+     * Finds a vehicle by its ID.
+     * @param vehicleId the vehicle ID
+     * @return the Vehicle object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public Vehicle findById(int vehicleId) throws SQLException {
         return getVehicleById(vehicleId);
     }
 
-    // GET VEHICLE BY ID WITH OWNER DETAILS
+    /**
+     * Gets a vehicle by its ID, including its owner's details.
+     * @param vehicleId the vehicle ID
+     * @return the Vehicle object with owner info, or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public Vehicle getVehicleById(int vehicleId) throws SQLException {
         String sql = """
                 SELECT v.*, u.fullName AS owner_name, u.email AS owner_email,
@@ -73,7 +91,11 @@ public class VehicleDAO {
         return null;
     }
 
-    // FIND ALL VEHICLES
+    /**
+     * Retrieves all vehicles in the system.
+     * @return a list of all Vehicles
+     * @throws SQLException if a database error occurs
+     */
     public List<Vehicle> findAll() throws SQLException {
         String sql = "SELECT * FROM vehicles ORDER BY created_at DESC";
         List<Vehicle> vehicles = new ArrayList<>();
@@ -89,7 +111,12 @@ public class VehicleDAO {
         return vehicles;
     }
 
-    // FIND ALL VEHICLES BY OWNER
+    /**
+     * Finds all vehicles owned by a specific user.
+     * @param ownerId the owner's user ID
+     * @return a list of Vehicles
+     * @throws SQLException if a database error occurs
+     */
     public List<Vehicle> findByOwner(int ownerId) throws SQLException {
         String sql = "SELECT * FROM vehicles WHERE owner_id = ? ORDER BY created_at DESC";
         List<Vehicle> vehicles = new ArrayList<>();
@@ -108,7 +135,11 @@ public class VehicleDAO {
         return vehicles;
     }
 
-    // FIND AVAILABLE VEHICLES ONLY
+    /**
+     * Finds all currently available vehicles.
+     * @return a list of available Vehicles
+     * @throws SQLException if a database error occurs
+     */
     public List<Vehicle> findAvailable() throws SQLException {
         String sql = "SELECT * FROM vehicles WHERE availability_status = 'AVAILABLE' ORDER BY created_at DESC";
         List<Vehicle> vehicles = new ArrayList<>();
@@ -124,7 +155,13 @@ public class VehicleDAO {
         return vehicles;
     }
 
-    // SEARCH BY KEYWORD AND TYPE
+    /**
+     * Searches for available vehicles by keyword and/or type.
+     * @param keyword a search keyword (matches name, location, or description)
+     * @param type the vehicle type filter
+     * @return a list of matching Vehicles
+     * @throws SQLException if a database error occurs
+     */
     public List<Vehicle> search(String keyword, String type) throws SQLException {
         String sql = """
                 SELECT * FROM vehicles
@@ -156,7 +193,12 @@ public class VehicleDAO {
         return vehicles;
     }
 
-    // UPDATE VEHICLE
+    /**
+     * Updates a vehicle's information.
+     * @param vehicle the Vehicle object to update
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean update(Vehicle vehicle) throws SQLException {
         String sql = """
                 UPDATE vehicles
@@ -181,7 +223,13 @@ public class VehicleDAO {
         }
     }
 
-    // UPDATE AVAILABILITY STATUS ONLY
+    /**
+     * Updates a vehicle's availability status.
+     * @param vehicleId the vehicle ID
+     * @param status the new status
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean updateStatus(int vehicleId, String status) throws SQLException {
         String sql = "UPDATE vehicles SET availability_status = ? WHERE vehicle_id = ?";
 
@@ -195,7 +243,12 @@ public class VehicleDAO {
         }
     }
 
-    // DELETE VEHICLE
+    /**
+     * Deletes a vehicle by its ID.
+     * @param vehicleId the vehicle ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean delete(int vehicleId) throws SQLException {
         String sql = "DELETE FROM vehicles WHERE vehicle_id = ?";
 
@@ -207,7 +260,11 @@ public class VehicleDAO {
         }
     }
 
-    // COUNT ALL VEHICLES
+    /**
+     * Counts the total number of vehicles.
+     * @return the total vehicle count
+     * @throws SQLException if a database error occurs
+     */
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) FROM vehicles";
 
@@ -222,7 +279,11 @@ public class VehicleDAO {
         return 0;
     }
 
-    // GET LAST 7 DAYS POST COUNTS
+    /**
+     * Gets the count of vehicles posted in the last 7 days.
+     * @return a list of integers representing counts for each day
+     * @throws SQLException if a database error occurs
+     */
     public List<Integer> getLast7DaysPosts() throws SQLException {
         List<Integer> counts = new ArrayList<>();
         String sql = "SELECT COUNT(*) FROM vehicles WHERE DATE(created_at) = CURDATE() - INTERVAL ? DAY";
@@ -239,12 +300,21 @@ public class VehicleDAO {
         return counts;
     }
 
-    // ALIAS for admin naming
+    /**
+     * Gets the total number of vehicles (alias for countAll).
+     * @return the total vehicle count
+     * @throws SQLException if a database error occurs
+     */
     public int getTotalVehicles() throws SQLException {
         return countAll();
     }
 
-    // COUNT VEHICLES BY AVAILABILITY STATUS
+    /**
+     * Counts vehicles by a specific status.
+     * @param status the availability status
+     * @return the count of vehicles
+     * @throws SQLException if a database error occurs
+     */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM vehicles WHERE availability_status = ?";
 
@@ -262,7 +332,12 @@ public class VehicleDAO {
         return 0;
     }
 
-    // COUNT VEHICLES BY MULTIPLE STATUSES (for blocked = blocked + maintenance)
+    /**
+     * Counts vehicles that match any of the provided statuses.
+     * @param statuses an array of statuses
+     * @return the combined count
+     * @throws SQLException if a database error occurs
+     */
     public int countByStatusIn(String... statuses) throws SQLException {
         if (statuses == null || statuses.length == 0) {
             return 0;

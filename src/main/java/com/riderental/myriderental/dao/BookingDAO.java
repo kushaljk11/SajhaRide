@@ -9,9 +9,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling Booking database operations.
+ */
 public class BookingDAO {
 
-    // CREATE BOOKING
+    /**
+     * Creates a new booking in the database.
+     * @param booking the booking details
+     * @return the created booking with ID
+     * @throws SQLException if a database error occurs
+     */
     public Booking create(Booking booking) throws SQLException {
         String sql = """
                 INSERT INTO bookings
@@ -41,7 +49,12 @@ public class BookingDAO {
         }
     }
 
-    // FIND BY ID
+    /**
+     * Finds a booking by its ID.
+     * @param bookingId the booking ID
+     * @return the Booking object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public Booking findById(int bookingId) throws SQLException {
         String sql = """
                 SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,
@@ -66,7 +79,12 @@ public class BookingDAO {
         return null;
     }
 
-    // FIND ALL BOOKINGS BY RENTER (user_id)
+    /**
+     * Finds all bookings for a specific renter.
+     * @param userId the renter's user ID
+     * @return a list of Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> findByRenter(int userId) throws SQLException {
         String sql = """
                 SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,
@@ -94,7 +112,12 @@ public class BookingDAO {
         return bookings;
     }
 
-    // FIND ALL BOOKINGS FOR OWNER'S VEHICLES
+    /**
+     * Finds all bookings for an owner's vehicles.
+     * @param ownerId the owner's user ID
+     * @return a list of Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> findByOwner(int ownerId) throws SQLException {
         String sql = """
                 SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,
@@ -122,7 +145,11 @@ public class BookingDAO {
         return bookings;
     }
 
-    // FIND ALL BOOKINGS (ADMIN)
+    /**
+     * Retrieves all bookings across the system.
+     * @return a list of all Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> findAll() throws SQLException {
         String sql = """
                 SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,
@@ -146,7 +173,12 @@ public class BookingDAO {
         return bookings;
     }
 
-    // FIND RECENT BOOKINGS (limit)
+    /**
+     * Finds recent bookings up to a specified limit.
+     * @param limit the max number of bookings to retrieve
+     * @return a list of recent Bookings
+     * @throws SQLException if a database error occurs
+     */
     public List<Booking> findRecent(int limit) throws SQLException {
         String sql = "SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,\n" +
                 "                       u.fullName AS renter_name\n" +
@@ -173,7 +205,13 @@ public class BookingDAO {
         return bookings;
     }
 
-    // UPDATE BOOKING STATUS
+    /**
+     * Updates the status of a booking.
+     * @param bookingId the booking ID
+     * @param status the new status
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean updateStatus(int bookingId, String status) throws SQLException {
         String sql = "UPDATE bookings SET status = ? WHERE booking_id = ?";
 
@@ -187,7 +225,13 @@ public class BookingDAO {
         }
     }
 
-    // CHECK IF BOOKING BELONGS TO AN OWNER'S VEHICLE
+    /**
+     * Checks if a booking belongs to a specific owner.
+     * @param bookingId the booking ID
+     * @param ownerId the owner's user ID
+     * @return true if the booking is for the owner's vehicle, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean isOwnedBy(int bookingId, int ownerId) throws SQLException {
         String sql = """
                 SELECT COUNT(*)
@@ -212,7 +256,11 @@ public class BookingDAO {
         return false;
     }
 
-    // COUNT ALL BOOKINGS
+    /**
+     * Counts the total number of bookings.
+     * @return the total booking count
+     * @throws SQLException if a database error occurs
+     */
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings";
 
@@ -227,7 +275,11 @@ public class BookingDAO {
         return 0;
     }
 
-    // GET LAST 7 DAYS BOOKING COUNTS
+    /**
+     * Retrieves the number of bookings made in the last 7 days.
+     * @return a list of integers representing counts for the past 7 days
+     * @throws SQLException if a database error occurs
+     */
     public List<Integer> getLast7DaysBookings() throws SQLException {
         List<Integer> counts = new ArrayList<>();
         String sql = "SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = CURDATE() - INTERVAL ? DAY";
@@ -244,7 +296,12 @@ public class BookingDAO {
         return counts;
     }
 
-    // COUNT BOOKINGS BY STATUS
+    /**
+     * Counts the total number of bookings with a specific status.
+     * @param status the booking status
+     * @return the total count
+     * @throws SQLException if a database error occurs
+     */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings WHERE status = ?";
 
@@ -262,7 +319,11 @@ public class BookingDAO {
         return 0;
     }
 
-    // CALCULATE TOTAL REVENUE (sum of approved + completed bookings)
+    /**
+     * Calculates the total revenue across all approved/completed bookings.
+     * @return the total revenue
+     * @throws SQLException if a database error occurs
+     */
     public double calculateTotalRevenue() throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(total_price), 0)
@@ -281,7 +342,12 @@ public class BookingDAO {
         return 0;
     }
 
-    // CALCULATE EARNINGS FOR ONE OWNER
+    /**
+     * Calculates the earnings for a specific vehicle owner.
+     * @param ownerId the owner's user ID
+     * @return the total earnings
+     * @throws SQLException if a database error occurs
+     */
     public double calculateOwnerEarnings(int ownerId) throws SQLException {
         String sql = """
                 SELECT COALESCE(SUM(b.total_price), 0)
@@ -305,7 +371,14 @@ public class BookingDAO {
         return 0;
     }
 
-    // CHECK IF DATES OVERLAP FOR A VEHICLE (used by AvailabilityService)
+    /**
+     * Checks if a vehicle has an overlapping booking for the requested dates.
+     * @param vehicleId the vehicle ID
+     * @param startDate the requested start date
+     * @param endDate the requested end date
+     * @return true if an overlap exists, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean hasOverlappingBooking(int vehicleId, LocalDate startDate,
                                          LocalDate endDate) throws SQLException {
         String sql = """

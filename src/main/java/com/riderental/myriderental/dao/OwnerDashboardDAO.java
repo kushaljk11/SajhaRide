@@ -13,39 +13,98 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Data Access Object for aggregating dashboard statistics for vehicle owners.
+ */
 public class OwnerDashboardDAO {
 
     private final BookingDAO bookingDAO = new BookingDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Counts the total number of vehicles owned by a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the total number of vehicles
+     * @throws SQLException if a database access error occurs
+     */
     public int countTotalVehicles(int ownerId) throws SQLException {
         return vehicleDAO.findByOwner(ownerId).size();
     }
 
+    /**
+     * Counts the number of vehicles currently available for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of available vehicles
+     * @throws SQLException if a database access error occurs
+     */
     public int countAvailableVehicles(int ownerId) throws SQLException {
         return countVehiclesByStatus(ownerId, "AVAILABLE");
     }
 
+    /**
+     * Counts the number of vehicles currently booked (rented) for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of booked vehicles
+     * @throws SQLException if a database access error occurs
+     */
     public int countBookedVehicles(int ownerId) throws SQLException {
         return countVehiclesByStatus(ownerId, "RENTED");
     }
 
+    /**
+     * Counts the number of vehicles currently under maintenance for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of vehicles under maintenance
+     * @throws SQLException if a database access error occurs
+     */
     public int countMaintenanceVehicles(int ownerId) throws SQLException {
         return countVehiclesByStatus(ownerId, "MAINTENANCE");
     }
 
+    /**
+     * Counts the number of pending booking requests for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of pending bookings
+     * @throws SQLException if a database access error occurs
+     */
     public int countPendingBookings(int ownerId) throws SQLException {
         return countBookingsByStatuses(ownerId, "PENDING");
     }
 
+    /**
+     * Counts the number of approved booking requests for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of approved bookings
+     * @throws SQLException if a database access error occurs
+     */
     public int countApprovedBookings(int ownerId) throws SQLException {
         return countBookingsByStatuses(ownerId, "APPROVED");
     }
 
+    /**
+     * Counts the number of rejected or cancelled booking requests for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the number of rejected or cancelled bookings
+     * @throws SQLException if a database access error occurs
+     */
     public int countRejectedOrCancelledBookings(int ownerId) throws SQLException {
         return countBookingsByStatuses(ownerId, "REJECTED", "CANCELLED");
     }
 
+    /**
+     * Counts the total number of bookings across all statuses for a specific owner.
+     *
+     * @param ownerId the ID of the owner
+     * @return the total number of bookings
+     * @throws SQLException if a database access error occurs
+     */
     public int countTotalBookings(int ownerId) throws SQLException {
         String sql = """
                 SELECT COUNT(*)
@@ -66,10 +125,25 @@ public class OwnerDashboardDAO {
         return 0;
     }
 
+    /**
+     * Calculates the total earnings for a specific owner based on approved and completed bookings.
+     *
+     * @param ownerId the ID of the owner
+     * @return the total earnings amount
+     * @throws SQLException if a database access error occurs
+     */
     public double calculateTotalEarnings(int ownerId) throws SQLException {
         return bookingDAO.calculateOwnerEarnings(ownerId);
     }
 
+    /**
+     * Retrieves a list of recent bookings for a specific owner, up to a specified limit.
+     *
+     * @param ownerId the ID of the owner
+     * @param limit the maximum number of recent bookings to retrieve
+     * @return a list of recent bookings
+     * @throws SQLException if a database access error occurs
+     */
     public List<Booking> findRecentBookings(int ownerId, int limit) throws SQLException {
         List<Booking> bookings = bookingDAO.findByOwner(ownerId);
         if (bookings == null || bookings.isEmpty()) {
@@ -78,6 +152,13 @@ public class OwnerDashboardDAO {
         return bookings.size() <= limit ? bookings : new ArrayList<>(bookings.subList(0, limit));
     }
 
+    /**
+     * Aggregates booking statistics by status for charting purposes.
+     *
+     * @param ownerId the ID of the owner
+     * @return a list of chart points representing booking status counts
+     * @throws SQLException if a database access error occurs
+     */
     public List<ChartPoint> findBookingStatusSeries(int ownerId) throws SQLException {
         Map<String, Integer> counts = new LinkedHashMap<>();
         for (String status : Arrays.asList("PENDING", "APPROVED", "COMPLETED", "CANCELLED", "REJECTED")) {
@@ -113,6 +194,13 @@ public class OwnerDashboardDAO {
         return points;
     }
 
+    /**
+     * Aggregates vehicle availability statistics for charting purposes.
+     *
+     * @param ownerId the ID of the owner
+     * @return a list of chart points representing vehicle availability counts
+     * @throws SQLException if a database access error occurs
+     */
     public List<ChartPoint> findVehicleAvailabilitySeries(int ownerId) throws SQLException {
         Map<String, Integer> counts = new LinkedHashMap<>();
         for (String status : Arrays.asList("AVAILABLE", "RENTED", "MAINTENANCE")) {
@@ -147,6 +235,14 @@ public class OwnerDashboardDAO {
         return points;
     }
 
+    /**
+     * Aggregates monthly earnings statistics for a specific year for charting purposes.
+     *
+     * @param ownerId the ID of the owner
+     * @param year the year to aggregate data for
+     * @return a list of chart points representing monthly earnings
+     * @throws SQLException if a database access error occurs
+     */
     public List<ChartPoint> findMonthlyEarningsSeries(int ownerId, int year) throws SQLException {
         double[] months = new double[12];
 
@@ -184,6 +280,13 @@ public class OwnerDashboardDAO {
         return points;
     }
 
+    /**
+     * Aggregates vehicle counts by type for charting purposes.
+     *
+     * @param ownerId the ID of the owner
+     * @return a list of chart points representing vehicle type counts
+     * @throws SQLException if a database access error occurs
+     */
     public List<ChartPoint> findVehicleTypeSeries(int ownerId) throws SQLException {
         String sql = """
                 SELECT vehicle_type, COUNT(*) AS total

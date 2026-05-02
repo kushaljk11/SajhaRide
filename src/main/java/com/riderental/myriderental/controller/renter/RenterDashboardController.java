@@ -17,12 +17,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for displaying the renter dashboard.
+ */
 @WebServlet("/renter/dashboard")
 public class RenterDashboardController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles GET requests to populate and display the renter dashboard.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -82,6 +92,11 @@ public class RenterDashboardController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");

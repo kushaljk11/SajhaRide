@@ -1,5 +1,8 @@
 package com.riderental.myriderental.dto.User;
 
+/**
+ * Data Transfer Object for user registration.
+ */
 public class RegisterDto {
     private String fullName;
     private String email;

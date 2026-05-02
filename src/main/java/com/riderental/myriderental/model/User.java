@@ -2,6 +2,9 @@ package com.riderental.myriderental.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a user entity within the system.
+ */
 public class User {
 
     private int userId;

@@ -21,17 +21,35 @@ import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Utility class for integrating with the eSewa payment gateway.
+ */
 public final class EsewaUtil {
 
     private static final DateTimeFormatter TRANSACTION_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
     private EsewaUtil() {
     }
 
+    /**
+     * Formats a double amount to a valid eSewa string format.
+     *
+     * @param amount the amount to format
+     * @return formatted amount string
+     */
     public static String formatAmount(double amount) {
         return formatAmount(BigDecimal.valueOf(amount));
     }
 
+    /**
+     * Formats a BigDecimal amount to a valid eSewa string format.
+     *
+     * @param amount the amount to format
+     * @return formatted amount string
+     */
     public static String formatAmount(BigDecimal amount) {
         if (amount == null) {
             throw new IllegalArgumentException("Amount cannot be null");
@@ -46,6 +64,12 @@ public final class EsewaUtil {
         return text.contains(".") ? text : text + ".0";
     }
 
+    /**
+     * Generates a unique transaction UUID based on the booking ID and timestamp.
+     *
+     * @param bookingId the booking ID
+     * @return generated transaction UUID
+     */
     public static String generateTransactionUuid(String bookingId) {
         String safeBookingId = sanitizeIdentifier(bookingId);
         String timestamp = LocalDateTime.now().format(TRANSACTION_TIME_FORMAT);
@@ -53,6 +77,14 @@ public final class EsewaUtil {
         return safeBookingId + "-" + timestamp + "-" + randomSuffix;
     }
 
+    /**
+     * Creates an HMAC SHA256 signature for eSewa API payload.
+     *
+     * @param secretKey the secret key
+     * @param fields the map of fields
+     * @param signedFieldNames a comma-separated list of field names to sign
+     * @return Base64 encoded signature
+     */
     public static String createSignature(String secretKey, Map<String, String> fields, String signedFieldNames) {
         Objects.requireNonNull(secretKey, "secretKey");
         String signingString = buildSigningString(fields, signedFieldNames);
@@ -68,6 +100,13 @@ public final class EsewaUtil {
         }
     }
 
+    /**
+     * Builds a string of signed fields formatted for signature generation.
+     *
+     * @param fields the map of fields
+     * @param signedFieldNames a comma-separated list of field names
+     * @return the formatted signing string
+     */
     public static String buildSigningString(Map<String, String> fields, String signedFieldNames) {
         Objects.requireNonNull(fields, "fields");
         if (signedFieldNames == null || signedFieldNames.isBlank()) {
@@ -102,6 +141,12 @@ public final class EsewaUtil {
         return builder.toString();
     }
 
+    /**
+     * Builds a URL query string from the provided parameters.
+     *
+     * @param parameters the map of query parameters
+     * @return formatted query string
+     */
     public static String buildQueryString(Map<String, String> parameters) {
         Objects.requireNonNull(parameters, "parameters");
 
@@ -122,6 +167,13 @@ public final class EsewaUtil {
         return builder.toString();
     }
 
+    /**
+     * Reads all content from an input stream into a string.
+     *
+     * @param inputStream the input stream
+     * @return the string content
+     * @throws IOException if an I/O error occurs
+     */
     public static String readFully(InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return "";
@@ -137,6 +189,13 @@ public final class EsewaUtil {
         }
     }
 
+    /**
+     * Extracts a string value from a simple JSON string based on a key.
+     *
+     * @param json the JSON string
+     * @param key the key to extract
+     * @return the extracted value, or null if not found
+     */
     public static String extractJsonStringValue(String json, String key) {
         if (json == null || json.isBlank() || key == null || key.isBlank()) {
             return null;
@@ -154,6 +213,12 @@ public final class EsewaUtil {
         return value == null ? null : unescapeJson(value);
     }
 
+    /**
+     * Checks if the provided status string represents a complete payment status.
+     *
+     * @param status the status string
+     * @return true if the status is complete, false otherwise
+     */
     public static boolean isCompleteStatus(String status) {
         if (status == null) {
             return false;
@@ -166,6 +231,12 @@ public final class EsewaUtil {
                 || "PAID".equals(normalized);
     }
 
+    /**
+     * Sanitizes an identifier to ensure it contains only safe characters.
+     *
+     * @param value the identifier to sanitize
+     * @return the sanitized identifier
+     */
     public static String sanitizeIdentifier(String value) {
         if (value == null || value.isBlank()) {
             return "txn";
@@ -175,10 +246,22 @@ public final class EsewaUtil {
         return sanitized.isBlank() ? "txn" : sanitized;
     }
 
+    /**
+     * URL-encodes a string value.
+     *
+     * @param value the string to encode
+     * @return the encoded string
+     */
     private static String urlEncode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Unescapes a JSON string value.
+     *
+     * @param value the string to unescape
+     * @return the unescaped string
+     */
     private static String unescapeJson(String value) {
         return value
                 .replace("\\\\", "\\")

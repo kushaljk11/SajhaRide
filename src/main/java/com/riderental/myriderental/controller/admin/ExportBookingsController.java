@@ -15,11 +15,17 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for exporting bookings data to a CSV file.
+ */
 @WebServlet("/admin/bookings/export-csv")
 public class ExportBookingsController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
 
+    /**
+     * Handles GET requests to generate and download the bookings CSV file.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

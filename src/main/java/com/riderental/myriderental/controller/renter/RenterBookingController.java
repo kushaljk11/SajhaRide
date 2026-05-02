@@ -15,10 +15,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for viewing a renter's incoming and outgoing bookings.
+ */
 @WebServlet("/renter/booking")
 public class RenterBookingController extends HttpServlet {
     private final BookingService bookingService = new BookingService();
 
+    /**
+     * Handles GET requests to display the renter's bookings page.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,6 +85,11 @@ public class RenterBookingController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");

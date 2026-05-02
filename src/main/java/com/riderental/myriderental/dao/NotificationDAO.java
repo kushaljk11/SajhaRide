@@ -7,8 +7,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling user notifications in the database.
+ */
 public class NotificationDAO {
 
+    /**
+     * Creates a new notification.
+     * @param notification the Notification object
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean create(Notification notification) throws SQLException {
         String sql = "INSERT INTO notifications (user_id, message) VALUES (?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -19,6 +28,12 @@ public class NotificationDAO {
         }
     }
 
+    /**
+     * Finds recent notifications for a user.
+     * @param userId the user ID
+     * @return a list of up to 20 recent Notifications
+     * @throws SQLException if a database error occurs
+     */
     public List<Notification> findByUserId(int userId) throws SQLException {
         String sql = "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20";
         List<Notification> list = new ArrayList<>();
@@ -34,6 +49,12 @@ public class NotificationDAO {
         return list;
     }
 
+    /**
+     * Gets the count of unread notifications for a user.
+     * @param userId the user ID
+     * @return the number of unread notifications
+     * @throws SQLException if a database error occurs
+     */
     public int getUnreadCount(int userId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = FALSE";
         try (Connection conn = DBConnection.getConnection();
@@ -48,6 +69,13 @@ public class NotificationDAO {
         return 0;
     }
 
+    /**
+     * Marks a specific notification as read.
+     * @param notificationId the notification ID
+     * @param userId the user ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean markAsRead(int notificationId, int userId) throws SQLException {
         String sql = "UPDATE notifications SET is_read = TRUE WHERE id = ? AND user_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -58,6 +86,12 @@ public class NotificationDAO {
         }
     }
     
+    /**
+     * Marks all notifications for a user as read.
+     * @param userId the user ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean markAllAsRead(int userId) throws SQLException {
         String sql = "UPDATE notifications SET is_read = TRUE WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -67,6 +101,11 @@ public class NotificationDAO {
         }
     }
 
+    /**
+     * Retrieves a list of user IDs for all admin users.
+     * @return a list of admin user IDs
+     * @throws SQLException if a database error occurs
+     */
     public List<Integer> getAllAdminIds() throws SQLException {
         String sql = "SELECT userId FROM users WHERE role = 'ADMIN'";
         List<Integer> ids = new ArrayList<>();

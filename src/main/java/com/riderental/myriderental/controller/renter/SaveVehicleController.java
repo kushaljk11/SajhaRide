@@ -11,11 +11,21 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+/**
+ * Controller for adding or removing a vehicle from a user's saved list.
+ */
 @WebServlet("/renter/saved/add")
 public class SaveVehicleController extends HttpServlet {
 
     private final SavedVehicleDAO savedVehicleDAO = new SavedVehicleDAO();
 
+    /**
+     * Handles POST requests to save or unsave a vehicle.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

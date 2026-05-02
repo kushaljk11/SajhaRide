@@ -12,11 +12,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for viewing the list of vehicles and searching.
+ */
 @WebServlet(urlPatterns = {"/vehicles", "/vehicles/list"})
 public class ViewVehicleController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles GET requests to display the vehicle list or search results.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -2,6 +2,9 @@ package com.riderental.myriderental.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a KYC verification submission.
+ */
 public class KycVerification {
     private int id;
     private int userId;

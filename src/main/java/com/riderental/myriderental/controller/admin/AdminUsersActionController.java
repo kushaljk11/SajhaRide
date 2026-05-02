@@ -11,11 +11,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for executing actions on users (delete, suspend) from the admin panel.
+ */
 @WebServlet("/admin/users/*")
 public class AdminUsersActionController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Handles POST requests for user actions.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo(); // e.g. /delete or /suspend

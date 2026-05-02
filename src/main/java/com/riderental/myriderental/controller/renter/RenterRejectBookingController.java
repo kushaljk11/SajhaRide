@@ -13,12 +13,22 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for handling booking rejections by a renter (for renter's own vehicles).
+ */
 @WebServlet("/renter/booking/reject")
 public class RenterRejectBookingController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
     private final BookingDAO bookingDAO = new BookingDAO();
 
+    /**
+     * Handles POST requests to reject a booking.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -52,6 +62,11 @@ public class RenterRejectBookingController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");

@@ -18,12 +18,22 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller for handling user profile viewing and updates.
+ */
 @WebServlet("/profile")
 @MultipartConfig
 public class ProfileController extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
     private final KycDAO kycDAO = new KycDAO();
 
+    /**
+     * Handles GET requests to display the user's profile.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -47,6 +57,13 @@ public class ProfileController extends HttpServlet {
         }
     }
 
+    /**
+     * Handles POST requests to update the user's profile information.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -86,11 +103,24 @@ public class ProfileController extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves the logged-in user from the session.
+     * @param request the HTTP request
+     * @return the logged-in User, or null if not found
+     */
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
     }
 
+    /**
+     * Saves an uploaded profile image to the server.
+     * @param profileImage the Part containing the uploaded image
+     * @param request the HTTP request
+     * @return the relative path to the saved image, or null if no image was uploaded
+     * @throws IOException if an I/O error occurs
+     * @throws ServletException if a servlet-specific error occurs
+     */
     private String saveProfileImage(Part profileImage, HttpServletRequest request) throws IOException, ServletException {
         if (profileImage == null || profileImage.getSize() == 0) {
             return null;

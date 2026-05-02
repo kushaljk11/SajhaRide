@@ -8,9 +8,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for handling User database operations.
+ */
 public class UserDAO {
 
-    // CREATE USER
+    /**
+     * Creates a new user in the database.
+     * @param user the User object
+     * @return the created user with ID
+     * @throws SQLException if a database error occurs
+     */
     public User create(User user) throws SQLException {
         String sql = """
                 INSERT INTO users
@@ -44,7 +52,12 @@ public class UserDAO {
         }
     }
 
-    // FIND BY EMAIL
+    /**
+     * Finds a user by their email address.
+     * @param email the user's email
+     * @return the User object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM users WHERE email = ?";
 
@@ -62,7 +75,12 @@ public class UserDAO {
         return null;
     }
 
-    // FIND BY ID
+    /**
+     * Finds a user by their ID.
+     * @param userId the user ID
+     * @return the User object or null if not found
+     * @throws SQLException if a database error occurs
+     */
     public User findById(int userId) throws SQLException {
         String sql = "SELECT * FROM users WHERE userId = ?";
 
@@ -80,7 +98,11 @@ public class UserDAO {
         return null;
     }
 
-    // FIND ALL USERS
+    /**
+     * Retrieves all users in the system.
+     * @return a list of all Users
+     * @throws SQLException if a database error occurs
+     */
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM users ORDER BY createdAt DESC";
         List<User> users = new ArrayList<>();
@@ -97,7 +119,11 @@ public class UserDAO {
         return users;
     }
 
-    // COUNT ALL USERS
+    /**
+     * Counts the total number of users.
+     * @return the total user count
+     * @throws SQLException if a database error occurs
+     */
     public int getTotalUsers() throws SQLException {
         String sql = "SELECT COUNT(*) FROM users";
 
@@ -112,7 +138,12 @@ public class UserDAO {
         return 0;
     }
 
-    // COUNT USERS BY STATUS
+    /**
+     * Counts users by their account status.
+     * @param status the account status
+     * @return the count of users
+     * @throws SQLException if a database error occurs
+     */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE accountStatus = ?";
 
@@ -130,7 +161,12 @@ public class UserDAO {
         return 0;
     }
 
-    // COUNT USERS BY ROLE
+    /**
+     * Counts users by their role.
+     * @param role the user role
+     * @return the count of users
+     * @throws SQLException if a database error occurs
+     */
     public int countByRole(String role) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
 
@@ -148,7 +184,12 @@ public class UserDAO {
         return 0;
     }
 
-    // UPDATE FULL USER
+    /**
+     * Updates an existing user's full information.
+     * @param user the User object with updated fields
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean update(User user) throws SQLException {
         String sql = """
                 UPDATE users
@@ -176,7 +217,12 @@ public class UserDAO {
         }
     }
 
-    // UPDATE PROFILE ONLY
+    /**
+     * Updates only a user's profile information.
+     * @param user the User object with updated profile fields
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean updateProfile(User user) throws SQLException {
         String sql = """
                 UPDATE users
@@ -197,7 +243,12 @@ public class UserDAO {
         }
     }
 
-    // DELETE USER
+    /**
+     * Deletes a user by their ID.
+     * @param userId the user ID
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean delete(int userId) throws SQLException {
         String sql = "DELETE FROM users WHERE userId = ?";
 

@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for displaying the admin dashboard.
+ */
 @WebServlet("/admin/dashboard")
 public class AdminDashboardController extends HttpServlet {
 
@@ -23,6 +26,9 @@ public class AdminDashboardController extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    /**
+     * Handles requests to view the admin dashboard.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

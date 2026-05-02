@@ -14,11 +14,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for displaying a renter's saved vehicles.
+ */
 @WebServlet("/renter/saved")
 public class RenterSavedController extends HttpServlet {
     
     private final SavedVehicleDAO savedVehicleDAO = new SavedVehicleDAO();
 
+    /**
+     * Handles GET requests to display the saved vehicles page.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

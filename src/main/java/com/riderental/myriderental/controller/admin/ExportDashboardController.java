@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
+/**
+ * Controller for exporting the admin dashboard report to a text file.
+ */
 @WebServlet("/admin/dashboard/export-report")
 public class ExportDashboardController extends HttpServlet {
 
@@ -22,6 +25,9 @@ public class ExportDashboardController extends HttpServlet {
     private final VehicleDAO vehicleDAO = new VehicleDAO();
     private final BookingService bookingService = new BookingService();
 
+    /**
+     * Handles GET requests to generate and download the dashboard report text file.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

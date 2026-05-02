@@ -15,11 +15,17 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+/**
+ * Controller for adding a new booking from the admin panel.
+ */
 @WebServlet("/admin/bookings/create")
 public class AddBookingController extends HttpServlet {
 
     private final BookingDAO bookingDAO = new BookingDAO();
 
+    /**
+     * Shows the add booking form.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,6 +37,9 @@ public class AddBookingController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/admin/add-booking.jsp").forward(request, response);
     }
 
+    /**
+     * Processes the submission to create a new booking.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
