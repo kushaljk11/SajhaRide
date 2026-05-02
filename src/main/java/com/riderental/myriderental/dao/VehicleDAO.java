@@ -210,6 +210,58 @@ public class VehicleDAO {
         return 0;
     }
 
+    // ALIAS for admin naming
+    public int getTotalVehicles() throws SQLException {
+        return countAll();
+    }
+
+    // COUNT VEHICLES BY AVAILABILITY STATUS
+    public int countByStatus(String status) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM vehicles WHERE availability_status = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    // COUNT VEHICLES BY MULTIPLE STATUSES (for blocked = blocked + maintenance)
+    public int countByStatusIn(String... statuses) throws SQLException {
+        if (statuses == null || statuses.length == 0) {
+            return 0;
+        }
+
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM vehicles WHERE availability_status IN (");
+        for (int i = 0; i < statuses.length; i++) {
+            if (i > 0) sql.append(",");
+            sql.append("?");
+        }
+        sql.append(")");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < statuses.length; i++) {
+                stmt.setString(i + 1, statuses[i]);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     // MAP RESULT SET TO VEHICLE OBJECT
     private Vehicle map(ResultSet rs) throws SQLException {
         Vehicle vehicle = new Vehicle();

@@ -1,6 +1,9 @@
 package com.riderental.myriderental.controller.admin;
 
 import com.riderental.myriderental.model.User;
+import com.riderental.myriderental.dao.VehicleDAO;
+import jakarta.servlet.ServletException;
+import java.sql.SQLException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +15,8 @@ import java.io.IOException;
 
 @WebServlet("/admin/vehicles")
 public class ManageVehiclesController extends HttpServlet {
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -19,7 +24,30 @@ public class ManageVehiclesController extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/manage-vehicles.jsp").forward(request, response);
+        try {
+            java.util.List<com.riderental.myriderental.model.Vehicle> vehicles = vehicleDAO.findAll();
+            int totalVehicles = vehicleDAO.getTotalVehicles();
+            int activePosts = vehicleDAO.countByStatus("AVAILABLE");
+            int awaitingApproval = vehicleDAO.countByStatus("PENDING");
+            int blockedListings = vehicleDAO.countByStatusIn("BLOCKED", "MAINTENANCE");
+
+            // Calculate total booking value from all approved/completed bookings
+            double totalBookingValue = 0;
+            try {
+                com.riderental.myriderental.dao.BookingDAO bookingDAO = new com.riderental.myriderental.dao.BookingDAO();
+                totalBookingValue = bookingDAO.calculateTotalRevenue();
+            } catch (Exception ignored) {}
+
+            request.setAttribute("vehicles", vehicles);
+            request.setAttribute("totalVehicles", totalVehicles);
+            request.setAttribute("activePosts", activePosts);
+            request.setAttribute("awaitingApproval", awaitingApproval);
+            request.setAttribute("blockedListings", blockedListings);
+            request.setAttribute("totalBookingValue", totalBookingValue);
+            request.getRequestDispatcher("/WEB-INF/views/admin/manage-vehicles.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Unable to load vehicles for admin", e);
+        }
     }
 
     private boolean ensureAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="jakarta.servlet.http.HttpServletRequest" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +10,10 @@
 <body class="h-screen overflow-hidden bg-gray-50 text-gray-900">
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
+
+  <%
+    String ctx = ((HttpServletRequest) request).getContextPath();
+  %>
 
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
     <jsp:include page="components/topbar.jsp" />
@@ -23,29 +27,29 @@
         </div>
         <div class="flex flex-wrap gap-3">
           <button class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100">Last 30 Days</button>
-          <button class="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">Export Report</button>
+          <a href="<%= ctx %>/admin/dashboard/export-report" class="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900">Export Report</a>
         </div>
       </section>
 
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article class="rounded-3xl border border-blue-100 bg-white p-4 shadow-sm">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700">Total Users</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">1,240</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">${totalUsers}</p>
           <p class="mt-2 text-sm text-gray-500">Riders, owners, and admins</p>
         </article>
         <article class="rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Total Listings</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">450</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">${totalVehicles}</p>
           <p class="mt-2 text-sm text-gray-500">Active and archived posts</p>
         </article>
         <article class="rounded-3xl border border-orange-100 bg-white p-4 shadow-sm">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-orange-700">Total Bookings</p>
-          <p class="mt-3 text-3xl font-semibold text-gray-900">3,120</p>
+          <p class="mt-3 text-3xl font-semibold text-gray-900">${totalBookings}</p>
           <p class="mt-2 text-sm text-gray-500">Successful reservations</p>
         </article>
         <article class="rounded-3xl border border-red-100 bg-red-800 p-4 shadow-sm text-white">
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-red-100">Pending Approvals</p>
-          <p class="mt-3 text-3xl font-semibold">12</p>
+          <p class="mt-3 text-3xl font-semibold">${pendingBookings}</p>
           <p class="mt-2 text-sm text-red-100">Review new listings today</p>
         </article>
       </section>
@@ -88,50 +92,48 @@
           <section class="rounded-3xl bg-slate-900 p-5 text-white shadow-sm">
             <div class="flex items-center justify-between gap-3">
               <div>
-                <h2 class="text-2xl font-semibold">Upcoming Bookings</h2>
-                <p class="mt-1 text-sm text-slate-300">View the next confirmed rides</p>
+                <h2 class="text-2xl font-semibold">Recent Bookings</h2>
+                <p class="mt-1 text-sm text-slate-300">Latest confirmed bookings on the platform</p>
               </div>
               <a href="${pageContext.request.contextPath}/admin/bookings" class="text-sm font-semibold text-red-300 hover:text-red-200">View All</a>
             </div>
 
             <div class="mt-4 space-y-4">
+              <%
+                java.util.List<com.riderental.myriderental.model.Booking> recentBookings = (java.util.List<com.riderental.myriderental.model.Booking>) request.getAttribute("recentBookings");
+                if (recentBookings != null && !recentBookings.isEmpty()) {
+                  int count = 0;
+                  for (com.riderental.myriderental.model.Booking b : recentBookings) {
+                    if (count >= 3) break;
+              %>
               <article class="flex items-center gap-3 rounded-2xl bg-white/5 p-3">
-                <img src="${pageContext.request.contextPath}/images/about.png" alt="Booking preview" class="h-12 w-12 rounded-xl object-cover" />
+                <img src="<%= ctx %>/images/about.png" alt="Booking preview" class="h-12 w-12 rounded-xl object-cover" />
                 <div class="min-w-0 flex-1">
-                  <p class="font-semibold">Anjali Sharma</p>
-                  <p class="text-sm text-slate-300">Kathmandu • tomorrow 9:00</p>
+                  <p class="font-semibold"><%= b.getRenterName() != null ? b.getRenterName() : "Renter #" + b.getUserId() %></p>
+                  <p class="text-sm text-slate-300"><%= b.getStartDate() %> • <%= b.getVehicleName() != null ? b.getVehicleName() : "Vehicle" %></p>
                 </div>
-                <span class="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-200">SUV</span>
+                <span class="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-200"><%= b.getStatus() %></span>
               </article>
-
-              <article class="flex items-center gap-3 rounded-2xl bg-white/5 p-3">
-                <img src="${pageContext.request.contextPath}/images/register.png" alt="Booking preview" class="h-12 w-12 rounded-xl object-cover" />
-                <div class="min-w-0 flex-1">
-                  <p class="font-semibold">Rajesh Hamal</p>
-                  <p class="text-sm text-slate-300">Lalitpur • today 17:30</p>
-                </div>
-                <span class="rounded-full bg-blue-500/20 px-2.5 py-1 text-xs font-semibold text-blue-200">Bike</span>
-              </article>
-
-              <article class="flex items-center gap-3 rounded-2xl bg-white/5 p-3">
-                <img src="${pageContext.request.contextPath}/images/logoho.png" alt="Booking preview" class="h-12 w-12 rounded-xl object-cover" />
-                <div class="min-w-0 flex-1">
-                  <p class="font-semibold">Sneha KC</p>
-                  <p class="text-sm text-slate-300">Bhaktapur • tomorrow 14:30</p>
-                </div>
-                <span class="rounded-full bg-orange-500/20 px-2.5 py-1 text-xs font-semibold text-orange-200">EV Mini</span>
-              </article>
+              <%
+                    count++;
+                  }
+                } else {
+              %>
+              <p class="text-slate-300">No recent bookings</p>
+              <% } %>
             </div>
 
             <div class="mt-5 rounded-3xl bg-gradient-to-br from-red-800 to-red-950 p-4">
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-red-100">Platform Goal</p>
-              <p class="mt-2 text-sm leading-6 text-red-50">Reach 5,000 bookings this month to unlock the next regional growth milestone.</p>
-              <div class="mt-4 flex items-center justify-between text-sm text-red-100">
-                <span>3,120 / 5,000</span>
-                <span>62%</span>
-              </div>
-              <div class="mt-2 h-2 rounded-full bg-white/10">
-                <div class="h-2 w-[62%] rounded-full bg-red-300"></div>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-red-100">Success Metrics</p>
+              <div class="mt-3 space-y-2 text-sm text-red-100">
+                <div class="flex justify-between">
+                  <span>Total Bookings:</span>
+                  <span class="font-semibold">${totalBookings}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Total Revenue:</span>
+                  <span class="font-semibold">NPR <%= String.format("%.0f", request.getAttribute("totalRevenue") != null ? (Double) request.getAttribute("totalRevenue") : 0) %></span>
+                </div>
               </div>
             </div>
           </section>

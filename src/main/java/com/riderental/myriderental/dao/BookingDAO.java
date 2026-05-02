@@ -146,6 +146,33 @@ public class BookingDAO {
         return bookings;
     }
 
+    // FIND RECENT BOOKINGS (limit)
+    public List<Booking> findRecent(int limit) throws SQLException {
+        String sql = "SELECT b.*, v.vehicle_name, v.vehicle_type, v.image_path,\n" +
+                "                       u.fullName AS renter_name\n" +
+                "                FROM bookings b\n" +
+                "                JOIN vehicles v ON b.vehicle_id = v.vehicle_id\n" +
+                "                JOIN users u ON b.user_id = u.userId\n" +
+                "                ORDER BY b.created_at DESC\n" +
+                "                LIMIT ?";
+
+        List<Booking> bookings = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    bookings.add(map(rs));
+                }
+            }
+        }
+
+        return bookings;
+    }
+
     // UPDATE BOOKING STATUS
     public boolean updateStatus(int bookingId, String status) throws SQLException {
         String sql = "UPDATE bookings SET status = ? WHERE booking_id = ?";

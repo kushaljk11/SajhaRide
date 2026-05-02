@@ -32,16 +32,23 @@ public class AdminDashboardController extends HttpServlet {
         }
 
         try {
-            int totalUsers = userDAO.findAll().size();
-            int totalVehicles = vehicleDAO.countAll();
+            int totalUsers = userDAO.getTotalUsers();
+            int totalVehicles = vehicleDAO.getTotalVehicles();
             int totalBookings = bookingService.getTotalBookingCount();
             int pendingBookings = bookingService.getPendingBookingCount();
             int approvedBookings = bookingService.getApprovedBookingCount();
             int rejectedBookings = bookingService.getRejectedBookingCount();
             double totalRevenue = bookingService.getTotalRevenue();
 
-            List<Booking> recentBookings = bookingService.getAllBookings();
-            List<User> recentUsers = userDAO.findAll();
+            List<Booking> recentBookings = new java.util.ArrayList<>();
+            try {
+                recentBookings = bookingService.getAllBookings();
+            } catch (Exception ignored) {}
+
+            List<User> recentUsers = new java.util.ArrayList<>();
+            try {
+                recentUsers = userDAO.findAll();
+            } catch (Exception ignored) {}
 
             request.setAttribute("totalUsers", totalUsers);
             request.setAttribute("totalVehicles", totalVehicles);
@@ -57,7 +64,18 @@ public class AdminDashboardController extends HttpServlet {
                     .forward(request, response);
 
         } catch (SQLException e) {
-            throw new ServletException("Unable to load admin dashboard", e);
+            // On DB failure, log and show safe defaults
+            e.printStackTrace();
+            request.setAttribute("totalUsers", 0);
+            request.setAttribute("totalVehicles", 0);
+            request.setAttribute("totalBookings", 0);
+            request.setAttribute("pendingBookings", 0);
+            request.setAttribute("approvedBookings", 0);
+            request.setAttribute("rejectedBookings", 0);
+            request.setAttribute("totalRevenue", 0.0);
+            request.setAttribute("recentBookings", new java.util.ArrayList<>());
+            request.setAttribute("recentUsers", new java.util.ArrayList<>());
+            request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);
         }
     }
 
