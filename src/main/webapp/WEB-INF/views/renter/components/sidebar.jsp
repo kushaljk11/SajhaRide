@@ -43,7 +43,7 @@
               <rect x="3" y="4" width="18" height="16" rx="2"></rect>
               <path d="M3 10h18"></path>
             </svg>
-            My Booking
+            My Bookings
         </a>
 
         <a href="${pageContext.request.contextPath}/renter/saved" data-renter-route="/renter/saved"

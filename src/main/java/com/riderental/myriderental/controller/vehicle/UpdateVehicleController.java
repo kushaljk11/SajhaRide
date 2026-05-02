@@ -89,7 +89,7 @@ public class UpdateVehicleController extends HttpServlet {
 			existing.setLocation(trim(request.getParameter("location")));
 			existing.setAvailabilityStatus(resolveAvailability(request.getParameter("availabilityStatus")));
 
-			String imagePath = saveVehicleImage(request.getPart("vehicleImage"), request);
+			String imagePath = saveVehicleImage(request.getPart("vehicleImage"), request, existing.getVehicleId());
 			if (imagePath != null) {
 				existing.setImagePath(imagePath);
 			}
@@ -138,7 +138,7 @@ public class UpdateVehicleController extends HttpServlet {
 		};
 	}
 
-	private String saveVehicleImage(Part imagePart, HttpServletRequest request) throws IOException, ServletException {
+	private String saveVehicleImage(Part imagePart, HttpServletRequest request, int vehicleId) throws IOException, ServletException {
 		if (imagePart == null || imagePart.getSize() == 0) return null;
 		String submittedFileName = imagePart.getSubmittedFileName();
 		if (submittedFileName == null || submittedFileName.isBlank()) return null;
@@ -147,13 +147,13 @@ public class UpdateVehicleController extends HttpServlet {
 		int dotIndex = submittedFileName.lastIndexOf('.');
 		if (dotIndex >= 0) extension = submittedFileName.substring(dotIndex);
 
-		String fileName = System.currentTimeMillis() + "-" + Math.abs(submittedFileName.hashCode()) + extension;
-		String uploadsPath = request.getServletContext().getRealPath("/uploads");
+		String fileName = vehicleId + extension;
+		String uploadsPath = request.getServletContext().getRealPath("/uploads/vehicle");
 		File uploadsDir = new File(uploadsPath);
 		if (!uploadsDir.exists() && !uploadsDir.mkdirs()) {
 			throw new ServletException("Unable to create uploads directory");
 		}
 		imagePart.write(new File(uploadsDir, fileName).getAbsolutePath());
-		return "uploads/" + fileName;
+		return "uploads/vehicle/" + fileName;
 	}
 }

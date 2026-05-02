@@ -43,6 +43,7 @@ public class RenterDashboardController extends HttpServlet {
         try {
             int renterId = sessionUser.getUserId();
             List<Vehicle> vehicles = vehicleDAO.findByOwner(renterId);
+            List<Vehicle> exploreVehicles = vehicleDAO.findAvailable();
             List<Booking> allBookings = bookingService.getOwnerBookings(renterId);
 
             List<Booking> pendingBookings = new ArrayList<>();
@@ -60,6 +61,7 @@ public class RenterDashboardController extends HttpServlet {
             double totalEarnings = bookingService.getOwnerEarnings(renterId);
 
             request.setAttribute("vehicles", vehicles);
+            request.setAttribute("exploreVehicles", exploreVehicles);
             request.setAttribute("allBookings", allBookings);
             request.setAttribute("pendingBookings", pendingBookings);
             request.setAttribute("activeBookings", activeBookings);

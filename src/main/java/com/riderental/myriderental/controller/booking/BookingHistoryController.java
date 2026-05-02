@@ -38,7 +38,7 @@ public class BookingHistoryController extends HttpServlet {
         try {
             List<Booking> bookings = bookingService.getRenterBookings(sessionUser.getUserId());
             request.setAttribute("bookings", bookings);
-            request.getRequestDispatcher("/views/booking/booking-history.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/booking/booking-history.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {

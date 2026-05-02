@@ -26,19 +26,40 @@
 			<p class="mt-3 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base">Review and manage your shortlisted vehicles, <span class="font-semibold text-red-800"><%= firstName %></span>. Book your next journey through the heart of our community-vetted sharing network.</p>
 
 			<section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+				<% 
+					java.util.List<com.riderental.myriderental.model.Vehicle> savedVehicles = (java.util.List<com.riderental.myriderental.model.Vehicle>) request.getAttribute("savedVehicles");
+					if (savedVehicles == null || savedVehicles.isEmpty()) {
+				%>
+					<article class="col-span-full rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+                        <p class="text-gray-600">You haven't saved any rides yet.</p>
+                        <a href="${pageContext.request.contextPath}/explore" class="mt-4 inline-block font-semibold text-red-800 hover:text-red-900">Start exploring</a>
+                    </article>
+				<% } else { 
+					for (com.riderental.myriderental.model.Vehicle v : savedVehicles) {
+						String imgPath = v.getImagePath();
+						if (imgPath == null || imgPath.isBlank()) {
+							imgPath = "images/about.png";
+						} else {
+							imgPath = imgPath.replace("\\", "/");
+							if (imgPath.startsWith("/")) imgPath = imgPath.substring(1);
+							if (!imgPath.startsWith("uploads/") && !imgPath.startsWith("images/")) {
+								imgPath = "uploads/" + imgPath;
+							}
+						}
+				%>
 				<article class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 					<div class="relative h-44 overflow-hidden bg-gray-100">
-						<img src="${pageContext.request.contextPath}/images/about.png" alt="Mahindra Scorpio N" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-						<span class="absolute right-3 top-3 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">SUV</span>
+						<img src="${pageContext.request.contextPath}/<%= imgPath %>" alt="<%= v.getVehicleName() %>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+						<span class="absolute right-3 top-3 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700"><%= v.getVehicleType() %></span>
 					</div>
 					<div class="p-4">
 						<div class="flex items-start justify-between gap-4">
-							<h2 class="text-xl font-semibold leading-tight text-gray-900">Mahindra Scorpio N</h2>
-							<p class="text-right text-lg font-bold text-red-800">Rs. 5,000<span class="block text-xs font-semibold text-gray-400">/ day</span></p>
+							<h2 class="text-xl font-semibold leading-tight text-gray-900 line-clamp-1"><%= v.getVehicleName() %></h2>
+							<p class="text-right text-lg font-bold text-red-800 whitespace-nowrap">Rs. <%= String.format(java.util.Locale.US, "%,.0f", v.getPricePerDay()) %><span class="block text-xs font-semibold text-gray-400">/ day</span></p>
 						</div>
-						<p class="mt-2 text-sm text-gray-500">Kathmandu, Nepal</p>
+						<p class="mt-2 text-sm text-gray-500"><%= v.getLocation() %></p>
 						<div class="mt-4 flex items-center gap-2">
-							<button type="button" class="flex-1 rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Book Now</button>
+							<a href="<%= request.getContextPath() %>/vehicle-details?id=<%= v.getVehicleId() %>" class="flex-1 block text-center rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">View Details</a>
 							<button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800" aria-label="Remove from saved">
 								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 									<path d="M3 6h18"></path>
@@ -51,84 +72,7 @@
 						</div>
 					</div>
 				</article>
-
-				<article class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-					<div class="relative h-44 overflow-hidden bg-gray-100">
-						<img src="${pageContext.request.contextPath}/images/register.png" alt="Honda Activa 6G" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-						<span class="absolute right-3 top-3 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700">Scooter</span>
-					</div>
-					<div class="p-4">
-						<div class="flex items-start justify-between gap-4">
-							<h2 class="text-xl font-semibold leading-tight text-gray-900">Honda Activa 6G</h2>
-							<p class="text-right text-lg font-bold text-red-800">Rs. 1,200<span class="block text-xs font-semibold text-gray-400">/ day</span></p>
-						</div>
-						<p class="mt-2 text-sm text-gray-500">Lalitpur, Nepal</p>
-						<div class="mt-4 flex items-center gap-2">
-							<button type="button" class="flex-1 rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Book Now</button>
-							<button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800" aria-label="Remove from saved">
-								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M3 6h18"></path>
-									<path d="M8 6V4h8v2"></path>
-									<path d="M19 6l-1 14H6L5 6"></path>
-									<path d="M10 11v6"></path>
-									<path d="M14 11v6"></path>
-								</svg>
-							</button>
-						</div>
-					</div>
-				</article>
-
-				<article class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-					<div class="relative h-44 overflow-hidden bg-gray-100">
-						<img src="${pageContext.request.contextPath}/images/logoho.png" alt="Hyundai Venue" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-						<span class="absolute right-3 top-3 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">Compact SUV</span>
-					</div>
-					<div class="p-4">
-						<div class="flex items-start justify-between gap-4">
-							<h2 class="text-xl font-semibold leading-tight text-gray-900">Hyundai Venue</h2>
-							<p class="text-right text-lg font-bold text-red-800">Rs. 4,200<span class="block text-xs font-semibold text-gray-400">/ day</span></p>
-						</div>
-						<p class="mt-2 text-sm text-gray-500">Pokhara, Nepal</p>
-						<div class="mt-4 flex items-center gap-2">
-							<button type="button" class="flex-1 rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Book Now</button>
-							<button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800" aria-label="Remove from saved">
-								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M3 6h18"></path>
-									<path d="M8 6V4h8v2"></path>
-									<path d="M19 6l-1 14H6L5 6"></path>
-									<path d="M10 11v6"></path>
-									<path d="M14 11v6"></path>
-								</svg>
-							</button>
-						</div>
-					</div>
-				</article>
-
-				<article class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:col-span-2 xl:col-span-1">
-					<div class="relative h-44 overflow-hidden bg-gray-100">
-						<img src="${pageContext.request.contextPath}/images/about.png" alt="Royal Enfield Classic" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-						<span class="absolute right-3 top-3 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-700">Motorbike</span>
-					</div>
-					<div class="p-4">
-						<div class="flex items-start justify-between gap-4">
-							<h2 class="text-xl font-semibold leading-tight text-gray-900">Royal Enfield Classic</h2>
-							<p class="text-right text-lg font-bold text-red-800">Rs. 2,500<span class="block text-xs font-semibold text-gray-400">/ day</span></p>
-						</div>
-						<p class="mt-2 text-sm text-gray-500">Kathmandu, Nepal</p>
-						<div class="mt-4 flex items-center gap-2">
-							<button type="button" class="flex-1 rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Book Now</button>
-							<button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800" aria-label="Remove from saved">
-								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M3 6h18"></path>
-									<path d="M8 6V4h8v2"></path>
-									<path d="M19 6l-1 14H6L5 6"></path>
-									<path d="M10 11v6"></path>
-									<path d="M14 11v6"></path>
-								</svg>
-							</button>
-						</div>
-					</div>
-				</article>
+				<% } } %>
 			</section>
 
 			<section class="mt-6 grid gap-4 lg:grid-cols-2">

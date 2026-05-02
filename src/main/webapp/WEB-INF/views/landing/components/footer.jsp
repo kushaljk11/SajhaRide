@@ -49,11 +49,11 @@
                 <h3 class="text-lg font-semibold text-white">Quick Links</h3>
                 <ul class="mt-4 space-y-2 text-sm text-red-100">
                     <li><a href="<%= request.getContextPath() %>/" class="transition hover:text-white">Home</a></li>
-                    <li><a href="<%= request.getContextPath() %>/vehicles/list" class="transition hover:text-white">Find a Ride</a></li>
-                    <li><a href="<%= request.getContextPath() %>/auth/register" class="transition hover:text-white">List Your Vehicle</a></li>
-                    <li><a href="<%= request.getContextPath() %>/auth/login" class="transition hover:text-white">Login</a></li>
-                    <li><a href="#" class="transition hover:text-white">Help Center</a></li>
-                    <li><a href="#" class="transition hover:text-white">Contact</a></li>
+                    <li><a href="<%= request.getContextPath() %>/login" class="transition hover:text-white">Find a Ride</a></li>
+                    <li><a href="<%= request.getContextPath() %>/login" class="transition hover:text-white">List Your Vehicle</a></li>
+                    <li><a href="<%= request.getContextPath() %>/login" class="transition hover:text-white">Login</a></li>
+                    <li><a href="<%= request.getContextPath() %>/contact" class="transition hover:text-white">Help Center</a></li>
+                    <li><a href="<%= request.getContextPath() %>/contact" class="transition hover:text-white">Contact</a></li>
                 </ul>
             </div>
 

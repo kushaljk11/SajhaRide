@@ -9,10 +9,13 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.riderental.myriderental.dao.PaymentDAO;
+
 public class BookingService {
 
     private final BookingDAO bookingDAO = new BookingDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
+    private final PaymentDAO paymentDAO = new PaymentDAO();
     private final AvailabilityService availabilityService = new AvailabilityService();
 
     // CREATE A NEW BOOKING REQUEST
@@ -41,7 +44,13 @@ public class BookingService {
         booking.setTotalPrice(totalPrice);
         booking.setStatus("PENDING");
 
-        return bookingDAO.create(booking);
+        Booking savedBooking = bookingDAO.create(booking);
+
+        // Automatically create a PENDING payment record for the renter
+        // Using 'ESEWA' as the default placeholder to satisfy DB ENUM('ESEWA', 'KHALTI')
+        paymentDAO.savePayment(savedBooking.getBookingId(), "ESEWA", totalPrice, null, null);
+
+        return savedBooking;
     }
 
     // APPROVE A BOOKING

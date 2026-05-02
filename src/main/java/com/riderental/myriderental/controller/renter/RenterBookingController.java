@@ -29,28 +29,35 @@ public class RenterBookingController extends HttpServlet {
         }
 
         try {
-            List<Booking> allBookings = bookingService.getOwnerBookings(sessionUser.getUserId());
+            List<Booking> ownerBookings = bookingService.getOwnerBookings(sessionUser.getUserId());
+            List<Booking> renterBookings = bookingService.getRenterBookings(sessionUser.getUserId());
 
-            List<Booking> pendingBookings = new ArrayList<>();
-            List<Booking> activeBookings = new ArrayList<>();
-            List<Booking> completedBookings = new ArrayList<>();
+            List<Booking> pendingRequests = new ArrayList<>();
+            List<Booking> activeRequests = new ArrayList<>();
+            List<Booking> completedRequests = new ArrayList<>();
 
-            for (Booking b : allBookings) {
-                switch (b.getStatus()) {
-                    case "PENDING" -> pendingBookings.add(b);
-                    case "APPROVED" -> activeBookings.add(b);
-                    case "COMPLETED" -> completedBookings.add(b);
+            for (Booking b : ownerBookings) {
+                switch (b.getStatus() != null ? b.getStatus() : "PENDING") {
+                    case "PENDING" -> pendingRequests.add(b);
+                    case "APPROVED" -> activeRequests.add(b);
+                    case "COMPLETED" -> completedRequests.add(b);
+                    default -> pendingRequests.add(b);
                 }
             }
 
-            request.setAttribute("allBookings", allBookings);
-            request.setAttribute("pendingBookings", pendingBookings);
-            request.setAttribute("activeBookings", activeBookings);
-            request.setAttribute("completedBookings", completedBookings);
-            request.setAttribute("totalBookings", allBookings.size());
-            request.setAttribute("pendingCount", pendingBookings.size());
-            request.setAttribute("activeCount", activeBookings.size());
-            request.setAttribute("completedCount", completedBookings.size());
+            request.setAttribute("ownerBookings", ownerBookings);
+            request.setAttribute("renterBookings", renterBookings);
+            
+            request.setAttribute("pendingRequests", pendingRequests);
+            request.setAttribute("activeRequests", activeRequests);
+            request.setAttribute("completedRequests", completedRequests);
+            
+            request.setAttribute("totalRequests", ownerBookings.size());
+            request.setAttribute("pendingCount", pendingRequests.size());
+            request.setAttribute("activeCount", activeRequests.size());
+            request.setAttribute("completedCount", completedRequests.size());
+            
+            request.setAttribute("totalTrips", renterBookings.size());
 
             String successMessage = request.getParameter("success");
             if (successMessage != null && !successMessage.isBlank()) {
