@@ -19,12 +19,11 @@
   boolean paymentsActive = currentPath.startsWith("/owner/payments");
   boolean settingsActive = currentPath.startsWith("/owner/settings");
   boolean chatActive = currentPath.startsWith("/owner/chat");
-  boolean exploreActive = currentPath.startsWith("/explore");
 %>
 <aside
   class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]"
 >
-  <div class="mb-5 flex items-center gap-2 px-1">
+  <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img
       src="${pageContext.request.contextPath}/images/logo.svg"
       alt="SajhaRide"
@@ -33,7 +32,7 @@
     <p class="text-lg mt-4 font-semibold text-red-800">
       Sajha<span class="text-blue-800">Ride</span>
     </p>
-  </div>
+  </a>
 
   <hr />
 
@@ -79,7 +78,7 @@
         <circle cx="8" cy="15" r="1.5"></circle>
         <circle cx="16" cy="15" r="1.5"></circle>
       </svg>
-      My Vechicle
+      My Vehicle
     </a>
 
     <a
@@ -184,25 +183,6 @@
       Chat
     </a>
 
-    <a
-      href="${pageContext.request.contextPath}/explore"
-      data-owner-route="/explore"
-      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition <%= exploreActive ? "bg-red-800 font-semibold text-white" : "font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900" %>"
-      <%= exploreActive ? "aria-current=\"page\"" : "" %>
-    >
-      <svg
-        class="h-5 w-5"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="7"></circle>
-        <path d="m20 20-3.5-3.5"></path>
-      </svg>
-      Explore
-    </a>
   </nav>
 </aside>
 

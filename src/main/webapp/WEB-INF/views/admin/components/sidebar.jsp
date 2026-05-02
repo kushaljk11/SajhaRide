@@ -17,7 +17,7 @@
   boolean bookingsActive = currentPath.startsWith("/admin/bookings");
 %>
 <aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
-  <div class="mb-5 flex items-center gap-2 px-1">
+  <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img
       src="${pageContext.request.contextPath}/images/logo.svg"
       alt="SajhaRide"
@@ -31,7 +31,7 @@
         Admin Console
       </p>
     </div>
-  </div>
+  </a>
 
   <hr />
 

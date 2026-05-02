@@ -2,6 +2,7 @@
 <%@ page import="com.riderental.myriderental.model.User" %>
 <%
   User loggedInUser = (User) session.getAttribute("loggedInUser");
+  String topbarCtx = request.getContextPath();
   String displayName = (loggedInUser != null && loggedInUser.getFullName() != null && !loggedInUser.getFullName().isBlank())
       ? loggedInUser.getFullName()
       : "Profile";
@@ -35,7 +36,7 @@
 
   <div class="group relative">
     <a
-      href="/profile"
+      href="<%= topbarCtx %>/profile"
       class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-red-800 text-white transition-colors duration-200 hover:border-red-800 hover:bg-red-900"
       aria-label="Open profile"
       title="Open profile"
