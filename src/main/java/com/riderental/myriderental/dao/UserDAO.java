@@ -2,10 +2,10 @@ package com.riderental.myriderental.dao;
 
 import com.riderental.myriderental.model.User;
 import com.riderental.myriderental.util.DBConnection;
+import com.riderental.myriderental.util.DaoHelper;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,19 +60,7 @@ public class UserDAO {
      */
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM users WHERE email = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return map(rs);
-                }
-            }
-        }
-        return null;
+        return DaoHelper.queryOne(sql, stmt -> stmt.setString(1, email), this::map);
     }
 
     /**
@@ -83,19 +71,7 @@ public class UserDAO {
      */
     public User findById(int userId) throws SQLException {
         String sql = "SELECT * FROM users WHERE userId = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return map(rs);
-                }
-            }
-        }
-        return null;
+        return DaoHelper.queryOne(sql, stmt -> stmt.setInt(1, userId), this::map);
     }
 
     /**
@@ -105,18 +81,7 @@ public class UserDAO {
      */
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM users ORDER BY createdAt DESC";
-        List<User> users = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                users.add(map(rs));
-            }
-        }
-
-        return users;
+        return DaoHelper.queryList(sql, this::map);
     }
 
     /**
@@ -126,16 +91,7 @@ public class UserDAO {
      */
     public int getTotalUsers() throws SQLException {
         String sql = "SELECT COUNT(*) FROM users";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql);
     }
 
     /**
@@ -146,19 +102,7 @@ public class UserDAO {
      */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE accountStatus = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, status);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql, stmt -> stmt.setString(1, status));
     }
 
     /**
@@ -169,19 +113,7 @@ public class UserDAO {
      */
     public int countByRole(String role) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, role);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql, stmt -> stmt.setString(1, role));
     }
 
     /**
@@ -197,10 +129,7 @@ public class UserDAO {
                     profileImagePath = ?, role = ?, trustScore = ?, accountStatus = ?, is_verified = ?
                 WHERE userId = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.executeUpdate(sql, stmt -> {
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
@@ -212,9 +141,7 @@ public class UserDAO {
             stmt.setString(9, user.getAccountStatus());
             stmt.setBoolean(10, user.isVerified());
             stmt.setInt(11, user.getUserId());
-
-            return stmt.executeUpdate() > 0;
-        }
+        }) > 0;
     }
 
     /**
@@ -229,18 +156,13 @@ public class UserDAO {
                 SET fullName = ?, phoneNumber = ?, address = ?, profileImagePath = ?
                 WHERE userId = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.executeUpdate(sql, stmt -> {
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getPhoneNumber());
             stmt.setString(3, user.getAddress());
             stmt.setString(4, user.getProfileImagePath());
             stmt.setInt(5, user.getUserId());
-
-            return stmt.executeUpdate() > 0;
-        }
+        }) > 0;
     }
 
     /**
@@ -251,13 +173,7 @@ public class UserDAO {
      */
     public boolean delete(int userId) throws SQLException {
         String sql = "DELETE FROM users WHERE userId = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-            return stmt.executeUpdate() > 0;
-        }
+        return DaoHelper.executeUpdate(sql, stmt -> stmt.setInt(1, userId)) > 0;
     }
 
     // MAP RESULT SET → USER OBJECT

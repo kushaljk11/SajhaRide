@@ -2,6 +2,7 @@ package com.riderental.myriderental.dao;
 
 import com.riderental.myriderental.model.Booking;
 import com.riderental.myriderental.util.DBConnection;
+import com.riderental.myriderental.util.DaoHelper;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -64,19 +65,7 @@ public class BookingDAO {
                 JOIN users u ON b.user_id = u.userId
                 WHERE b.booking_id = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, bookingId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return map(rs);
-                }
-            }
-        }
-        return null;
+        return DaoHelper.queryOne(sql, stmt -> stmt.setInt(1, bookingId), this::map);
     }
 
     /**
@@ -95,21 +84,7 @@ public class BookingDAO {
                 WHERE b.user_id = ?
                 ORDER BY b.created_at DESC
                 """;
-
-        List<Booking> bookings = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    bookings.add(map(rs));
-                }
-            }
-        }
-        return bookings;
+        return DaoHelper.queryList(sql, stmt -> stmt.setInt(1, userId), this::map);
     }
 
     /**
@@ -128,21 +103,7 @@ public class BookingDAO {
                 WHERE v.owner_id = ?
                 ORDER BY b.created_at DESC
                 """;
-
-        List<Booking> bookings = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, ownerId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    bookings.add(map(rs));
-                }
-            }
-        }
-        return bookings;
+        return DaoHelper.queryList(sql, stmt -> stmt.setInt(1, ownerId), this::map);
     }
 
     /**
@@ -159,18 +120,7 @@ public class BookingDAO {
                 JOIN users u ON b.user_id = u.userId
                 ORDER BY b.created_at DESC
                 """;
-
-        List<Booking> bookings = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                bookings.add(map(rs));
-            }
-        }
-        return bookings;
+        return DaoHelper.queryList(sql, this::map);
     }
 
     /**
@@ -187,22 +137,7 @@ public class BookingDAO {
                 "                JOIN users u ON b.user_id = u.userId\n" +
                 "                ORDER BY b.created_at DESC\n" +
                 "                LIMIT ?";
-
-        List<Booking> bookings = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, limit);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    bookings.add(map(rs));
-                }
-            }
-        }
-
-        return bookings;
+        return DaoHelper.queryList(sql, stmt -> stmt.setInt(1, limit), this::map);
     }
 
     /**
@@ -214,15 +149,10 @@ public class BookingDAO {
      */
     public boolean updateStatus(int bookingId, String status) throws SQLException {
         String sql = "UPDATE bookings SET status = ? WHERE booking_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.executeUpdate(sql, stmt -> {
             stmt.setString(1, status);
             stmt.setInt(2, bookingId);
-
-            return stmt.executeUpdate() > 0;
-        }
+        }) > 0;
     }
 
     /**
@@ -239,21 +169,10 @@ public class BookingDAO {
                 JOIN vehicles v ON b.vehicle_id = v.vehicle_id
                 WHERE b.booking_id = ? AND v.owner_id = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.queryCount(sql, stmt -> {
             stmt.setInt(1, bookingId);
             stmt.setInt(2, ownerId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-
-        return false;
+        }) > 0;
     }
 
     /**
@@ -263,16 +182,7 @@ public class BookingDAO {
      */
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql);
     }
 
     /**
@@ -304,19 +214,7 @@ public class BookingDAO {
      */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM bookings WHERE status = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, status);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql, stmt -> stmt.setString(1, status));
     }
 
     /**
@@ -330,16 +228,7 @@ public class BookingDAO {
                 FROM bookings
                 WHERE status IN ('APPROVED', 'COMPLETED')
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0;
+        return DaoHelper.queryDouble(sql);
     }
 
     /**
@@ -356,19 +245,7 @@ public class BookingDAO {
                 WHERE v.owner_id = ?
                 AND b.status IN ('APPROVED', 'COMPLETED')
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, ownerId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble(1);
-                }
-            }
-        }
-        return 0;
+        return DaoHelper.queryDouble(sql, stmt -> stmt.setInt(1, ownerId));
     }
 
     /**
@@ -388,21 +265,11 @@ public class BookingDAO {
                 AND start_date <= ?
                 AND end_date >= ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.queryCount(sql, stmt -> {
             stmt.setInt(1, vehicleId);
             stmt.setDate(2, Date.valueOf(endDate));
             stmt.setDate(3, Date.valueOf(startDate));
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
+        }) > 0;
     }
 
     // MAP RESULT SET TO BOOKING OBJECT

@@ -2,6 +2,7 @@ package com.riderental.myriderental.dao;
 
 import com.riderental.myriderental.model.Vehicle;
 import com.riderental.myriderental.util.DBConnection;
+import com.riderental.myriderental.util.DaoHelper;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -76,19 +77,7 @@ public class VehicleDAO {
                 JOIN users u ON v.owner_id = u.userId
                 WHERE v.vehicle_id = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, vehicleId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return map(rs);
-                }
-            }
-        }
-        return null;
+        return DaoHelper.queryOne(sql, stmt -> stmt.setInt(1, vehicleId), this::map);
     }
 
     /**
@@ -98,17 +87,7 @@ public class VehicleDAO {
      */
     public List<Vehicle> findAll() throws SQLException {
         String sql = "SELECT * FROM vehicles ORDER BY created_at DESC";
-        List<Vehicle> vehicles = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                vehicles.add(map(rs));
-            }
-        }
-        return vehicles;
+        return DaoHelper.queryList(sql, this::map);
     }
 
     /**
@@ -119,20 +98,7 @@ public class VehicleDAO {
      */
     public List<Vehicle> findByOwner(int ownerId) throws SQLException {
         String sql = "SELECT * FROM vehicles WHERE owner_id = ? ORDER BY created_at DESC";
-        List<Vehicle> vehicles = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, ownerId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    vehicles.add(map(rs));
-                }
-            }
-        }
-        return vehicles;
+        return DaoHelper.queryList(sql, stmt -> stmt.setInt(1, ownerId), this::map);
     }
 
     /**
@@ -142,17 +108,7 @@ public class VehicleDAO {
      */
     public List<Vehicle> findAvailable() throws SQLException {
         String sql = "SELECT * FROM vehicles WHERE availability_status = 'AVAILABLE' ORDER BY created_at DESC";
-        List<Vehicle> vehicles = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                vehicles.add(map(rs));
-            }
-        }
-        return vehicles;
+        return DaoHelper.queryList(sql, this::map);
     }
 
     /**
@@ -170,11 +126,7 @@ public class VehicleDAO {
                 AND (? = '' OR vehicle_type = ?)
                 ORDER BY created_at DESC
                 """;
-        List<Vehicle> vehicles = new ArrayList<>();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.queryList(sql, stmt -> {
             String kw = "%" + (keyword == null ? "" : keyword.trim()) + "%";
             String tp = type == null ? "" : type.trim().toUpperCase();
 
@@ -183,14 +135,7 @@ public class VehicleDAO {
             stmt.setString(3, kw);
             stmt.setString(4, tp);
             stmt.setString(5, tp);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    vehicles.add(map(rs));
-                }
-            }
-        }
-        return vehicles;
+        }, this::map);
     }
 
     /**
@@ -206,10 +151,7 @@ public class VehicleDAO {
                     price_per_day = ?, location = ?, availability_status = ?, image_path = ?
                 WHERE vehicle_id = ?
                 """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.executeUpdate(sql, stmt -> {
             stmt.setString(1, vehicle.getVehicleName());
             stmt.setString(2, vehicle.getVehicleType());
             stmt.setString(3, vehicle.getDescription());
@@ -218,9 +160,7 @@ public class VehicleDAO {
             stmt.setString(6, vehicle.getAvailabilityStatus());
             stmt.setString(7, vehicle.getImagePath());
             stmt.setInt(8, vehicle.getVehicleId());
-
-            return stmt.executeUpdate() > 0;
-        }
+        }) > 0;
     }
 
     /**
@@ -232,15 +172,10 @@ public class VehicleDAO {
      */
     public boolean updateStatus(int vehicleId, String status) throws SQLException {
         String sql = "UPDATE vehicles SET availability_status = ? WHERE vehicle_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        return DaoHelper.executeUpdate(sql, stmt -> {
             stmt.setString(1, status);
             stmt.setInt(2, vehicleId);
-
-            return stmt.executeUpdate() > 0;
-        }
+        }) > 0;
     }
 
     /**
@@ -251,13 +186,7 @@ public class VehicleDAO {
      */
     public boolean delete(int vehicleId) throws SQLException {
         String sql = "DELETE FROM vehicles WHERE vehicle_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, vehicleId);
-            return stmt.executeUpdate() > 0;
-        }
+        return DaoHelper.executeUpdate(sql, stmt -> stmt.setInt(1, vehicleId)) > 0;
     }
 
     /**
@@ -267,16 +196,7 @@ public class VehicleDAO {
      */
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) FROM vehicles";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql);
     }
 
     /**
@@ -317,19 +237,7 @@ public class VehicleDAO {
      */
     public int countByStatus(String status) throws SQLException {
         String sql = "SELECT COUNT(*) FROM vehicles WHERE availability_status = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, status);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return 0;
+        return DaoHelper.queryCount(sql, stmt -> stmt.setString(1, status));
     }
 
     /**
@@ -350,20 +258,11 @@ public class VehicleDAO {
         }
         sql.append(")");
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
+        return DaoHelper.queryCount(sql.toString(), stmt -> {
             for (int i = 0; i < statuses.length; i++) {
                 stmt.setString(i + 1, statuses[i]);
             }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return 0;
+        });
     }
 
     // MAP RESULT SET TO VEHICLE OBJECT
