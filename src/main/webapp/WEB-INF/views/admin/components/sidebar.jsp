@@ -17,7 +17,15 @@
   boolean bookingsActive = currentPath.startsWith("/admin/bookings");
   boolean kycActive = currentPath.startsWith("/admin/kyc");
 %>
-<aside class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]">
+<div
+  id="adminSidebarOverlay"
+  class="fixed inset-0 z-30 hidden bg-gray-900/40 lg:hidden"
+  onclick="toggleAdminSidebar()"
+></div>
+<aside
+  id="adminSidebar"
+  class="fixed inset-y-0 left-0 z-40 flex h-screen w-64 -translate-x-full flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)] transition-transform duration-200 lg:static lg:translate-x-0"
+>
   <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img
       src="${pageContext.request.contextPath}/images/logo.svg"

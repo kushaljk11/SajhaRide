@@ -13,10 +13,11 @@
 
         <head>
           <title>SajhaRide</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <script src="https://cdn.tailwindcss.com"></script>
         </head>
 
-        <body class="<%= ownerView || renterView ? " h-screen overflow-hidden bg-gray-100 text-gray-900"
+        <body class="<%= ownerView || renterView ? " min-h-screen bg-gray-100 text-gray-900 lg:h-screen lg:overflow-hidden"
           : "bg-gray-100 text-gray-900" %>">
           <div class="flex h-full">
             <% if (ownerView) { %>
@@ -34,7 +35,7 @@
 
                           <main class="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
                             <section class="rounded-2xl border border-red-100 bg-white p-4 shadow-sm">
-                              <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
+                              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                                 <div>
                                   <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
                                     Pick Up Location</p>
@@ -74,7 +75,7 @@
                                     <option>Under NPR 10,000</option>
                                   </select>
                                 </div>
-                                <div class="flex items-end">
+                                <div class="flex items-end sm:col-span-2 lg:col-span-1">
                                   <button
                                     class="w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Update
                                     Search</button>
@@ -83,17 +84,17 @@
                             </section>
 
                             <section class="mt-6">
-                              <div class="mb-4 flex items-center justify-between gap-3">
+                              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                   <h1 class="text-3xl font-semibold tracking-tight text-gray-900">Explore Vehicle</h1>
                                   <p class="mt-1 text-sm text-gray-600">Browse verified rides for your next
                                     adventure.</p>
                                 </div>
-                                <div class="hidden items-center gap-2 sm:flex">
+                                <div class="flex items-center gap-2">
                                   <button
-                                    class="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800">Grid</button>
+                                    class="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 sm:w-auto">Grid</button>
                                   <button
-                                    class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600">List</button>
+                                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 sm:w-auto">List</button>
                                 </div>
                               </div>
 

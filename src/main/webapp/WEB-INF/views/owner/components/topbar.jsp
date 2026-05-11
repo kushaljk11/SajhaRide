@@ -15,9 +15,27 @@
 %>
 
 <header
-  class="flex h-16 items-center justify-end gap-2.5 shadow-[2px_0_8px_rgba(153,27,27,0.18)] bg-white px-5"
+  class="flex h-16 items-center justify-between gap-4 shadow-[2px_0_8px_rgba(153,27,27,0.18)] bg-white px-5"
 >
-  <div class="relative">
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-700 transition hover:bg-gray-100 lg:hidden"
+      aria-label="Toggle sidebar"
+      aria-controls="ownerSidebar"
+      aria-expanded="false"
+      onclick="toggleOwnerSidebar()"
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M3 6h18"></path>
+        <path d="M3 12h18"></path>
+        <path d="M3 18h18"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <div class="relative">
     <button
       class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-red-800 bg-gray-100 text-red-800 transition-colors duration-200 hover:border-gray-400 hover:bg-indigo-50"
       type="button"
@@ -65,7 +83,7 @@
     </div>
   </div>
 
-  <div class="group relative">
+    <div class="group relative">
     <a
       href="<%= topbarCtx %>/profile"
       class="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-red-800 text-white transition-colors duration-200 hover:border-red-800 hover:bg-red-900"
@@ -90,9 +108,22 @@
       <%= displayName %>
     </div>
   </div>
+  </div>
 </header>
 
 <script>
+  function toggleOwnerSidebar() {
+    var sidebar = document.getElementById("ownerSidebar");
+    var overlay = document.getElementById("ownerSidebarOverlay");
+    var toggleButton = document.querySelector("[aria-controls='ownerSidebar']");
+    if (!sidebar || !overlay) return;
+    sidebar.classList.toggle("-translate-x-full");
+    overlay.classList.toggle("hidden");
+    if (toggleButton) {
+      var expanded = !sidebar.classList.contains("-translate-x-full");
+      toggleButton.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+  }
   function toggleOwnerNotifications() {
     document.getElementById('ownerNotificationDropdown').classList.toggle('hidden');
   }

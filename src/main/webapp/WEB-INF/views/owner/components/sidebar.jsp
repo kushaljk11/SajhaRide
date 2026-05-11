@@ -21,8 +21,14 @@
   boolean chatActive = currentPath.startsWith("/owner/chat");
   boolean profileActive = currentPath.startsWith("/profile");
 %>
+<div
+  id="ownerSidebarOverlay"
+  class="fixed inset-0 z-30 hidden bg-gray-900/40 lg:hidden"
+  onclick="toggleOwnerSidebar()"
+></div>
 <aside
-  class="flex h-screen w-64 shrink-0 flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)]"
+  id="ownerSidebar"
+  class="fixed inset-y-0 left-0 z-40 flex h-screen w-64 -translate-x-full flex-col bg-white px-4 py-3 shadow-[1px_0_4px_rgba(153,27,27,0.18)] transition-transform duration-200 lg:static lg:translate-x-0"
 >
   <a href="${pageContext.request.contextPath}/" class="mb-5 flex items-center gap-2 px-1 transition hover:opacity-90" aria-label="Go to landing page" title="Home">
     <img

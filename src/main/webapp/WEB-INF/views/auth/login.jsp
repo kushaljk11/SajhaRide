@@ -6,13 +6,14 @@
 <html>
 <head>
     <title>SajhaRide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex min-h-screen">
 
 <div class="w-full overflow-hidden flex flex-col md:flex-row min-h-screen">
 
-    <div class="hidden md:flex md:w-1/2 relative bg-cover bg-center h-1/2 md:h-auto"
+    <div class="hidden md:flex md:w-1/2 relative bg-cover bg-center"
          style="background-image: url('../../../images/register.png');">
 
         <div class="absolute inset-0 bg-gradient-to-br from-red-800/70 via-black/50 to-black/30 flex flex-col justify-end p-10">
@@ -53,7 +54,7 @@
         </div>
     </div>
 
-    <div class="w-full md:w-1/2 bg-white flex items-center justify-center px-8 py-12 md:px-12 h-1/2 md:h-screen">
+    <div class="w-full md:w-1/2 bg-white flex items-center justify-center px-6 py-10 md:px-12 md:py-12 min-h-screen md:min-h-0">
         <div class="w-full max-w-sm">
 
             <div class="flex items-center gap-2 mb-8">

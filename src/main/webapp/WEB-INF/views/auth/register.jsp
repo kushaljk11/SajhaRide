@@ -8,6 +8,7 @@
 <html>
 <head>
     <title>SajhaRide - Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -29,7 +30,7 @@
         </div>
     </div>
 
-    <div class="w-full md:w-1/2 bg-white flex items-center justify-center px-6 py-10 md:px-12">
+    <div class="w-full md:w-1/2 bg-white flex items-center justify-center px-6 py-10 md:px-12 min-h-screen md:min-h-0">
         <div class="w-full max-w-2xl">
             <div class="mb-8">
                 <h1 class="text-3xl font-semibold text-center text-gray-900">Register Asap!</h1>

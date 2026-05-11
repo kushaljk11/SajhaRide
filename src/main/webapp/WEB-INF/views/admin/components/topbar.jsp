@@ -17,9 +17,25 @@
 %>
 
 <header class="flex h-16 items-center justify-between gap-4 border-b border-red-100 bg-white px-5 shadow-[2px_0_8px_rgba(153,27,27,0.12)]">
-  <div>
-    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Admin Panel</p>
-    <p class="mt-1 text-sm text-gray-500">Manage users, listings, and bookings from one place.</p>
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-700 transition hover:bg-gray-100 lg:hidden"
+      aria-label="Toggle sidebar"
+      aria-controls="adminSidebar"
+      aria-expanded="false"
+      onclick="toggleAdminSidebar()"
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M3 6h18"></path>
+        <path d="M3 12h18"></path>
+        <path d="M3 18h18"></path>
+      </svg>
+    </button>
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Admin Panel</p>
+      <p class="mt-1 text-sm text-gray-500">Manage users, listings, and bookings from one place.</p>
+    </div>
   </div>
 
   <div class="flex items-center gap-3">
@@ -73,6 +89,18 @@
 </header>
 
 <script>
+  function toggleAdminSidebar() {
+    var sidebar = document.getElementById("adminSidebar");
+    var overlay = document.getElementById("adminSidebarOverlay");
+    var toggleButton = document.querySelector("[aria-controls='adminSidebar']");
+    if (!sidebar || !overlay) return;
+    sidebar.classList.toggle("-translate-x-full");
+    overlay.classList.toggle("hidden");
+    if (toggleButton) {
+      var expanded = !sidebar.classList.contains("-translate-x-full");
+      toggleButton.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+  }
   function toggleAdminNotifications() {
     document.getElementById('adminNotificationDropdown').classList.toggle('hidden');
   }
