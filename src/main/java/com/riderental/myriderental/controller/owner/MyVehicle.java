@@ -35,7 +35,7 @@ public class MyVehicle extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User sessionUser = getSessionUser(request);
-        if (sessionUser == null || !ensureOwnerAccess(sessionUser)) {
+        if (sessionUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -63,15 +63,5 @@ public class MyVehicle extends HttpServlet {
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
-    }
-
-    /**
-     * Ensures that the requesting user has owner access.
-     * @param loggedInUser the currently logged-in user
-     * @return true if the user is an owner, false otherwise
-     */
-    private boolean ensureOwnerAccess(User loggedInUser) {
-        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
-        return "owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role);
     }
 }

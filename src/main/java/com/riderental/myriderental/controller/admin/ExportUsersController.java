@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,12 +27,6 @@ public class ExportUsersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Check admin access
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         try {
             // Fetch all users
             List<User> users = userDAO.findAll();
@@ -75,14 +68,6 @@ public class ExportUsersController extends HttpServlet {
             return "\"" + str.replace("\"", "\"\"") + "\"";
         }
         return str;
-    }
-
-    private boolean isAdmin(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        User loggedIn = session == null ? null : (User) session.getAttribute("loggedInUser");
-        if (loggedIn == null) return false;
-        String role = loggedIn.getRole() == null ? "" : loggedIn.getRole().trim();
-        return "ADMIN".equalsIgnoreCase(role);
     }
 }
 

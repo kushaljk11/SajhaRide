@@ -14,20 +14,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Filter to ensure user authentication for shared routes.
+ * Filter to ensure the user is authenticated and has the OWNER role.
  */
-@WebFilter(urlPatterns = {
-        "/profile",
-        "/booking/*",
-        "/notifications/*",
-        "/document/*",
-        "/api/chat/*",
-        "/user/kyc/*"
-})
-public class AuthFilter implements Filter {
+@WebFilter("/owner/*")
+public class OwnerAuthFilter implements Filter {
 
     /**
-     * Allows only logged-in users to access shared authenticated routes.
+     * Allows only authenticated OWNER users to access owner routes.
      *
      * @param request the ServletRequest object
      * @param response the ServletResponse object
@@ -50,6 +43,22 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        chain.doFilter(request, response);
+        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
+        if ("OWNER".equalsIgnoreCase(role)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
+            return;
+        }
+
+        if ("RENTER".equalsIgnoreCase(role)) {
+            resp.sendRedirect(req.getContextPath() + "/renter/dashboard");
+            return;
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/login");
     }
 }

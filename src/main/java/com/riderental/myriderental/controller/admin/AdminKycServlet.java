@@ -30,11 +30,6 @@ public class AdminKycServlet extends HttpServlet {
         
         HttpSession session = request.getSession(false);
         User user = session != null ? (User) session.getAttribute("loggedInUser") : null;
-        
-        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
 
         try {
             List<KycVerification> pendingKycs = kycDAO.findAllPending();
@@ -54,11 +49,6 @@ public class AdminKycServlet extends HttpServlet {
         
         HttpSession session = request.getSession(false);
         User user = session != null ? (User) session.getAttribute("loggedInUser") : null;
-        
-        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
 
         String action = request.getParameter("action");
         String kycIdParam = request.getParameter("kycId");

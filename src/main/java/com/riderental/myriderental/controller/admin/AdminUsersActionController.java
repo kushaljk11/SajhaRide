@@ -30,12 +30,6 @@ public class AdminUsersActionController extends HttpServlet {
             return;
         }
 
-        // Ensure admin access
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         String idParam = request.getParameter("id");
         if (idParam == null || idParam.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/admin/users");
@@ -67,14 +61,6 @@ public class AdminUsersActionController extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/users");
-    }
-
-    private boolean isAdmin(HttpServletRequest request) {
-        jakarta.servlet.http.HttpSession session = request.getSession(false);
-        User loggedIn = session == null ? null : (User) session.getAttribute("loggedInUser");
-        if (loggedIn == null) return false;
-        String role = loggedIn.getRole() == null ? "" : loggedIn.getRole().trim();
-        return "ADMIN".equalsIgnoreCase(role);
     }
 }
 

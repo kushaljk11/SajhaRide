@@ -33,11 +33,6 @@ public class OwnerChatController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        if (!ensureOwnerAccess(request, response)) {
-            return;
-        }
-
         User sessionUser = getSessionUser(request);
         if (sessionUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -84,32 +79,6 @@ public class OwnerChatController extends HttpServlet {
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
-    }
-
-    /**
-     * Ensures that the requesting user has owner access. Redirects otherwise.
-     * @param request the HTTP request
-     * @param response the HTTP response
-     * @return true if the user is an owner, false otherwise
-     * @throws IOException if an I/O error occurs during redirection
-     */
-    private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        User loggedInUser = session == null ? null : (User) session.getAttribute("loggedInUser");
-
-        if (loggedInUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return false;
-        }
-
-        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
-        if ("owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role)) {
-            return true;
-        }
-
-
-        response.sendRedirect(request.getContextPath() + "/login");
-        return false;
     }
 }
 
