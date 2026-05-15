@@ -214,7 +214,7 @@
                             <p class="mt-1 text-sm text-gray-500"><%= v.getVehicleType() %> • <%= v.getLocation() %></p>
                             <div class="mt-3 flex items-center justify-between">
                                 <p class="text-sm font-semibold text-red-800">Rs. <%= String.format(java.util.Locale.US, "%,.2f", v.getPricePerDay()) %></p>
-                                <a href="${pageContext.request.contextPath}/vehicles/detail?id=<%= v.getVehicleId() %>" class="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-800 hover:bg-red-100">View</a>
+                                <a href="${pageContext.request.contextPath}/vehicle-details?id=<%= v.getVehicleId() %>" class="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-800 hover:bg-red-100">View</a>
                             </div>
                         </div>
                     </article>

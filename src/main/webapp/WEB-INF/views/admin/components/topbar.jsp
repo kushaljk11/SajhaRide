@@ -32,10 +32,10 @@
         <path d="M3 18h18"></path>
       </svg>
     </button>
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Admin Panel</p>
-      <p class="mt-1 text-sm text-gray-500">Manage users, listings, and bookings from one place.</p>
-    </div>
+<%--    <div>--%>
+<%--      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Admin Panel</p>--%>
+<%--      <p class="mt-1 text-sm text-gray-500">Manage users, listings, and bookings from one place.</p>--%>
+<%--    </div>--%>
   </div>
 
   <div class="flex items-center gap-3">

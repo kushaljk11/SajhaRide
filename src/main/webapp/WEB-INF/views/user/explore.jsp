@@ -8,7 +8,18 @@
         request.getAttribute("viewRole"); if ((role==null || role.isBlank()) && loggedInUser !=null &&
         loggedInUser.getRole() !=null) { role=loggedInUser.getRole().toLowerCase(); } boolean ownerView="owner"
         .equalsIgnoreCase(role); boolean renterView="renter" .equalsIgnoreCase(role); if (!ownerView && !renterView) {
-        response.sendRedirect(request.getContextPath() + "/login" ); return; } %>
+        response.sendRedirect(request.getContextPath() + "/login" ); return; }
+        String selectedLocation = (String) request.getAttribute("location");
+        String selectedType = (String) request.getAttribute("type");
+        String selectedStartDate = (String) request.getAttribute("startDate");
+        String selectedEndDate = (String) request.getAttribute("endDate");
+        String selectedMaxPrice = (String) request.getAttribute("maxPrice");
+        if (selectedLocation == null) selectedLocation = "";
+        if (selectedType == null) selectedType = "";
+        if (selectedStartDate == null) selectedStartDate = "";
+        if (selectedEndDate == null) selectedEndDate = "";
+        if (selectedMaxPrice == null) selectedMaxPrice = "";
+      %>
         <html>
 
         <head>
@@ -34,54 +45,63 @@
                         <% } %>
 
                           <main class="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-                            <section class="rounded-2xl border border-red-100 bg-white p-4 shadow-sm">
+                            <form action="<%= request.getContextPath() %>/explore" method="get" class="rounded-2xl border border-red-100 bg-white p-4 shadow-sm">
                               <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                                 <div>
-                                  <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
-                                    Pick Up Location</p>
-                                  <select
+                                  <label for="exploreLocation" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                                    Pick Up Location</label>
+                                  <select id="exploreLocation" name="location"
                                     class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                    <option>Kathmandu</option>
-                                    <option>Pokhara</option>
-                                    <option>Bhaktapur</option>
-                                    <option>Lalitpur</option>
+                                    <option value="">All Locations</option>
+                                    <option value="Kathmandu" <%= "Kathmandu".equalsIgnoreCase(selectedLocation) ? "selected" : "" %>>Kathmandu</option>
+                                    <option value="Pokhara" <%= "Pokhara".equalsIgnoreCase(selectedLocation) ? "selected" : "" %>>Pokhara</option>
+                                    <option value="Bhaktapur" <%= "Bhaktapur".equalsIgnoreCase(selectedLocation) ? "selected" : "" %>>Bhaktapur</option>
+                                    <option value="Lalitpur" <%= "Lalitpur".equalsIgnoreCase(selectedLocation) ? "selected" : "" %>>Lalitpur</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
-                                    Vehicle Category</p>
-                                  <select
+                                  <label for="exploreType" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                                    Vehicle Category</label>
+                                  <select id="exploreType" name="type"
                                     class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                    <option>All Types</option>
-                                    <option>SUV</option>
-                                    <option>Bike</option>
-                                    <option>Scooter</option>
+                                    <option value="">All Types</option>
+                                    <option value="CAR" <%= "CAR".equalsIgnoreCase(selectedType) ? "selected" : "" %>>Car</option>
+                                    <option value="BIKE" <%= "BIKE".equalsIgnoreCase(selectedType) ? "selected" : "" %>>Bike</option>
+                                    <option value="SCOOTER" <%= "SCOOTER".equalsIgnoreCase(selectedType) ? "selected" : "" %>>Scooter</option>
+                                    <option value="VAN" <%= "VAN".equalsIgnoreCase(selectedType) ? "selected" : "" %>>Van</option>
+                                    <option value="TRUCK" <%= "TRUCK".equalsIgnoreCase(selectedType) ? "selected" : "" %>>Truck</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
-                                    Rental Period</p>
-                                  <input type="text" value="Select dates"
-                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-500 focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100" />
+                                  <label for="exploreStartDate" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                                    Start Date</label>
+                                  <input id="exploreStartDate" name="startDate" type="date" value="<%= selectedStartDate %>"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100" />
                                 </div>
                                 <div>
-                                  <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
-                                    Budget Per Day</p>
-                                  <select
+                                  <label for="exploreEndDate" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                                    End Date</label>
+                                  <input id="exploreEndDate" name="endDate" type="date" value="<%= selectedEndDate %>"
+                                    class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100" />
+                                </div>
+                                <div>
+                                  <label for="exploreMaxPrice" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                                    Budget Per Day</label>
+                                  <select id="exploreMaxPrice" name="maxPrice"
                                     class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                    <option>Any Price</option>
-                                    <option>Under NPR 2,000</option>
-                                    <option>Under NPR 5,000</option>
-                                    <option>Under NPR 10,000</option>
+                                    <option value="">Any Price</option>
+                                    <option value="2000" <%= "2000".equals(selectedMaxPrice) ? "selected" : "" %>>Under NPR 2,000</option>
+                                    <option value="5000" <%= "5000".equals(selectedMaxPrice) ? "selected" : "" %>>Under NPR 5,000</option>
+                                    <option value="10000" <%= "10000".equals(selectedMaxPrice) ? "selected" : "" %>>Under NPR 10,000</option>
                                   </select>
                                 </div>
                                 <div class="flex items-end sm:col-span-2 lg:col-span-1">
-                                  <button
+                                  <button type="submit"
                                     class="w-full rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-900">Update
                                     Search</button>
                                 </div>
                               </div>
-                            </section>
+                            </form>
 
                             <section class="mt-6">
                               <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

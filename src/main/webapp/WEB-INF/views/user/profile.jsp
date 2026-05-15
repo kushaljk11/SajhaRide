@@ -44,6 +44,26 @@
                 </head>
 
                 <body class="bg-gray-50 min-h-screen">
+                    <% if (successMsg !=null && !successMsg.isEmpty()) { %>
+                        <div id="profileSuccessToast" class="fixed right-6 top-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-lg">
+                            <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Profile updated</p>
+                                <p class="mt-0.5 text-xs text-gray-500"><%= esc.apply(successMsg) %></p>
+                            </div>
+                            <button type="button" class="ml-2 text-gray-400 transition hover:text-gray-700" aria-label="Dismiss notification" onclick="document.getElementById('profileSuccessToast').remove()">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                            </button>
+                        </div>
+                        <script>
+                            window.setTimeout(function () {
+                                var toast = document.getElementById('profileSuccessToast');
+                                if (toast) toast.remove();
+                            }, 4000);
+                        </script>
+                    <% } %>
 
                     <% if (isRenter || isOwner) { %>
                         <div class="flex h-screen overflow-hidden">
@@ -163,15 +183,6 @@
                                                                             Keep your information up to date
                                                                         </p>
                                                                     </div>
-
-                                                                    <!-- Success Message -->
-                                                                    <% if (successMsg !=null && !successMsg.isEmpty()) {
-                                                                        %>
-                                                                        <div
-                                                                            class="mb-5 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3">
-                                                                            <%= esc.apply(successMsg) %>
-                                                                        </div>
-                                                                        <% } %>
 
                                                                             <!-- Error Message -->
                                                                             <% if (errorMsg !=null &&

@@ -53,10 +53,11 @@
                 </svg>
                 <select id="location" name="location"
                   class="w-full border-none bg-transparent text-sm font-medium text-slate-700 outline-none">
-                  <option>Kathmandu</option>
-                  <option>Lalitpur</option>
-                  <option>Bhaktapur</option>
-                  <option>Pokhara</option>
+                  <option value="">All Locations</option>
+                  <option value="Kathmandu">Kathmandu</option>
+                  <option value="Lalitpur">Lalitpur</option>
+                  <option value="Bhaktapur">Bhaktapur</option>
+                  <option value="Pokhara">Pokhara</option>
                 </select>
               </div>
             </div>
@@ -77,10 +78,12 @@
                 </svg>
                 <select id="type" name="type"
                   class="w-full border-none bg-transparent text-sm font-medium text-slate-700 outline-none">
-                  <option>Car</option>
-                  <option>Bike</option>
-                  <option>Scooter</option>
-                  <option>Jeep</option>
+                  <option value="">All Types</option>
+                  <option value="CAR">Car</option>
+                  <option value="BIKE">Bike</option>
+                  <option value="SCOOTER">Scooter</option>
+                  <option value="VAN">Van</option>
+                  <option value="TRUCK">Truck</option>
                 </select>
               </div>
             </div>

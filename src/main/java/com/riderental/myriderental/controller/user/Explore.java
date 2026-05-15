@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import com.riderental.myriderental.model.Vehicle;
 
@@ -43,16 +44,58 @@ public class Explore extends HttpServlet {
 
         request.setAttribute("viewRole", role.toLowerCase());
 
-        // Fetch available vehicles
         try {
+            String location = request.getParameter("location");
+            String type = request.getParameter("type");
+            String startDateParam = request.getParameter("startDate");
+            String endDateParam = request.getParameter("endDate");
+            String maxPriceParam = request.getParameter("maxPrice");
+
+            LocalDate startDate = parseDate(startDateParam);
+            LocalDate endDate = parseDate(endDateParam);
+            Double maxPrice = parsePrice(maxPriceParam);
+
             VehicleDAO vehicleDAO = new VehicleDAO();
-            List<Vehicle> vehicles = vehicleDAO.findAvailable();
+            List<Vehicle> vehicles = vehicleDAO.search(null, type, location, startDate, endDate);
+            if (maxPrice != null) {
+                vehicles = vehicles.stream()
+                        .filter(vehicle -> vehicle.getPricePerDay() <= maxPrice)
+                        .toList();
+            }
+
             request.setAttribute("vehicles", vehicles);
+            request.setAttribute("location", location);
+            request.setAttribute("type", type);
+            request.setAttribute("startDate", startDateParam);
+            request.setAttribute("endDate", endDateParam);
+            request.setAttribute("maxPrice", maxPriceParam);
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "Error loading vehicles");
         }
 
         request.getRequestDispatcher("/WEB-INF/views/user/explore.jsp").forward(request, response);
+    }
+
+    private LocalDate parseDate(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(value.trim());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Double parsePrice(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

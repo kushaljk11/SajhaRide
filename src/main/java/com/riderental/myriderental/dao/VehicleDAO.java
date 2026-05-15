@@ -5,6 +5,7 @@ import com.riderental.myriderental.util.DBConnection;
 import com.riderental.myriderental.util.DaoHelper;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,43 @@ public class VehicleDAO {
     }
 
     /**
+     * Finds vehicles for the admin inventory with optional keyword, type, and status filters.
+     * @param keyword a search keyword (matches name, location, or description)
+     * @param type the vehicle type filter
+     * @param status the availability status filter
+     * @return a list of matching Vehicles
+     * @throws SQLException if a database error occurs
+     */
+    public List<Vehicle> findForAdmin(String keyword, String type, String status) throws SQLException {
+        String sql = """
+                SELECT * FROM vehicles
+                WHERE (vehicle_name LIKE ? OR location LIKE ? OR description LIKE ?)
+                AND (? = '' OR UPPER(vehicle_type) = ?)
+                AND (
+                    ? = ''
+                    OR (? = 'BLOCKED' AND availability_status IN ('BLOCKED', 'MAINTENANCE'))
+                    OR (? <> 'BLOCKED' AND availability_status = ?)
+                )
+                ORDER BY created_at DESC
+                """;
+        return DaoHelper.queryList(sql, stmt -> {
+            String kw = "%" + (keyword == null ? "" : keyword.trim()) + "%";
+            String tp = type == null ? "" : type.trim().toUpperCase();
+            String st = normalizeAdminStatus(status);
+
+            stmt.setString(1, kw);
+            stmt.setString(2, kw);
+            stmt.setString(3, kw);
+            stmt.setString(4, tp);
+            stmt.setString(5, tp);
+            stmt.setString(6, st);
+            stmt.setString(7, st);
+            stmt.setString(8, st);
+            stmt.setString(9, st);
+        }, this::map);
+    }
+
+    /**
      * Finds all vehicles owned by a specific user.
      * @param ownerId the owner's user ID
      * @return a list of Vehicles
@@ -119,22 +157,65 @@ public class VehicleDAO {
      * @throws SQLException if a database error occurs
      */
     public List<Vehicle> search(String keyword, String type) throws SQLException {
+        return search(keyword, type, null, null, null);
+    }
+
+    /**
+     * Searches for available vehicles by keyword, type, location, and date range.
+     * @param keyword a search keyword (matches name, location, or description)
+     * @param type the vehicle type filter
+     * @param location the location filter
+     * @param startDate the requested start date
+     * @param endDate the requested end date
+     * @return a list of matching Vehicles
+     * @throws SQLException if a database error occurs
+     */
+    public List<Vehicle> search(String keyword, String type, String location,
+                                LocalDate startDate, LocalDate endDate) throws SQLException {
         String sql = """
-                SELECT * FROM vehicles
-                WHERE availability_status = 'AVAILABLE'
-                AND (vehicle_name LIKE ? OR location LIKE ? OR description LIKE ?)
-                AND (? = '' OR vehicle_type = ?)
-                ORDER BY created_at DESC
+                SELECT * FROM vehicles v
+                WHERE v.availability_status = 'AVAILABLE'
+                AND (v.vehicle_name LIKE ? OR v.location LIKE ? OR v.description LIKE ?)
+                AND (? = '' OR UPPER(v.vehicle_type) = ?)
+                AND (? = '' OR v.location LIKE ?)
+                AND (
+                    ? IS NULL OR ? IS NULL OR NOT EXISTS (
+                        SELECT 1 FROM bookings b
+                        WHERE b.vehicle_id = v.vehicle_id
+                        AND b.status IN ('PENDING', 'APPROVED')
+                        AND b.start_date <= ?
+                        AND b.end_date >= ?
+                    )
+                )
+                ORDER BY v.created_at DESC
                 """;
         return DaoHelper.queryList(sql, stmt -> {
             String kw = "%" + (keyword == null ? "" : keyword.trim()) + "%";
             String tp = type == null ? "" : type.trim().toUpperCase();
+            String loc = location == null ? "" : location.trim();
+            String locPattern = "%" + loc + "%";
 
             stmt.setString(1, kw);
             stmt.setString(2, kw);
             stmt.setString(3, kw);
             stmt.setString(4, tp);
             stmt.setString(5, tp);
+            stmt.setString(6, loc);
+            stmt.setString(7, locPattern);
+            if (startDate == null) {
+                stmt.setNull(8, Types.DATE);
+                stmt.setNull(11, Types.DATE);
+            } else {
+                stmt.setDate(8, Date.valueOf(startDate));
+                stmt.setDate(11, Date.valueOf(startDate));
+            }
+            if (endDate == null) {
+                stmt.setNull(9, Types.DATE);
+                stmt.setNull(10, Types.DATE);
+            } else {
+                stmt.setDate(9, Date.valueOf(endDate));
+                stmt.setDate(10, Date.valueOf(endDate));
+            }
         }, this::map);
     }
 
@@ -263,6 +344,18 @@ public class VehicleDAO {
                 stmt.setString(i + 1, statuses[i]);
             }
         });
+    }
+
+    private String normalizeAdminStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return "";
+        }
+        String normalized = status.trim().toUpperCase();
+        return switch (normalized) {
+            case "AVAILABLE", "PENDING", "RENTED", "MAINTENANCE", "BLOCKED", "DELETED" -> normalized;
+            case "ACTIVE" -> "AVAILABLE";
+            default -> "";
+        };
     }
 
     // MAP RESULT SET TO VEHICLE OBJECT
