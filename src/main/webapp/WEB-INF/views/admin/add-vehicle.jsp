@@ -28,6 +28,11 @@
       </section>
 
       <section class="max-w-2xl rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <% if (request.getAttribute("error") != null) { %>
+          <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+            <%= request.getAttribute("error") %>
+          </div>
+        <% } %>
         <form method="POST" action="<%= ctx %>/admin/vehicles/create" enctype="multipart/form-data" class="space-y-6">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -38,10 +43,11 @@
               <label class="block text-sm font-semibold text-gray-700">Vehicle Type</label>
               <select name="vehicleType" required class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-red-300 focus:bg-white focus:ring-2 focus:ring-red-100">
                 <option value="">Select Type</option>
-                <option value="SEDAN">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="HATCHBACK">Hatchback</option>
-                <option value="MOTORBIKE">Motorbike</option>
+                <option value="CAR">Car</option>
+                <option value="BIKE">Bike</option>
+                <option value="SCOOTER">Scooter</option>
+                <option value="VAN">Van</option>
+                <option value="TRUCK">Truck</option>
               </select>
             </div>
           </div>

@@ -31,7 +31,12 @@ public class ManageVehiclesController extends HttpServlet {
         }
 
         try {
-            java.util.List<com.riderental.myriderental.model.Vehicle> vehicles = vehicleDAO.findAll();
+            String keyword = request.getParameter("keyword");
+            String type = request.getParameter("type");
+            String status = request.getParameter("status");
+
+            java.util.List<com.riderental.myriderental.model.Vehicle> vehicles =
+                    vehicleDAO.findForAdmin(keyword, type, status);
             int totalVehicles = vehicleDAO.getTotalVehicles();
             int activePosts = vehicleDAO.countByStatus("AVAILABLE");
             int awaitingApproval = vehicleDAO.countByStatus("PENDING");
@@ -50,6 +55,10 @@ public class ManageVehiclesController extends HttpServlet {
             request.setAttribute("awaitingApproval", awaitingApproval);
             request.setAttribute("blockedListings", blockedListings);
             request.setAttribute("totalBookingValue", totalBookingValue);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("type", type);
+            request.setAttribute("status", status);
+            request.setAttribute("filteredVehicleCount", vehicles.size());
             request.getRequestDispatcher("/WEB-INF/views/admin/manage-vehicles.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Unable to load vehicles for admin", e);

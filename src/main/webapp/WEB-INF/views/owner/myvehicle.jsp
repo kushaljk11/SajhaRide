@@ -6,6 +6,8 @@ contentType="text/html;charset=UTF-8" language="java" import="com.riderental.myr
   if (vehicles == null) {
     vehicles = java.util.Collections.emptyList();
   }
+  boolean vehicleCreated = "created".equalsIgnoreCase(request.getParameter("success"));
+  boolean vehicleDeleted = "deleted".equalsIgnoreCase(request.getParameter("success"));
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +18,63 @@ contentType="text/html;charset=UTF-8" language="java" import="com.riderental.myr
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen overflow-hidden bg-gray-100 text-gray-900">
+<% if (vehicleCreated) { %>
+<div id="vehicleSuccessToast" class="fixed right-6 top-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-lg">
+  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+  </div>
+  <div>
+    <p class="font-semibold text-gray-900">Vehicle added successfully</p>
+    <p class="mt-0.5 text-xs text-gray-500">Your new listing is now available in your fleet.</p>
+  </div>
+  <button type="button" class="ml-2 text-gray-400 transition hover:text-gray-700" aria-label="Dismiss notification" onclick="document.getElementById('vehicleSuccessToast').remove()">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+  </button>
+</div>
+<script>
+  window.setTimeout(function () {
+    var toast = document.getElementById('vehicleSuccessToast');
+    if (toast) toast.remove();
+  }, 4000);
+</script>
+<% } %>
+<% if (vehicleDeleted) { %>
+<div id="vehicleDeleteToast" class="fixed right-6 top-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border border-red-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-lg">
+  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1 14h12l1-14"></path></svg>
+  </div>
+  <div>
+    <p class="font-semibold text-gray-900">Vehicle deleted successfully</p>
+    <p class="mt-0.5 text-xs text-gray-500">The listing has been removed from your fleet.</p>
+  </div>
+  <button type="button" class="ml-2 text-gray-400 transition hover:text-gray-700" aria-label="Dismiss notification" onclick="document.getElementById('vehicleDeleteToast').remove()">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+  </button>
+</div>
+<script>
+  window.setTimeout(function () {
+    var toast = document.getElementById('vehicleDeleteToast');
+    if (toast) toast.remove();
+  }, 4000);
+</script>
+<% } %>
+<div id="deleteVehicleModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div class="flex items-start gap-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1 14h12l1-14"></path></svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">Delete vehicle?</h2>
+        <p id="deleteVehicleMessage" class="mt-2 text-sm leading-6 text-gray-600">This vehicle listing will be permanently deleted.</p>
+      </div>
+    </div>
+    <div class="mt-6 flex justify-end gap-3">
+      <button type="button" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" onclick="closeDeleteVehicleModal()">Cancel</button>
+      <button type="button" class="rounded-lg bg-red-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-900" onclick="confirmDeleteVehicle()">Delete Vehicle</button>
+    </div>
+  </div>
+</div>
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
 
@@ -81,9 +140,9 @@ contentType="text/html;charset=UTF-8" language="java" import="com.riderental.myr
             <div class="mt-4 flex items-center gap-2 border-t border-gray-100 pt-4">
               <a href="<%= request.getContextPath() %>/owner/vehicle/update?vehicleId=<%= v.getVehicleId() %>" class="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">Edit</a>
               <a href="<%= request.getContextPath() %>/owner/bookings" class="flex-1 rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100">View Bookings</a>
-              <form action="<%= request.getContextPath() %>/owner/vehicle/delete" method="post" onsubmit="return confirm('Delete this vehicle?');">
+              <form action="<%= request.getContextPath() %>/owner/vehicle/delete" method="post" class="delete-vehicle-form">
                 <input type="hidden" name="vehicleId" value="<%= v.getVehicleId() %>" />
-                <button class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100" type="submit" aria-label="Delete vehicle">
+                <button class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100" type="button" aria-label="Delete vehicle" onclick="openDeleteVehicleModal(this)">
                   <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1 14h12l1-14"></path></svg>
                 </button>
               </form>
@@ -102,5 +161,30 @@ contentType="text/html;charset=UTF-8" language="java" import="com.riderental.myr
     </main>
   </div>
 </div>
+<script>
+  var pendingDeleteVehicleForm = null;
+
+  function openDeleteVehicleModal(button) {
+    pendingDeleteVehicleForm = button.closest('form');
+    var modal = document.getElementById('deleteVehicleModal');
+    var message = document.getElementById('deleteVehicleMessage');
+    message.textContent = 'This vehicle listing will be permanently deleted.';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeDeleteVehicleModal() {
+    pendingDeleteVehicleForm = null;
+    var modal = document.getElementById('deleteVehicleModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  function confirmDeleteVehicle() {
+    if (pendingDeleteVehicleForm) {
+      pendingDeleteVehicleForm.submit();
+    }
+  }
+</script>
 </body>
 </html>

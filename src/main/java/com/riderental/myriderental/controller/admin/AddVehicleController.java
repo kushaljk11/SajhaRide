@@ -4,12 +4,15 @@ import com.riderental.myriderental.dao.VehicleDAO;
 import com.riderental.myriderental.model.User;
 import com.riderental.myriderental.model.Vehicle;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
  * Controller for adding a new vehicle from the admin panel.
  */
 @WebServlet("/admin/vehicles/create")
+@MultipartConfig
 public class AddVehicleController extends HttpServlet {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
@@ -53,7 +57,6 @@ public class AddVehicleController extends HttpServlet {
             String pricePerDayStr = request.getParameter("pricePerDay");
             String location = request.getParameter("location");
             String description = request.getParameter("description");
-            String imagePath = request.getParameter("imagePath");
 
             if (vehicleName == null || vehicleName.isBlank() || vehicleType == null || vehicleType.isBlank() ||
                     pricePerDayStr == null || pricePerDayStr.isBlank() || location == null || location.isBlank()) {
@@ -76,11 +79,17 @@ public class AddVehicleController extends HttpServlet {
             newVehicle.setLocation(location);
             newVehicle.setOwnerId(ownerId);
             newVehicle.setDescription(description);
-            newVehicle.setImagePath(imagePath);
+            newVehicle.setImagePath(null);
             newVehicle.setAvailabilityStatus("AVAILABLE");
             newVehicle.setCreatedAt(LocalDateTime.now());
 
-            vehicleDAO.create(newVehicle);
+            Vehicle createdVehicle = vehicleDAO.create(newVehicle);
+            String imagePath = saveVehicleImage(request.getPart("imagePath"), request, createdVehicle.getVehicleId());
+            if (imagePath != null) {
+                createdVehicle.setImagePath(imagePath);
+                vehicleDAO.update(createdVehicle);
+            }
+
             response.sendRedirect(request.getContextPath() + "/admin/vehicles?success=created");
 
         } catch (NumberFormatException e) {
@@ -96,6 +105,34 @@ public class AddVehicleController extends HttpServlet {
         if (loggedIn == null) return false;
         String role = loggedIn.getRole() == null ? "" : loggedIn.getRole().trim();
         return "ADMIN".equalsIgnoreCase(role);
+    }
+
+    private String saveVehicleImage(Part imagePart, HttpServletRequest request, int vehicleId)
+            throws IOException, ServletException {
+        if (imagePart == null || imagePart.getSize() == 0) {
+            return null;
+        }
+
+        String submittedFileName = imagePart.getSubmittedFileName();
+        if (submittedFileName == null || submittedFileName.isBlank()) {
+            return null;
+        }
+
+        String extension = "";
+        int dotIndex = submittedFileName.lastIndexOf('.');
+        if (dotIndex >= 0) {
+            extension = submittedFileName.substring(dotIndex);
+        }
+
+        String fileName = vehicleId + extension;
+        String uploadsPath = request.getServletContext().getRealPath("/uploads/vehicle");
+        File uploadsDir = new File(uploadsPath);
+        if (!uploadsDir.exists() && !uploadsDir.mkdirs()) {
+            throw new ServletException("Unable to create uploads directory");
+        }
+
+        imagePart.write(new File(uploadsDir, fileName).getAbsolutePath());
+        return "uploads/vehicle/" + fileName;
     }
 }
 

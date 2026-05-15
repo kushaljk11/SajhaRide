@@ -8,12 +8,38 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen overflow-hidden bg-gray-50 text-gray-900">
+<% if ("created".equalsIgnoreCase(request.getParameter("success"))) { %>
+<div id="vehicleSuccessToast" class="fixed right-6 top-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-lg">
+  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+  </div>
+  <div>
+    <p class="font-semibold text-gray-900">Vehicle added successfully</p>
+    <p class="mt-0.5 text-xs text-gray-500">The new listing has been added to inventory.</p>
+  </div>
+  <button type="button" class="ml-2 text-gray-400 transition hover:text-gray-700" aria-label="Dismiss notification" onclick="document.getElementById('vehicleSuccessToast').remove()">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+  </button>
+</div>
+<script>
+  window.setTimeout(function () {
+    var toast = document.getElementById('vehicleSuccessToast');
+    if (toast) toast.remove();
+  }, 4000);
+</script>
+<% } %>
 <div class="flex h-full">
   <jsp:include page="components/sidebar.jsp" />
 
   <%-- context path helper for scriptlets --%>
   <%
     String ctx = ((HttpServletRequest) request).getContextPath();
+    String keyword = (String) request.getAttribute("keyword");
+    String type = (String) request.getAttribute("type");
+    String status = (String) request.getAttribute("status");
+    if (keyword == null) keyword = "";
+    if (type == null) type = "";
+    if (status == null) status = "";
   %>
 
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -56,25 +82,29 @@
       </section>
 
       <section class="mt-6 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <form action="<%= ctx %>/admin/vehicles" method="get" class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex flex-wrap gap-2 text-sm">
-            <button class="rounded-full bg-red-800 px-4 py-2 font-semibold text-white">All Posts</button>
-            <button class="rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-600">Active</button>
-            <button class="rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-600">Pending</button>
-            <button class="rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-600">Blocked</button>
-            <button class="rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-600">Deleted</button>
+            <button type="submit" name="status" value="" class="rounded-full px-4 py-2 font-semibold <%= status.isBlank() ? "bg-red-800 text-white" : "bg-gray-100 text-gray-600" %>">All Posts</button>
+            <button type="submit" name="status" value="AVAILABLE" class="rounded-full px-4 py-2 font-semibold <%= "AVAILABLE".equalsIgnoreCase(status) ? "bg-red-800 text-white" : "bg-gray-100 text-gray-600" %>">Active</button>
+            <button type="submit" name="status" value="PENDING" class="rounded-full px-4 py-2 font-semibold <%= "PENDING".equalsIgnoreCase(status) ? "bg-red-800 text-white" : "bg-gray-100 text-gray-600" %>">Pending</button>
+            <button type="submit" name="status" value="BLOCKED" class="rounded-full px-4 py-2 font-semibold <%= "BLOCKED".equalsIgnoreCase(status) ? "bg-red-800 text-white" : "bg-gray-100 text-gray-600" %>">Blocked</button>
+            <button type="submit" name="status" value="DELETED" class="rounded-full px-4 py-2 font-semibold <%= "DELETED".equalsIgnoreCase(status) ? "bg-red-800 text-white" : "bg-gray-100 text-gray-600" %>">Deleted</button>
           </div>
           <div class="flex flex-wrap items-center gap-3">
-            <select class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-red-300 focus:ring-2 focus:ring-red-100">
-              <option>All Vehicle Types</option>
-              <option>Sedan</option>
-              <option>SUV</option>
-              <option>Motorbike</option>
-              <option>Hatchback</option>
+            <input type="text" name="keyword" value="<%= keyword %>" placeholder="Search vehicles" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-red-300 focus:ring-2 focus:ring-red-100" />
+            <select name="type" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-red-300 focus:ring-2 focus:ring-red-100">
+              <option value="">All Vehicle Types</option>
+              <option value="CAR" <%= "CAR".equalsIgnoreCase(type) ? "selected" : "" %>>Car</option>
+              <option value="BIKE" <%= "BIKE".equalsIgnoreCase(type) ? "selected" : "" %>>Bike</option>
+              <option value="SCOOTER" <%= "SCOOTER".equalsIgnoreCase(type) ? "selected" : "" %>>Scooter</option>
+              <option value="VAN" <%= "VAN".equalsIgnoreCase(type) ? "selected" : "" %>>Van</option>
+              <option value="TRUCK" <%= "TRUCK".equalsIgnoreCase(type) ? "selected" : "" %>>Truck</option>
             </select>
-            <button class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700">Filter</button>
+            <input type="hidden" name="status" value="<%= status %>" />
+            <button type="submit" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 transition hover:bg-gray-50">Filter</button>
+            <a href="<%= ctx %>/admin/vehicles" class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-600 transition hover:bg-gray-100">Reset</a>
           </div>
-        </div>
+        </form>
 
         <div class="overflow-x-auto">
           <table class="min-w-full text-left text-sm">
@@ -128,7 +158,7 @@
         </div>
 
         <div class="mt-4 flex flex-col gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-          <p>Showing <span id="rowCount">1</span>-<span id="pageSize">10</span> of <%= request.getAttribute("totalVehicles") != null ? request.getAttribute("totalVehicles") : "0" %> vehicles</p>
+          <p>Showing <%= request.getAttribute("filteredVehicleCount") != null ? request.getAttribute("filteredVehicleCount") : "0" %> of <%= request.getAttribute("totalVehicles") != null ? request.getAttribute("totalVehicles") : "0" %> vehicles</p>
           <div class="flex items-center gap-2">
             <button class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-400">&lt;</button>
             <button class="rounded-lg bg-red-800 px-3 py-2 font-semibold text-white">1</button>

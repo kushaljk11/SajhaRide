@@ -97,7 +97,8 @@ public class ProfileController extends HttpServlet {
 
             userDAO.updateProfile(user);
             request.getSession().setAttribute("loggedInUser", user);
-            response.sendRedirect(request.getContextPath() + "/profile?updated=true");
+            request.getSession().setAttribute("profileSuccess", "Profile updated successfully.");
+            response.sendRedirect(request.getContextPath() + "/profile");
         } catch (SQLException e) {
             throw new ServletException("Unable to update profile", e);
         }

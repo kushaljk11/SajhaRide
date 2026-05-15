@@ -11,6 +11,9 @@
     List<Vehicle> vehicles = vehicleList(request.getAttribute("vehicles"));
     String keyword = (String) request.getAttribute("keyword");
     String type = (String) request.getAttribute("type");
+    String location = (String) request.getAttribute("location");
+    String startDate = (String) request.getAttribute("startDate");
+    String endDate = (String) request.getAttribute("endDate");
     String errorMessage = (String) request.getAttribute("errorMessage");
     if (vehicles == null) {
         vehicles = java.util.Collections.emptyList();
@@ -35,7 +38,7 @@
                 <h1 class="mt-2 text-3xl font-semibold text-slate-900">Available rides</h1>
                 <p class="mt-2 text-sm text-slate-600">Click any vehicle card to open its full details page.</p>
             </div>
-            <form action="<%= request.getContextPath() %>/vehicles/list" method="get" class="grid gap-3 sm:grid-cols-3 lg:w-[760px]">
+            <form action="<%= request.getContextPath() %>/vehicles/list" method="get" class="grid gap-3 sm:grid-cols-2 lg:w-[920px] xl:grid-cols-6">
                 <label for="vehicleKeyword" class="sr-only">Search vehicles</label>
                 <input id="vehicleKeyword" type="text" name="keyword" value="<%= keyword == null ? "" : keyword %>" placeholder="Search by name, location, or description"
                        class="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-red-800" />
@@ -48,6 +51,15 @@
                     <option value="VAN" <%= "VAN".equalsIgnoreCase(type) ? "selected" : "" %>>Van</option>
                     <option value="TRUCK" <%= "TRUCK".equalsIgnoreCase(type) ? "selected" : "" %>>Truck</option>
                 </select>
+                <label for="vehicleLocation" class="sr-only">Location</label>
+                <input id="vehicleLocation" type="text" name="location" value="<%= location == null ? "" : location %>" placeholder="Location"
+                       class="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-red-800" />
+                <label for="startDate" class="sr-only">Start date</label>
+                <input id="startDate" type="date" name="startDate" value="<%= startDate == null ? "" : startDate %>"
+                       class="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-red-800" />
+                <label for="endDate" class="sr-only">End date</label>
+                <input id="endDate" type="date" name="endDate" value="<%= endDate == null ? "" : endDate %>"
+                       class="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-red-800" />
                 <button type="submit" class="h-11 rounded-xl bg-red-800 px-5 text-sm font-semibold text-white transition hover:bg-red-900">Search</button>
             </form>
         </div>
