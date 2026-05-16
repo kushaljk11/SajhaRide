@@ -33,7 +33,7 @@ public class OwnerPaymentsController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User sessionUser = getSessionUser(request);
-        if (sessionUser == null || !ensureOwnerAccess(sessionUser)) {
+        if (sessionUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -61,15 +61,5 @@ public class OwnerPaymentsController extends HttpServlet {
     private User getSessionUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         return session == null ? null : (User) session.getAttribute("loggedInUser");
-    }
-
-    /**
-     * Ensures that the requesting user has owner access.
-     * @param user the currently logged-in user
-     * @return true if the user is an owner, false otherwise
-     */
-    private boolean ensureOwnerAccess(User user) {
-        String role = user.getRole() == null ? "" : user.getRole().trim();
-        return "owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role);
     }
 }

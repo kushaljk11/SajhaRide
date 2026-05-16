@@ -35,7 +35,7 @@ public class AddNewPost extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!ensureOwnerAccess(request, response)) {
+        if (!ensureOwnerIsVerified(request, response)) {
             return;
         }
 
@@ -54,7 +54,7 @@ public class AddNewPost extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!ensureOwnerAccess(request, response)) {
+        if (!ensureOwnerIsVerified(request, response)) {
             return;
         }
 
@@ -102,13 +102,13 @@ public class AddNewPost extends HttpServlet {
     }
 
     /**
-     * Ensures that the requesting user has owner access.
+     * Ensures that the owner is verified before listing a vehicle.
      * @param request the HTTP request
      * @param response the HTTP response
-     * @return true if the user is an owner, false otherwise
+     * @return true if the owner is verified, false otherwise
      * @throws IOException if an I/O error occurs during redirection
      */
-    private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private boolean ensureOwnerIsVerified(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
         User loggedInUser = session == null ? null : (User) session.getAttribute("loggedInUser");
 
@@ -117,30 +117,23 @@ public class AddNewPost extends HttpServlet {
             return false;
         }
 
-        String role = loggedInUser.getRole() == null ? "" : loggedInUser.getRole().trim();
-        if ("owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role)) {
-            if ("owner".equalsIgnoreCase(role)) {
-                try {
-                    com.riderental.myriderental.dao.UserDAO userDAO = new com.riderental.myriderental.dao.UserDAO();
-                    User freshUser = userDAO.findById(loggedInUser.getUserId());
-                    if (freshUser != null && !freshUser.isVerified()) {
-                        request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
-                        response.sendRedirect(request.getContextPath() + "/profile");
-                        return false;
-                    }
-                } catch (Exception e) {
-                    if (!loggedInUser.isVerified()) {
-                        request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
-                        response.sendRedirect(request.getContextPath() + "/profile");
-                        return false;
-                    }
-                }
+        try {
+            com.riderental.myriderental.dao.UserDAO userDAO = new com.riderental.myriderental.dao.UserDAO();
+            User freshUser = userDAO.findById(loggedInUser.getUserId());
+            if (freshUser != null && !freshUser.isVerified()) {
+                request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
+                response.sendRedirect(request.getContextPath() + "/profile");
+                return false;
             }
-            return true;
+        } catch (Exception e) {
+            if (!loggedInUser.isVerified()) {
+                request.getSession().setAttribute("profileError", "You must be verified before you can list a vehicle. Please upload your verification documents.");
+                response.sendRedirect(request.getContextPath() + "/profile");
+                return false;
+            }
         }
 
-        response.sendRedirect(request.getContextPath() + "/login");
-        return false;
+        return true;
     }
 
     /**

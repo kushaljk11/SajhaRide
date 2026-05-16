@@ -34,10 +34,6 @@ public class UpdateVehicleController extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (!ensureOwnerAccess(request, response)) {
-			return;
-		}
-
 		String vehicleIdParam = request.getParameter("vehicleId");
 		if (vehicleIdParam == null || vehicleIdParam.isBlank()) {
 			response.sendRedirect(request.getContextPath() + "/owner/myvehicle");
@@ -76,10 +72,6 @@ public class UpdateVehicleController extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (!ensureOwnerAccess(request, response)) {
-			return;
-		}
-
 		String vehicleIdParam = request.getParameter("vehicleId");
 		if (vehicleIdParam == null || vehicleIdParam.isBlank()) {
 			response.sendRedirect(request.getContextPath() + "/owner/myvehicle");
@@ -116,29 +108,6 @@ public class UpdateVehicleController extends HttpServlet {
 		} catch (NumberFormatException | SQLException e) {
 			throw new ServletException("Unable to update vehicle", e);
 		}
-	}
-
-	/**
-	 * Ensures that the requesting user has owner access.
-	 * @param request the HTTP request
-	 * @param response the HTTP response
-	 * @return true if the user is an owner, false otherwise
-	 * @throws IOException if an I/O error occurs during redirection
-	 */
-	private boolean ensureOwnerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		User sessionUser = getSessionUser(request);
-		if (sessionUser == null) {
-			response.sendRedirect(request.getContextPath() + "/login");
-			return false;
-		}
-
-		String role = sessionUser.getRole() == null ? "" : sessionUser.getRole().trim();
-		if ("owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role)) {
-			return true;
-		}
-
-		response.sendRedirect(request.getContextPath() + "/login");
-		return false;
 	}
 
 	/**

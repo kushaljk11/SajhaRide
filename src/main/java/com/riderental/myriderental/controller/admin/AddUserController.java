@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,11 +26,6 @@ public class AddUserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         request.getRequestDispatcher("/WEB-INF/views/admin/add-user.jsp").forward(request, response);
     }
 
@@ -41,11 +35,6 @@ public class AddUserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         try {
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
@@ -76,14 +65,6 @@ public class AddUserController extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Unable to create user", e);
         }
-    }
-
-    private boolean isAdmin(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        User loggedIn = session == null ? null : (User) session.getAttribute("loggedInUser");
-        if (loggedIn == null) return false;
-        String role = loggedIn.getRole() == null ? "" : loggedIn.getRole().trim();
-        return "ADMIN".equalsIgnoreCase(role);
     }
 }
 

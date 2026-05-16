@@ -32,11 +32,6 @@ public class AddVehicleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         request.getRequestDispatcher("/WEB-INF/views/admin/add-vehicle.jsp").forward(request, response);
     }
 
@@ -46,11 +41,6 @@ public class AddVehicleController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!isAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
         try {
             String vehicleName = request.getParameter("vehicleName");
             String vehicleType = request.getParameter("vehicleType");
@@ -97,14 +87,6 @@ public class AddVehicleController extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Unable to create vehicle", e);
         }
-    }
-
-    private boolean isAdmin(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        User loggedIn = session == null ? null : (User) session.getAttribute("loggedInUser");
-        if (loggedIn == null) return false;
-        String role = loggedIn.getRole() == null ? "" : loggedIn.getRole().trim();
-        return "ADMIN".equalsIgnoreCase(role);
     }
 
     private String saveVehicleImage(Part imagePart, HttpServletRequest request, int vehicleId)

@@ -31,7 +31,7 @@ public class DeleteVehicleController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		User sessionUser = getSessionUser(request);
-		if (sessionUser == null || !isAllowedRole(sessionUser)) {
+		if (sessionUser == null) {
 			response.sendRedirect(request.getContextPath() + "/login");
 			return;
 		}
@@ -65,15 +65,5 @@ public class DeleteVehicleController extends HttpServlet {
 	private User getSessionUser(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		return session == null ? null : (User) session.getAttribute("loggedInUser");
-	}
-
-	/**
-	 * Checks if the user role is allowed to delete a vehicle.
-	 * @param user the user to check
-	 * @return true if the role is owner or renter, false otherwise
-	 */
-	private boolean isAllowedRole(User user) {
-		String role = user.getRole() == null ? "" : user.getRole().trim();
-		return "owner".equalsIgnoreCase(role) || "renter".equalsIgnoreCase(role);
 	}
 }
